@@ -82,68 +82,49 @@ const lang = Astro.currentLocale;
 </header>
 
 <script>
-  // Utility to (re)attach mobile menu event listeners
   function attachMobileMenuListeners() {
-    const mobileMenuButton = document.getElementById('mobile-menu-button') as HTMLElement | null;
-    const mobileMenu = document.getElementById('mobile-menu') as HTMLElement | null;
-    if (mobileMenuButton && mobileMenu) {
-      // Remove previous listener if any
-      (mobileMenuButton as HTMLElement).onclick = null;
-      mobileMenuButton.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-      });
-    }
-    // Close mobile menu when clicking on a link
-    const mobileLinks = document.querySelectorAll('#mobile-menu a');
-    mobileLinks.forEach(link => {
-      (link as HTMLElement).onclick = null;
-      link.addEventListener('click', () => {
-        mobileMenu?.classList.add('hidden');
-      });
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (!mobileMenuButton || !mobileMenu) return;
+
+    // 중복 방지: onclick으로 덮어쓰기
+    mobileMenuButton.onclick = () => {
+      mobileMenu.classList.toggle('hidden');
+    };
+
+    // 링크 누르면 닫기
+    document.querySelectorAll('#mobile-menu a').forEach((link) => {
+      link.onclick = () => mobileMenu.classList.add('hidden');
     });
   }
 
-  // Attach listeners on DOMContentLoaded and after resize (in case of responsive changes)
-  document.addEventListener('DOMContentLoaded', () => {
-    attachMobileMenuListeners();
-  });
-  window.addEventListener('resize', () => {
-    attachMobileMenuListeners();
-  });
+  document.addEventListener('DOMContentLoaded', attachMobileMenuListeners);
+  window.addEventListener('resize', attachMobileMenuListeners);
 
-  // Add shadow on scroll
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {
-    if (window.scrollY > 64) {
-      navbar?.classList.add('shadow-md');
-    } else {
-      navbar?.classList.remove('shadow-md');
-    }
+    if (window.scrollY > 64) navbar?.classList.add('shadow-md');
+    else navbar?.classList.remove('shadow-md');
   });
 
-  // Scroll spy
+  // Scroll spy (HTMLElement 체크)
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.nav-link');
 
   window.addEventListener('scroll', () => {
     let current = '';
 
-    sections.forEach(section => {
-      // Assert section as HTMLElement to access offsetTop and clientHeight
-      const htmlSection = section as HTMLElement;
-      const sectionTop = htmlSection.offsetTop;
-      const sectionHeight = htmlSection.clientHeight;
-
-      if (window.scrollY >= sectionTop - 100) {
-        current = section.getAttribute('id') || '';
+    sections.forEach((section) => {
+      if (!(section instanceof HTMLElement)) return;
+      if (window.scrollY >= section.offsetTop - 100) {
+        current = section.id;
       }
     });
 
-    navLinks.forEach(link => {
+    navLinks.forEach((link) => {
       link.classList.remove('active');
-      if (link.getAttribute('href')?.slice(1) === current) {
-        link.classList.add('active');
-      }
+      const href = link.getAttribute('href') || '';
+      if (href.startsWith('#') && href.slice(1) === current) link.classList.add('active');
     });
   });
 </script>
