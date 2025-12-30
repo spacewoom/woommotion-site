@@ -4,11 +4,10 @@
     "description": "Developer and creator of modern web templates focusing on Astro, multilingual support, and performance optimization."
   },
   "nav": {
-    "start": "Start",
-    "about": "About Me",
-    "skills": "Skills",
-    "contact": "Contact",
-    "contactButton": "Contact"
+    "home": "Home",
+    "works": "Works",
+    "services": "Services",
+    "contact": "Contact"
   },
   "hero": {
     "greeting": "Hello, I am",
