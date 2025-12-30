@@ -104,10 +104,12 @@ const projects = [
             </ul>
 
             <Button
-              text="자세히 보기"
-              href={`/projects/${project.slug}`}
+              text="YouTube에서 보기"
+              href={project.youtubeUrl}
               variant="outline"
               size="sm"
+              target="_blank"
+              rel="noopener noreferrer"
             />
           </div>
         </div>
