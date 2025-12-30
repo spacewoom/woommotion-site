@@ -1,51 +1,37 @@
 ---
 import ThemeToggle from '../ui/ThemeToggle.astro';
-import Button from '../ui/Buttons.astro'; // Ensuring .astro extension
 import { Image } from 'astro:assets';
 import logoLight from '../../assets/fb_logo.png';
 import logoDark from '../../assets/fb_logo_white.png';
-
-const lang = Astro.currentLocale;
 ---
 
 <header id="navbar" class="fixed top-0 w-full bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm z-50 transition-all duration-300">
   <div class="max-w-container mx-auto px-6 py-4 flex items-center justify-between">
-    <!-- Logo/Monogram with dark/light mode versions -->
-    <a href={lang === 'de' ? '/de/' : '/'} class="block" aria-label="Homepage">
-      <!-- Light mode logo (hidden in dark mode) -->
-      <Image src={logoLight} alt="Portfolio Logo" class="h-8 w-auto dark:hidden transition-opacity duration-300" />
-
-      <!-- Dark mode logo (hidden in light mode) -->
-      <Image src={logoDark} alt="Portfolio Logo" class="h-8 w-auto hidden dark:block transition-opacity duration-300" />
+    <!-- Logo -->
+    <a href="/" class="block" aria-label="Homepage">
+      <Image src={logoLight} alt="Woommotion Logo" class="h-8 w-auto dark:hidden transition-opacity duration-300" />
+      <Image src={logoDark} alt="Woommotion Logo" class="h-8 w-auto hidden dark:block transition-opacity duration-300" />
     </a>
 
     <!-- Desktop Navigation -->
     <nav class="hidden md:flex items-center space-x-8">
       <ul class="flex space-x-8">
-        <li>
-          <a href="#home" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">home</a>
-        </li>
-        <li>
-          <a href="#works" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">works</a>
-        </li>
-        <li>
-          <a href="#services" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">services</a>
-        </li>
-        <li>
-          <a href="#contact" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">contact</a>
-        </li>
+        <li><a href="#home" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">home</a></li>
+        <li><a href="#works" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">works</a></li>
+        <li><a href="#services" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">services</a></li>
+        <li><a href="#contact" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">contact</a></li>
       </ul>
 
       <div class="flex items-center space-x-4">
-        <ThemeToggle /> {/* Removed client:visible */}
+        <ThemeToggle />
       </div>
     </nav>
 
     <!-- Mobile menu button -->
     <div class="flex items-center space-x-4 md:hidden">
-      <ThemeToggle /> {/* Removed client:visible */}
+      <ThemeToggle />
       <button id="mobile-menu-button" class="text-secondary dark:text-white" aria-label="Toggle Menu">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
           <line x1="4" x2="20" y1="12" y2="12"></line>
           <line x1="4" x2="20" y1="6" y2="6"></line>
           <line x1="4" x2="20" y1="18" y2="18"></line>
@@ -58,21 +44,10 @@ const lang = Astro.currentLocale;
   <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-neutral-dark border-t border-gray-200 dark:border-gray-800">
     <div class="max-w-container mx-auto px-6 py-4">
       <ul class="flex flex-col space-y-4">
-        <li>
-          <a href="#home" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">{t('nav.home', lang)}</a>
-        </li>
-        <li>
-          <a href="#works" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">{t('nav.works', lang)}</a>
-        </li>
-        <li>
-          <a href="#services" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">{t('nav.services', lang)}</a>
-        </li>
-        <li>
-          <a href="#contact" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">{t('nav.contact', lang)}</a>
-        </li>
-        <li>
-          <LanguageSwitcher /> {/* Add the LanguageSwitcher here */}
-        </li>
+        <li><a href="#home" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">home</a></li>
+        <li><a href="#works" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">works</a></li>
+        <li><a href="#services" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">services</a></li>
+        <li><a href="#contact" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">contact</a></li>
       </ul>
     </div>
   </div>
@@ -84,12 +59,10 @@ const lang = Astro.currentLocale;
     const mobileMenu = document.getElementById('mobile-menu');
     if (!mobileMenuButton || !mobileMenu) return;
 
-    // 중복 방지: onclick으로 덮어쓰기
     mobileMenuButton.onclick = () => {
       mobileMenu.classList.toggle('hidden');
     };
 
-    // 링크 누르면 닫기
     document.querySelectorAll('#mobile-menu a').forEach((link) => {
       link.onclick = () => mobileMenu.classList.add('hidden');
     });
@@ -104,18 +77,14 @@ const lang = Astro.currentLocale;
     else navbar?.classList.remove('shadow-md');
   });
 
-  // Scroll spy (HTMLElement 체크)
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.nav-link');
 
   window.addEventListener('scroll', () => {
     let current = '';
-
     sections.forEach((section) => {
       if (!(section instanceof HTMLElement)) return;
-      if (window.scrollY >= section.offsetTop - 100) {
-        current = section.id;
-      }
+      if (window.scrollY >= section.offsetTop - 100) current = section.id;
     });
 
     navLinks.forEach((link) => {
@@ -127,29 +96,11 @@ const lang = Astro.currentLocale;
 </script>
 
 <style>
-  .nav-link {
-    position: relative;
-    font-weight: 500;
-    transition: color 0.3s ease;
-  }
-
+  .nav-link { position: relative; font-weight: 500; transition: color 0.3s ease; }
   .nav-link::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -4px;
-    left: 0;
-    background-color: theme('colors.primary');
-    transition: width 0.3s ease;
+    content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 0;
+    background-color: theme('colors.primary'); transition: width 0.3s ease;
   }
-
-  .nav-link:hover::after,
-  .nav-link.active::after {
-    width: 100%;
-  }
-
-  .nav-link.active {
-    color: theme('colors.primary');
-  }
+  .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+  .nav-link.active { color: theme('colors.primary'); }
 </style>
