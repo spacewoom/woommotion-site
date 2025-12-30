@@ -1,53 +1,67 @@
 ---
 import Button from '../ui/Buttons.astro';
-import { t } from '../../utils/i18n';
 
 interface Props {
   lang: string | undefined;
 }
 
-const { lang } = Astro.props;
+const { lang } = Astro.props; // (지금은 i18n 안 쓰지만, index.astro에서 내려주니 남겨둬도 OK)
+
+const sectionTitle = 'Works';
+const sectionSubtitle =
+  '흥미로운 연출, 명확한 정보 전달, 감각적인 모션으로 브랜드와 제품의 핵심 메시지를 설득력 있게 보여줍니다.';
 
 const projects = [
   {
-    title: 'Relaunch DB Training Website',
-    slug: 'db-training-relaunch',
+    title: '인포그래픽 | 기후동행카드 (35s)',
+    slug: 'infographics-01',
     image: '/images/projects/db-training.jpg',
-    tags: [t('projects.tags.uxUiDesign', lang), t('projects.tags.projectManagement', lang)],
-    shortDescription: t('projects.dbTrainingRelaunch.shortDescription', lang),
-    challenge: t('projects.dbTrainingRelaunch.challenge', lang),
-    approach: t('projects.dbTrainingRelaunch.approach', lang),
-    result: t('projects.dbTrainingRelaunch.result', lang)
+    tags: ['인포그래픽', '모션그래픽'],
+    summary:
+      '텍스트를 최소화하고 직관적인 이미지 중심으로 구성해, 짧은 시간 안에 핵심 정보가 이해되도록 디자인했습니다.',
+    info: {
+      year: '2024',
+      duration: '35s',
+      role: '기획 · 디자인 · 애니메이션',
+    },
   },
   {
-    title: 'Kampagnen-Dashboard für Media-Tracking',
-    slug: 'media-dashboard',
+    title: '프로모션 | Prmr 크루 모집',
+    slug: 'promotion-01',
     image: '/images/projects/media-dashboard.jpg',
-    tags: [t('projects.tags.dataVisualization', lang), t('projects.tags.webDevelopment', lang)],
-    shortDescription: t('projects.mediaDashboard.shortDescription', lang),
-    challenge: t('projects.mediaDashboard.challenge', lang),
-    approach: t('projects.mediaDashboard.approach', lang),
-    result: t('projects.mediaDashboard.result', lang)
+    tags: ['타이포그래픽', '프로모션'],
+    summary:
+      '리드미컬한 타이포 키네틱과 화면 템포를 중심으로, 메시지가 빠르고 선명하게 전달되도록 제작했습니다.',
+    info: {
+      year: '2024',
+      duration: '15s',
+      role: '기획 · 디자인 · 애니메이션',
+    },
   },
   {
-    title: 'Erklärvideos für DB Digitalisierungsprogramm',
-    slug: 'db-explainer-videos',
+    title: '제품 홍보 | Grida pencil',
+    slug: 'product-01',
     image: '/images/projects/explainer-videos.jpg',
-    tags: [t('projects.tags.motionDesign', lang), t('projects.tags.scriptStoryboard', lang)],
-    shortDescription: t('projects.dbExplainerVideos.shortDescription', lang),
-    challenge: t('projects.dbExplainerVideos.challenge', lang),
-    approach: t('projects.dbExplainerVideos.approach', lang),
-    result: t('projects.dbExplainerVideos.result', lang)
-  }
+    tags: ['제품 홍보', '모션그래픽'],
+    summary:
+      '“아이디어는 끄적이는 순간부터 시작된다”는 메시지를 중심으로 드로잉 요소와 모션을 결합해 생동감 있게 표현했습니다.',
+    info: {
+      year: '2022',
+      duration: '30s 내외',
+      role: '기획 · 디자인· 애니메이션 · 3D 모델링',
+    },
+  },
 ];
 ---
 
 <section id="works" class="py-16 md:py-24 bg-neutral-bg dark:bg-neutral-dark/60">
   <div class="max-w-container mx-auto px-6">
     <div class="mb-12" data-aos="fade-up">
-      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">{t('projects.title', lang)}</h2>
+      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">
+        {sectionTitle}
+      </h2>
       <p class="text-secondary/70 dark:text-white/70 max-w-2xl">
-        {t('projects.subtitle', lang)}
+        {sectionSubtitle}
       </p>
     </div>
 
@@ -66,7 +80,7 @@ const projects = [
               loading="lazy"
             />
             <div class="absolute top-4 left-4 flex flex-wrap gap-2">
-              {project.tags.map(tag => (
+              {project.tags.map((tag) => (
                 <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
                   {tag}
                 </span>
@@ -78,12 +92,19 @@ const projects = [
             <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
               {project.title}
             </h3>
-            <p class="text-secondary/70 dark:text-white/70 mb-6">
-              {project.shortDescription}
+
+            <p class="text-secondary/70 dark:text-white/70 mb-4">
+              {project.summary}
             </p>
 
+            <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1 mb-6">
+              <li><span class="font-mono">작업연도</span> · {project.info.year}</li>
+              <li><span class="font-mono">러닝타임</span> · {project.info.duration}</li>
+              <li><span class="font-mono">역할</span> · {project.info.role}</li>
+            </ul>
+
             <Button
-              text={t('projects.buttonText', lang)}
+              text="자세히 보기"
               href={`/projects/${project.slug}`}
               variant="outline"
               size="sm"
@@ -93,9 +114,10 @@ const projects = [
       ))}
     </div>
 
+    <!-- /projects 페이지를 아직 안 쓸 거면 이 블록은 삭제해도 됩니다 -->
     <div class="mt-12 text-center" data-aos="fade-up">
       <Button
-        text={t('projects.allProjectsButtonText', lang)}
+        text="전체 작업 보기"
         href="/projects"
         variant="primary"
       />
