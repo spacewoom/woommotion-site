@@ -25,10 +25,17 @@ const lang = Astro.currentLocale;
     <nav class="hidden md:flex items-center space-x-8">
       <ul class="flex space-x-8">
         <li>
-          <li><a href="#home" class="nav-link ...">Home</a></li>
-        <li><a href="#works" class="nav-link ...">Works</a></li>
-        <li><a href="#services" class="nav-link ...">Services</a></li>
-         <li><a href="#contact" class="nav-link ...">Contact</a></li>
+          <a href="#home" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">{t('nav.home', lang)}</a>
+        </li>
+        <li>
+          <a href="#warks" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">{t('nav.works', lang)}</a>
+        </li>
+        <li>
+          <a href="#services" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">{t('nav.services', lang)}</a>
+        </li>
+        <li>
+          <a href="#contact" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">{t('nav.contact', lang)}</a>
+        </li>
       </ul>
 
       <div class="flex items-center space-x-4">
@@ -55,16 +62,16 @@ const lang = Astro.currentLocale;
     <div class="max-w-container mx-auto px-6 py-4">
       <ul class="flex flex-col space-y-4">
         <li>
-          <a href="#home" ...>Home</a>
+          <a href="#home" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">{t('nav.home', lang)}</a>
         </li>
         <li>
-          <a href="#works" ...>Works</a>
+          <a href="#works" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">{t('nav.works', lang)}</a>
         </li>
         <li>
-          <a href="#services" ...>Services</a>
+          <a href="#services" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">{t('nav.services', lang)}</a>
         </li>
         <li>
-          <a href="#contact" ...>Contact</a>
+          <a href="#contact" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">{t('nav.contact', lang)}</a>
         </li>
         <li>
           <LanguageSwitcher /> {/* Add the LanguageSwitcher here */}
