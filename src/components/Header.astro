@@ -1,1 +1,28 @@
+---
+const nav = [
+  { label: 'Home', href: '/#home' },
+  { label: 'Works', href: '/#works' },
+  { label: 'Services', href: '/#services' },
+  { label: 'Contact', href: '/#contact' },
+];
+---
+
+<header class="sticky top-0 z-50 backdrop-blur bg-white/80 dark:bg-neutral-dark/70 border-b border-gray-100 dark:border-gray-800">
+  <div class="max-w-container mx-auto px-6 h-14 flex items-center justify-between">
+    <a href="/#home" class="font-heading text-secondary dark:text-white tracking-wide">
+      woommotion
+    </a>
+
+    <nav class="flex items-center gap-4">
+      {nav.map((item) => (
+        <a
+          href={item.href}
+          class="text-sm text-secondary/70 dark:text-white/70 hover:text-primary transition-colors"
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
 
