@@ -1,5 +1,4 @@
 ---
-import ThemeToggle from '../ui/ThemeToggle.astro';
 const lang = Astro.currentLocale;
 ---
 
@@ -43,13 +42,11 @@ const lang = Astro.currentLocale;
       </ul>
 
       <div class="flex items-center space-x-4">
-        <ThemeToggle /> {/* Removed client:visible */}
       </div>
     </nav>
 
     <!-- Mobile menu button -->
     <div class="flex items-center space-x-4 md:hidden">
-      <ThemeToggle /> {/* Removed client:visible */}
       <button id="mobile-menu-button" class="text-secondary dark:text-white" aria-label="Toggle Menu">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
           <line x1="4" x2="20" y1="12" y2="12"></line>
