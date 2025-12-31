@@ -10,7 +10,7 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
 <section id="home" class="pt-28 pb-16 md:pt-36 md:pb-24 relative">
   <div class="max-w-container mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-gutter">
     <!-- LEFT : Copy / CTA -->
-    <div class="md:col-span-7 flex flex-col justify-center">
+    <div class="md:col-span-6 flex flex-col justify-center">
       <!-- (1) Small logo -->
       <div class="flex items-center gap-3 mb-6">
         <img
@@ -18,7 +18,15 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
           alt="WOOM logo"
           width="130"
           height="48"
-          class="h-8 w-auto"
+          class="h-8 w-auto dark:hidden"
+          loading="eager"
+        />
+        <img
+          src="/images/logo_white.svg"
+          alt="WOOM logo (white)"
+          width="130"
+          height="48"
+          class="h-8 w-auto hidden dark:block"
           loading="eager"
         />
         <!-- (2) Label -->
@@ -28,7 +36,7 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
       </div>
 
       <!-- (3) Slogan (big) -->
-      <h1 class="font-heading text-h1 text-secondary dark:text-white mb-4">
+      <h1 class="font-heading text-secondary dark:text-white mb-6 leading-[1.05] tracking-tight text-[clamp(2.2rem,4.0vw,4.0rem)] md:whitespace-nowrap">
         Imagine it, Create it!
       </h1>
 
@@ -77,12 +85,11 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
     </div>
 
     <!-- RIGHT : Brand video (6) -->
-    <div class="md:col-span-5 mt-10 md:mt-0">
-      <div class="relative">
+    <div class="md:col-span-6 mt-10 md:mt-0">
+      <div class="relative w-full">
         <!-- Decorative bg -->
-        <div class="absolute -top-6 -right-6 w-64 h-64 md:w-80 md:h-80 bg-gradient-to-br from-primary/10 to-orange-400/10 rounded-3xl -z-10"></div>
-
-        <div class="w-full max-w-md mx-auto rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 bg-black">
+        <div class="absolute -top-8 -right-8 w-80 h-80 md:w-[34rem] md:h-[34rem] bg-gradient-to-br from-primary/10 to-orange-400/10 rounded-3xl -z-10"></div>
+        <div class="w-full rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 bg-black">
           <div class="relative w-full" style="padding-top: 56.25%;">
             <iframe
               class="absolute top-0 left-0 w-full h-full"
@@ -97,7 +104,7 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
         </div>
 
         <p class="text-xs text-secondary/50 dark:text-white/50 mt-3 text-center">
-          * 자동재생은 브라우저 정책에 따라 제한될 수 있어요(음소거로 확률↑).
+          * 자동재생은 브라우저 정책에 따라 제한될 수 있어요.
         </p>
       </div>
     </div>
