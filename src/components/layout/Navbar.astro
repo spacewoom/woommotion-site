@@ -1,163 +1,59 @@
 ---
 import ThemeToggle from '../ui/ThemeToggle.astro';
-const lang = Astro.currentLocale;
 ---
 
-<header id="navbar" class="fixed top-0 w-full bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm z-50 transition-all duration-300">
-  <div class="max-w-container mx-auto px-6 py-4 flex items-center justify-between">
-    <!-- Logo/Monogram with dark/light mode versions -->
-    <a href="/#home" class="block" aria-label="Homepage">
-      <!-- Light mode logo (hidden in dark mode) -->
-      {/* <Image src={logoLight} alt="Portfolio Logo" class="h-8 w-auto dark:hidden transition-opacity duration-300" /> */}
+<header class="fixed top-0 left-0 w-full z-50 bg-white/80 dark:bg-neutral-dark/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+  <div class="max-w-container mx-auto px-6 h-16 flex items-center justify-between">
+
+    <!-- LEFT : Logo -->
+    <a href="/#home" class="flex items-center py-1" aria-label="WOOM Homepage">
+      <!-- Light mode -->
       <img
-          src="/images/logo.svg"
-          alt="WOOM logo"
-          width="130"
-          height="48"
-          class="h-8 w-auto dark:hidden"
-          loading="eager"
-        />
-        <img
-          src="/images/logo_white.svg"
-          alt="WOOM logo (white)"
-          width="130"
-          height="48"
-          class="h-8 w-auto hidden dark:block"
-          loading="eager"
-        />
-    </a>
-      <!-- Dark mode logo (hidden in light mode) -->
-      <Image src={logoDark} alt="Portfolio Logo" class="h-8 w-auto hidden dark:block transition-opacity duration-300" />
+        src="/images/logo.svg"
+        alt="WOOM"
+        class="h-8 w-auto dark:hidden"
+        loading="eager"
+        decoding="async"
+      />
+      <!-- Dark mode -->
+      <img
+        src="/images/logo_white.svg"
+        alt="WOOM"
+        class="h-8 w-auto hidden dark:block"
+        loading="eager"
+        decoding="async"
+      />
     </a>
 
-    <!-- Desktop Navigation -->
-    <nav class="hidden md:flex items-center space-x-8">
-      <ul class="flex space-x-8">
-        <li>
-          <a href="#home" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">home</a>
-        </li>
-        <li>
-          <a href="#works" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">works</a>
-        </li>
-        <li>
-          <a href="#services" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">services</a>
-        </li>
-        <li>
-          <a href="#contact" class="nav-link text-secondary dark:text-white hover:text-primary dark:hover:text-primary">contact</a>
-        </li>
-      </ul>
-
-      <div class="flex items-center space-x-4">
-        <ThemeToggle /> {/* Removed client:visible */}
-      </div>
+    <!-- CENTER : Navigation -->
+    <nav class="hidden md:flex items-center space-x-10">
+      <a href="#home" class="nav-link">home</a>
+      <a href="#works" class="nav-link">works</a>
+      <a href="#services" class="nav-link">services</a>
+      <a href="#contact" class="nav-link">contact</a>
     </nav>
 
-    <!-- Mobile menu button -->
-    <div class="flex items-center space-x-4 md:hidden">
-      <ThemeToggle /> {/* Removed client:visible */}
-      <button id="mobile-menu-button" class="text-secondary dark:text-white" aria-label="Toggle Menu">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
-          <line x1="4" x2="20" y1="12" y2="12"></line>
-          <line x1="4" x2="20" y1="6" y2="6"></line>
-          <line x1="4" x2="20" y1="18" y2="18"></line>
-        </svg>
-      </button>
+    <!-- RIGHT : Theme toggle -->
+    <div class="flex items-center gap-4">
+      <ThemeToggle />
     </div>
-  </div>
 
-  <!-- Mobile Navigation Menu -->
-  <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-neutral-dark border-t border-gray-200 dark:border-gray-800">
-    <div class="max-w-container mx-auto px-6 py-4">
-      <ul class="flex flex-col space-y-4">
-        <li>
-          <a href="#home" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">home</a>
-        </li>
-        <li>
-          <a href="#works" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">works</a>
-        </li>
-        <li>
-          <a href="#services" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">services</a>
-        </li>
-        <li>
-          <a href="#contact" class="block py-2 text-secondary dark:text-white hover:text-primary dark:hover:text-primary">contact</a>
-        </li>
-      </ul>
-    </div>
   </div>
 </header>
 
-<script>
-  function attachMobileMenuListeners() {
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    if (!mobileMenuButton || !mobileMenu) return;
-
-    // 중복 방지: onclick으로 덮어쓰기
-    mobileMenuButton.onclick = () => {
-      mobileMenu.classList.toggle('hidden');
-    };
-
-    // 링크 누르면 닫기
-    document.querySelectorAll('#mobile-menu a').forEach((link) => {
-      link.onclick = () => mobileMenu.classList.add('hidden');
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', attachMobileMenuListeners);
-  window.addEventListener('resize', attachMobileMenuListeners);
-
-  const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 64) navbar?.classList.add('shadow-md');
-    else navbar?.classList.remove('shadow-md');
-  });
-
-  // Scroll spy (HTMLElement 체크)
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-link');
-
-  window.addEventListener('scroll', () => {
-    let current = '';
-
-    sections.forEach((section) => {
-      if (!(section instanceof HTMLElement)) return;
-      if (window.scrollY >= section.offsetTop - 100) {
-        current = section.id;
-      }
-    });
-
-    navLinks.forEach((link) => {
-      link.classList.remove('active');
-      const href = link.getAttribute('href') || '';
-      if (href.startsWith('#') && href.slice(1) === current) link.classList.add('active');
-    });
-  });
-</script>
-
 <style>
   .nav-link {
-    position: relative;
+    font-size: 0.95rem;
     font-weight: 500;
-    transition: color 0.3s ease;
+    color: #1f2937; /* gray-800 */
+    transition: color 0.2s ease;
   }
 
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -4px;
-    left: 0;
-    background-color: theme('colors.primary');
-    transition: width 0.3s ease;
+  .dark .nav-link {
+    color: #e5e7eb; /* gray-200 */
   }
 
-  .nav-link:hover::after,
-  .nav-link.active::after {
-    width: 100%;
-  }
-
-  .nav-link.active {
-    color: theme('colors.primary');
+  .nav-link:hover {
+    color: #2563eb; /* primary */
   }
 </style>
