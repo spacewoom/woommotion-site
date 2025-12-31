@@ -1,58 +1,41 @@
 ---
-import ThemeToggle from '../ui/ThemeToggle.astro';
+import ThemeToggle from "../ui/ThemeToggle.astro";
+const lang = Astro.currentLocale;
+const pathname = Astro.url?.pathname ?? "/";
 ---
-<header class="fixed top-0 left-0 w-full z-50 bg-white/80 dark:bg-neutral-dark/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
-  <div class="max-w-container mx-auto px-6 h-16 flex items-center justify-between">
 
-    <!-- LEFT : Logo -->
-    <a href="/#home" class="flex items-center py-1" aria-label="WOOM Homepage">
-      <!-- Light mode -->
+<header id="navbar" class="fixed top-0 w-full bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm z-50 transition-all duration-300">
+  <div class="max-w-container mx-auto px-6 py-4 flex items-center justify-between">
+    <!-- LEFT: Logo (light/dark switch by CSS) -->
+    <a href="/#home" class="flex items-center gap-3" aria-label="Homepage">
       <img
         src="/images/logo.svg"
-        alt="WOOM"
+        alt="WOOM logo"
+        width="130"
+        height="48"
         class="h-8 w-auto dark:hidden"
         loading="eager"
         decoding="async"
       />
-      <!-- Dark mode -->
       <img
         src="/images/logo_white.svg"
-        alt="WOOM"
-        class="h-8 w-auto hidden dark:block"
+        alt="WOOM logo (white)"
+        width="130"
+        height="48"
+        class="hidden h-8 w-auto dark:block"
         loading="eager"
         decoding="async"
       />
     </a>
 
-    <!-- CENTER : Navigation -->
-    <nav class="hidden md:flex items-center space-x-10">
-      <a href="#home" class="nav-link">home</a>
-      <a href="#works" class="nav-link">works</a>
-      <a href="#services" class="nav-link">services</a>
-      <a href="#contact" class="nav-link">contact</a>
-    </nav>
+    <!-- RIGHT: Nav -->
+    <nav class="flex items-center gap-8">
+      <a href="/#home" class={`font-medium hover:opacity-80 ${pathname === "/" ? "text-primary" : "text-neutral-900 dark:text-neutral-100"}`}>home</a>
+      <a href="/works" class="font-medium text-neutral-900 dark:text-neutral-100 hover:opacity-80">works</a>
+      <a href="/#services" class="font-medium text-neutral-900 dark:text-neutral-100 hover:opacity-80">services</a>
+      <a href="/#contact" class="font-medium text-neutral-900 dark:text-neutral-100 hover:opacity-80">contact</a>
 
-    <!-- RIGHT : Theme toggle -->
-    <div class="flex items-center gap-4">
       <ThemeToggle />
-    </div>
-
+    </nav>
   </div>
 </header>
-
-<style>
-  .nav-link {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #1f2937; /* gray-800 */
-    transition: color 0.2s ease;
-  }
-
-  .dark .nav-link {
-    color: #e5e7eb; /* gray-200 */
-  }
-
-  .nav-link:hover {
-    color: #2563eb; /* primary */
-  }
-</style>
