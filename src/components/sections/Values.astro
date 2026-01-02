@@ -18,27 +18,16 @@ function splitTitle(raw: string) {
   return { ko, en };
 }
 
-/**
- * i18n 키가 없을 때 t()가 key를 그대로 반환하는 경우가 많아서
- * "값이 실제로 존재할 때만" optional로 쓰도록 처리
- */
-function optionalT(key: string) {
-  const v = t(key, lang);
-  if (!v || v === key) return '';
-  return v;
-}
-
 const card1Title = splitTitle(t('values.card1Title', lang));
 const card2Title = splitTitle(t('values.card2Title', lang));
 const card3Title = splitTitle(t('values.card3Title', lang));
 const card4Title = splitTitle(t('values.card4Title', lang));
 
-// (선택) 나중에 en.json 등에 경로만 넣으면 img로 교체 가능
-// 예: "card1Icon": "/services/icon-menu.png"  (public 폴더 기준 권장)
-const card1Icon = optionalT('values.card1Icon');
-const card2Icon = optionalT('values.card2Icon');
-const card3Icon = optionalT('values.card3Icon');
-const card4Icon = optionalT('values.card4Icon');
+/**
+ * ✅ 여기 “경로만” 바꾸면 4개 카드 아이콘이 한 번에 바뀝니다.
+ * public/services/video.svg  ->  /services/video.svg 로 접근
+ */
+const ICON_SRC = '/services/video.svg';
 ---
 
 <section id="services" class="py-16 md:py-24 bg-neutral-bg dark:bg-neutral-dark/60">
@@ -62,22 +51,14 @@ const card4Icon = optionalT('values.card4Icon');
         data-aos-delay="100"
       >
         <div class="mb-6 text-primary">
-          {card1Icon ? (
-            <img
-              src={card1Icon}
-              alt={`${card1Title.ko} icon`}
-              width="32"
-              height="32"
-              loading="lazy"
-              class="w-8 h-8"
-            />
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="valuesIcon1Title">
-              <title id="valuesIcon1Title">{card1Title.ko} Icon</title>
-              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-          )}
+          <img
+            src={ICON_SRC}
+            alt={`${card1Title.ko} icon`}
+            width="32"
+            height="32"
+            loading="lazy"
+            class="w-8 h-8"
+          />
         </div>
 
         <h3 class="font-heading text-secondary dark:text-white mb-3 transition-colors duration-300">
@@ -101,22 +82,14 @@ const card4Icon = optionalT('values.card4Icon');
         data-aos-delay="200"
       >
         <div class="mb-6 text-primary">
-          {card2Icon ? (
-            <img
-              src={card2Icon}
-              alt={`${card2Title.ko} icon`}
-              width="32"
-              height="32"
-              loading="lazy"
-              class="w-8 h-8"
-            />
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="valuesIcon2Title">
-              <title id="valuesIcon2Title">{card2Title.ko} Icon</title>
-              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-          )}
+          <img
+            src={ICON_SRC}
+            alt={`${card2Title.ko} icon`}
+            width="32"
+            height="32"
+            loading="lazy"
+            class="w-8 h-8"
+          />
         </div>
 
         <h3 class="font-heading text-secondary dark:text-white mb-3 transition-colors duration-300">
@@ -140,22 +113,14 @@ const card4Icon = optionalT('values.card4Icon');
         data-aos-delay="300"
       >
         <div class="mb-6 text-primary">
-          {card3Icon ? (
-            <img
-              src={card3Icon}
-              alt={`${card3Title.ko} icon`}
-              width="32"
-              height="32"
-              loading="lazy"
-              class="w-8 h-8"
-            />
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="valuesIcon3Title">
-              <title id="valuesIcon3Title">{card3Title.ko} Icon</title>
-              <path d="M12 20v-6M9 20v-4M6 20v-2M15 20v-2M18 20v-4"></path>
-              <path d="m4 4 2.5 2.5M19.1 8l-7.2 7.2M15 12V4h-8"></path>
-            </svg>
-          )}
+          <img
+            src={ICON_SRC}
+            alt={`${card3Title.ko} icon`}
+            width="32"
+            height="32"
+            loading="lazy"
+            class="w-8 h-8"
+          />
         </div>
 
         <h3 class="font-heading text-secondary dark:text-white mb-3 transition-colors duration-300">
@@ -179,24 +144,14 @@ const card4Icon = optionalT('values.card4Icon');
         data-aos-delay="400"
       >
         <div class="mb-6 text-primary">
-          {card4Icon ? (
-            <img
-              src={card4Icon}
-              alt={`${card4Title.ko} icon`}
-              width="32"
-              height="32"
-              loading="lazy"
-              class="w-8 h-8"
-            />
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="valuesIcon4Title">
-              <title id="valuesIcon4Title">{card4Title.ko} Icon</title>
-              <path d="M20 7h-9"></path>
-              <path d="M14 17H5"></path>
-              <circle cx="17" cy="17" r="3"></circle>
-              <circle cx="7" cy="7" r="3"></circle>
-            </svg>
-          )}
+          <img
+            src={ICON_SRC}
+            alt={`${card4Title.ko} icon`}
+            width="32"
+            height="32"
+            loading="lazy"
+            class="w-8 h-8"
+          />
         </div>
 
         <h3 class="font-heading text-secondary dark:text-white mb-3 transition-colors duration-300">
