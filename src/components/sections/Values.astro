@@ -1,129 +1,79 @@
 ---
-const services = [
-  {
-    titleKr: "디지털 메뉴보드",
-    titleEn: "Digital Menu Boards",
-    descKr:
-      "매장 환경에서 ‘가독성’과 ‘구매 유도’를 동시에 잡는 모션 메뉴보드. DID/키오스크 규격에 맞춰 템플릿화까지 지원합니다.",
-    descEn:
-      "Motion menu boards optimized for readability and conversion in-store. Delivered with DID/kiosk-ready specs and reusable templates.",
-    icon: "screen",
-  },
-  {
-    titleKr: "프로모션 콘텐츠",
-    titleEn: "Promotions & Campaigns",
-    descKr:
-      "신메뉴·시즌·이벤트 등 짧고 강한 메시지를 감각적인 움직임으로 전달. SNS/매장 송출용 버전까지 한 번에 구성합니다.",
-    descEn:
-      "Short, punchy promo videos with sensuous motion and clear messaging. Includes versions for SNS and in-store screens.",
-    icon: "spark",
-  },
-  {
-    titleKr: "제품·행사 영상",
-    titleEn: "Product & Event Visuals",
-    descKr:
-      "제품 USP와 핵심 정보를 빠르게 이해시키는 인포 중심 연출. 행사 오프닝/하이라이트 등 현장 목적에 맞게 설계합니다.",
-    descEn:
-      "Info-led visuals that highlight product USPs fast. Designed for event openings, highlights, and on-site display goals.",
-    icon: "box",
-  },
-  {
-    titleKr: "에이전시 아웃소싱",
-    titleEn: "Agency Outsourcing",
-    descKr:
-      "대행사/스튜디오 협업에 최적화된 제작 파트너링. 파일 구조·버전 관리·납기 기준을 명확히 맞춰 안정적으로 지원합니다.",
-    descEn:
-      "A production partner built for agency workflows—clear file structure, versioning, and reliable delivery timelines.",
-    icon: "handshake",
-  },
-];
+import { t } from '../../utils/i18n';
 
-function Icon({ name }) {
-  // 간단한 inline SVG 아이콘 (추가 라이브러리 불필요)
-  if (name === "screen") {
-    return (
-      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="3" y="4" width="18" height="12" rx="2"></rect>
-        <path d="M8 20h8"></path>
-        <path d="M12 16v4"></path>
-      </svg>
-    );
-  }
-  if (name === "spark") {
-    return (
-      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M12 2l1.6 5.2L19 9l-5.4 1.8L12 16l-1.6-5.2L5 9l5.4-1.8L12 2z"></path>
-        <path d="M5 14l.8 2.6L8 18l-2.2.7L5 21l-.8-2.3L2 18l2.2-.4L5 14z"></path>
-      </svg>
-    );
-  }
-  if (name === "box") {
-    return (
-      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73V8z"></path>
-        <path d="M3.3 7.3L12 12l8.7-4.7"></path>
-        <path d="M12 22V12"></path>
-      </svg>
-    );
-  }
-  // handshake (default)
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M11 12l2 2a2 2 0 0 0 3-3l-1-1"></path>
-      <path d="M10 13l-2-2a2 2 0 0 0-3 3l1 1"></path>
-      <path d="M14 11l1-1a2 2 0 0 1 3 3l-1 1"></path>
-      <path d="M10 13l-1 1a2 2 0 0 1-3-3l1-1"></path>
-      <path d="M2 12l4-4"></path>
-      <path d="M22 12l-4-4"></path>
-    </svg>
-  );
+interface Props {
+  lang: string | undefined;
 }
+
+const { lang } = Astro.props;
 ---
 
 <section id="services" class="py-16 md:py-24 bg-neutral-bg dark:bg-neutral-dark/60">
   <div class="max-w-container mx-auto px-6">
     <div class="mb-12 text-center" data-aos="fade-up">
-      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">Services</h2>
-
-      <!-- ✅ hero 문구와 동일 반복 피한 버전 + 요청 톤 반영 -->
-      <p class="text-secondary/70 dark:text-white/70 max-w-3xl mx-auto leading-relaxed">
-        흥미를 끌어당기는 감각적 움직임과 명확한 정보 전달로,
-        기획부터 제작까지 클라이언트의 니즈를 영상으로 시각화합니다.
-        <span class="block mt-2 text-secondary/60 dark:text-white/60">
-          Interesting, eye-catching, sensuous movements and clear information delivery — from planning to production, we visualize your needs at a reasonable cost.
-        </span>
+      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">{t('values.title', lang)}</h2>
+      <p class="text-secondary/70 dark:text-white/70 max-w-2xl mx-auto">
+        {t('values.subtitle', lang)}
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {services.map((item, idx) => (
-        <div
-          class="group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl p-7 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] dark:hover:bg-gradient-to-br dark:hover:from-primary/5 dark:hover:to-orange-500/5"
-          data-aos="fade-up"
-          data-aos-delay={(idx + 1) * 100}
-        >
-          <div class="mb-5 text-primary">
-            <Icon name={item.icon} />
-          </div>
-
-          <!-- ✅ 타이틀 2줄: 한글 크게 / 영어 작게 -->
-          <h3 class="font-heading text-secondary dark:text-white mb-3 leading-snug">
-            <span class="block text-lg font-semibold group-hover:text-primary transition-colors duration-300">
-              {item.titleKr}
-            </span>
-            <span class="block text-sm text-secondary/60 dark:text-white/60">
-              {item.titleEn}
-            </span>
-          </h3>
-
-          <p class="text-secondary/70 dark:text-white/70 text-sm leading-relaxed">
-            {item.descKr}
-            <span class="block mt-2 text-secondary/60 dark:text-white/60">
-              {item.descEn}
-            </span>
-          </p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Performance Card -->
+      <div
+        class="group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 hover:bg-gradient-highlight dark:hover:bg-gradient-to-br dark:hover:from-primary/5 dark:hover:to-orange-500/5"
+        data-aos="fade-up"
+        data-aos-delay="100"
+      >
+        <div class="mb-6 text-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="performanceIconTitle">
+            <title id="performanceIconTitle">{t('values.card1Title', lang)} Icon</title>
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
         </div>
-      ))}
+        <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">{t('values.card1Title', lang)}</h3>
+        <p class="text-secondary/70 dark:text-white/70">
+          {t('values.card1Text', lang)}
+        </p>
+      </div>
+
+      <!-- Accessibility Card -->
+      <div
+        class="group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 hover:bg-gradient-highlight dark:hover:bg-gradient-to-br dark:hover:from-primary/5 dark:hover:to-orange-500/5"
+        data-aos="fade-up"
+        data-aos-delay="200"
+      >
+        <div class="mb-6 text-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="accessibilityIconTitle">
+            <title id="accessibilityIconTitle">{t('values.card2Title', lang)} Icon</title>
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </div>
+        <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">{t('values.card2Title', lang)}</h3>
+        <p class="text-secondary/70 dark:text-white/70">
+          {t('values.card2Text', lang)}
+        </p>
+      </div>
+
+      <!-- Developer Experience Card -->
+      <div
+        class="group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 hover:bg-gradient-highlight dark:hover:bg-gradient-to-br dark:hover:from-primary/5 dark:hover:to-orange-500/5"
+        data-aos="fade-up"
+        data-aos-delay="300"
+      >
+        <div class="mb-6 text-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="developerExperienceIconTitle">
+            <title id="developerExperienceIconTitle">{t('values.card3Title', lang)} Icon</title>
+            <path d="M12 20v-6M9 20v-4M6 20v-2M15 20v-2M18 20v-4"></path>
+            <path d="m4 4 2.5 2.5M19.1 8l-7.2 7.2M15 12V4h-8"></path>
+          </svg>
+        </div>
+        <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">{t('values.card3Title', lang)}</h3>
+        <p class="text-secondary/70 dark:text-white/70">
+          {t('values.card3Text', lang)}
+        </p>
+      </div>
     </div>
   </div>
 </section>
