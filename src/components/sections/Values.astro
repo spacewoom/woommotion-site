@@ -1,102 +1,218 @@
 ---
-import en from '../../i18n/en.json';
-import de from '../../i18n/de.json';
-
-type Lang = 'en' | 'de';
+import { t } from '../../utils/i18n';
 
 interface Props {
-  lang?: Lang;
+  lang: string | undefined;
 }
 
-const { lang = 'en' } = Astro.props;
+const { lang } = Astro.props;
 
-const dictionaries: Record<Lang, any> = { en, de };
-const dict = dictionaries[lang] ?? en;
-
-// 안전한 path getter (없으면 fallback)
-function get(obj: any, path: string, fallback = '') {
-  const value = path.split('.').reduce((acc, key) => {
-    if (acc && typeof acc === 'object' && key in acc) return acc[key];
-    return undefined;
-  }, obj);
-  return value ?? fallback;
+/**
+ * "Korean | English" 형태면 2줄로 분리.
+ * 파이프(|)가 없으면 1줄(ko만)로 표시.
+ */
+function splitTitle(raw: string) {
+  const parts = (raw ?? '').split('|').map((s) => s.trim());
+  const ko = parts[0] || raw;
+  const en = parts[1] || '';
+  return { ko, en };
 }
 
-// en -> key 순으로 fallback
-function t(path: string) {
-  return get(dict, path, get(en, path, path));
+/**
+ * i18n 키가 없을 때 t()가 key를 그대로 반환하는 경우가 많아서
+ * "값이 실제로 존재할 때만" optional로 쓰도록 처리
+ */
+function optionalT(key: string) {
+  const v = t(key, lang);
+  if (!v || v === key) return '';
+  return v;
 }
 
-function splitTitle(title: string) {
-  // "Korean | English" 형태 지원
-  const parts = title.split('|').map((s) => s.trim());
-  const ko = parts[0] ?? title;
-  const enLine = parts[1] ?? '';
-  return { ko, en: enLine };
-}
+const card1Title = splitTitle(t('values.card1Title', lang));
+const card2Title = splitTitle(t('values.card2Title', lang));
+const card3Title = splitTitle(t('values.card3Title', lang));
+const card4Title = splitTitle(t('values.card4Title', lang));
 
-const card1 = splitTitle(t('values.card1Title'));
-const card2 = splitTitle(t('values.card2Title'));
-const card3 = splitTitle(t('values.card3Title'));
-const card4 = splitTitle(t('values.card4Title'));
+// (선택) 나중에 en.json 등에 경로만 넣으면 img로 교체 가능
+// 예: "card1Icon": "/services/icon-menu.png"  (public 폴더 기준 권장)
+const card1Icon = optionalT('values.card1Icon');
+const card2Icon = optionalT('values.card2Icon');
+const card3Icon = optionalT('values.card3Icon');
+const card4Icon = optionalT('values.card4Icon');
 ---
 
-<section id="services" class="relative py-20 sm:py-28">
-  <div class="mx-auto max-w-6xl px-6">
-    <header class="mb-10 sm:mb-14">
-      <p class="text-xs uppercase tracking-[0.22em] text-neutral-500">
-        {t('values.title')}
-      </p>
-
-      <h2 class="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-        {t('values.subtitle')}
+<section id="services" class="py-16 md:py-24 bg-neutral-bg dark:bg-neutral-dark/60">
+  <div class="max-w-container mx-auto px-6">
+    <div class="mb-12 text-center" data-aos="fade-up">
+      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">
+        {t('values.title', lang)}
       </h2>
-    </header>
+      <p class="text-secondary/70 dark:text-white/70 max-w-2xl mx-auto">
+        {t('values.subtitle', lang)}
+      </p>
+    </div>
 
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <!-- ✅ 원본 감성 유지 + 4카드 대응 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
       <!-- Card 1 -->
-      <article class="rounded-2xl border border-neutral-200/70 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/40 p-6 backdrop-blur">
-        <h3 class="leading-tight">
-          <span class="block text-lg font-semibold text-neutral-900 dark:text-neutral-100">{card1.ko}</span>
-          {card1.en && <span class="block mt-1 text-sm text-neutral-500">{card1.en}</span>}
+      <div
+        class="group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 hover:bg-gradient-highlight dark:hover:bg-gradient-to-br dark:hover:from-primary/5 dark:hover:to-orange-500/5"
+        data-aos="fade-up"
+        data-aos-delay="100"
+      >
+        <div class="mb-6 text-primary">
+          {card1Icon ? (
+            <img
+              src={card1Icon}
+              alt={`${card1Title.ko} icon`}
+              width="32"
+              height="32"
+              loading="lazy"
+              class="w-8 h-8"
+            />
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="valuesIcon1Title">
+              <title id="valuesIcon1Title">{card1Title.ko} Icon</title>
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          )}
+        </div>
+
+        <h3 class="font-heading text-secondary dark:text-white mb-3 transition-colors duration-300">
+          <span class="block text-xl group-hover:text-primary leading-tight">{card1Title.ko}</span>
+          {card1Title.en && (
+            <span class="block mt-1 text-sm text-secondary/60 dark:text-white/60 group-hover:text-primary/80 leading-tight">
+              {card1Title.en}
+            </span>
+          )}
         </h3>
-        <p class="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-          {t('values.card1Text')}
+
+        <p class="text-secondary/70 dark:text-white/70">
+          {t('values.card1Text', lang)}
         </p>
-      </article>
+      </div>
 
       <!-- Card 2 -->
-      <article class="rounded-2xl border border-neutral-200/70 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/40 p-6 backdrop-blur">
-        <h3 class="leading-tight">
-          <span class="block text-lg font-semibold text-neutral-900 dark:text-neutral-100">{card2.ko}</span>
-          {card2.en && <span class="block mt-1 text-sm text-neutral-500">{card2.en}</span>}
+      <div
+        class="group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 hover:bg-gradient-highlight dark:hover:bg-gradient-to-br dark:hover:from-primary/5 dark:hover:to-orange-500/5"
+        data-aos="fade-up"
+        data-aos-delay="200"
+      >
+        <div class="mb-6 text-primary">
+          {card2Icon ? (
+            <img
+              src={card2Icon}
+              alt={`${card2Title.ko} icon`}
+              width="32"
+              height="32"
+              loading="lazy"
+              class="w-8 h-8"
+            />
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="valuesIcon2Title">
+              <title id="valuesIcon2Title">{card2Title.ko} Icon</title>
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          )}
+        </div>
+
+        <h3 class="font-heading text-secondary dark:text-white mb-3 transition-colors duration-300">
+          <span class="block text-xl group-hover:text-primary leading-tight">{card2Title.ko}</span>
+          {card2Title.en && (
+            <span class="block mt-1 text-sm text-secondary/60 dark:text-white/60 group-hover:text-primary/80 leading-tight">
+              {card2Title.en}
+            </span>
+          )}
         </h3>
-        <p class="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-          {t('values.card2Text')}
+
+        <p class="text-secondary/70 dark:text-white/70">
+          {t('values.card2Text', lang)}
         </p>
-      </article>
+      </div>
 
       <!-- Card 3 -->
-      <article class="rounded-2xl border border-neutral-200/70 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/40 p-6 backdrop-blur">
-        <h3 class="leading-tight">
-          <span class="block text-lg font-semibold text-neutral-900 dark:text-neutral-100">{card3.ko}</span>
-          {card3.en && <span class="block mt-1 text-sm text-neutral-500">{card3.en}</span>}
+      <div
+        class="group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 hover:bg-gradient-highlight dark:hover:bg-gradient-to-br dark:hover:from-primary/5 dark:hover:to-orange-500/5"
+        data-aos="fade-up"
+        data-aos-delay="300"
+      >
+        <div class="mb-6 text-primary">
+          {card3Icon ? (
+            <img
+              src={card3Icon}
+              alt={`${card3Title.ko} icon`}
+              width="32"
+              height="32"
+              loading="lazy"
+              class="w-8 h-8"
+            />
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="valuesIcon3Title">
+              <title id="valuesIcon3Title">{card3Title.ko} Icon</title>
+              <path d="M12 20v-6M9 20v-4M6 20v-2M15 20v-2M18 20v-4"></path>
+              <path d="m4 4 2.5 2.5M19.1 8l-7.2 7.2M15 12V4h-8"></path>
+            </svg>
+          )}
+        </div>
+
+        <h3 class="font-heading text-secondary dark:text-white mb-3 transition-colors duration-300">
+          <span class="block text-xl group-hover:text-primary leading-tight">{card3Title.ko}</span>
+          {card3Title.en && (
+            <span class="block mt-1 text-sm text-secondary/60 dark:text-white/60 group-hover:text-primary/80 leading-tight">
+              {card3Title.en}
+            </span>
+          )}
         </h3>
-        <p class="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-          {t('values.card3Text')}
+
+        <p class="text-secondary/70 dark:text-white/70">
+          {t('values.card3Text', lang)}
         </p>
-      </article>
+      </div>
 
       <!-- Card 4 -->
-      <article class="rounded-2xl border border-neutral-200/70 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/40 p-6 backdrop-blur">
-        <h3 class="leading-tight">
-          <span class="block text-lg font-semibold text-neutral-900 dark:text-neutral-100">{card4.ko}</span>
-          {card4.en && <span class="block mt-1 text-sm text-neutral-500">{card4.en}</span>}
+      <div
+        class="group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 hover:bg-gradient-highlight dark:hover:bg-gradient-to-br dark:hover:from-primary/5 dark:hover:to-orange-500/5"
+        data-aos="fade-up"
+        data-aos-delay="400"
+      >
+        <div class="mb-6 text-primary">
+          {card4Icon ? (
+            <img
+              src={card4Icon}
+              alt={`${card4Title.ko} icon`}
+              width="32"
+              height="32"
+              loading="lazy"
+              class="w-8 h-8"
+            />
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="valuesIcon4Title">
+              <title id="valuesIcon4Title">{card4Title.ko} Icon</title>
+              <path d="M20 7h-9"></path>
+              <path d="M14 17H5"></path>
+              <circle cx="17" cy="17" r="3"></circle>
+              <circle cx="7" cy="7" r="3"></circle>
+            </svg>
+          )}
+        </div>
+
+        <h3 class="font-heading text-secondary dark:text-white mb-3 transition-colors duration-300">
+          <span class="block text-xl group-hover:text-primary leading-tight">{card4Title.ko}</span>
+          {card4Title.en && (
+            <span class="block mt-1 text-sm text-secondary/60 dark:text-white/60 group-hover:text-primary/80 leading-tight">
+              {card4Title.en}
+            </span>
+          )}
         </h3>
-        <p class="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-          {t('values.card4Text')}
+
+        <p class="text-secondary/70 dark:text-white/70">
+          {t('values.card4Text', lang)}
         </p>
-      </article>
+      </div>
+
     </div>
   </div>
 </section>
