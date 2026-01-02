@@ -27,7 +27,8 @@ const card4Title = splitTitle(t('values.card4Title', lang));
  * ✅ 여기 “경로만” 바꾸면 4개 카드 아이콘이 한 번에 바뀝니다.
  * public/services/video.svg  ->  /services/video.svg 로 접근
  */
-const ICON_SRC = '/services/video.svg';
+const ICON_LIGHT = '/services/video.svg';
+const ICON_DARK = '/services/video_white.svg';
 ---
 
 <section id="services" class="py-16 md:py-24 bg-neutral-bg dark:bg-neutral-dark/60">
@@ -57,7 +58,15 @@ const ICON_SRC = '/services/video.svg';
             width="32"
             height="32"
             loading="lazy"
-            class="w-8 h-8"
+            class="w-8 h-8 dark:hidden"
+          />
+          <img
+            src={ICON_SRC}
+            alt={`${card1Title.ko} icon`}
+            width="32"
+            height="32"
+            loading="lazy"
+            class="w-8 h-8 hidden dark:block"
           />
         </div>
 
@@ -88,7 +97,15 @@ const ICON_SRC = '/services/video.svg';
             width="32"
             height="32"
             loading="lazy"
-            class="w-8 h-8"
+            class="w-8 h-8 dark:hidden"
+          />
+          <img
+            src={ICON_SRC}
+            alt={`${card2Title.ko} icon`}
+            width="32"
+            height="32"
+            loading="lazy"
+            class="w-8 h-8 hidden dark:block"
           />
         </div>
 
@@ -119,7 +136,15 @@ const ICON_SRC = '/services/video.svg';
             width="32"
             height="32"
             loading="lazy"
-            class="w-8 h-8"
+            class="w-8 h-8 dark:hidden"
+          />
+            <img
+            src={ICON_SRC}
+            alt={`${card3Title.ko} icon`}
+            width="32"
+            height="32"
+            loading="lazy"
+            class="w-8 h-8 hidden dark:block"
           />
         </div>
 
@@ -150,7 +175,15 @@ const ICON_SRC = '/services/video.svg';
             width="32"
             height="32"
             loading="lazy"
-            class="w-8 h-8"
+            class="w-8 h-8 dark:hidden"
+          />
+          <img
+            src={ICON_SRC}
+            alt={`${card4Title.ko} icon`}
+            width="32"
+            height="32"
+            loading="lazy"
+            class="w-8 h-8 hidden dark:block"
           />
         </div>
 
