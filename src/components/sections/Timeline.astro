@@ -1,66 +1,80 @@
 ---
-import Section from "../layout/Section.astro";
-import { t } from "../../utils/i18n";
-import { getLangFromUrl } from "../../utils/getLangFromUrl";
+import Button from '../ui/Buttons.astro';
+import { t } from '../../utils/i18n';
 
-const lang = getLangFromUrl(Astro.url);
+interface Props {
+  lang: string | undefined;
+}
 
-// NOTE: 아래 데이터 구조/키는 기존(배포 성공했던) 구조를 그대로 유지해야 애니메이션이 유지됩니다.
-const timeline = [
-  { titleKey: "timeline.step1.title", subtitleKey: "timeline.step1.subtitle" },
-  { titleKey: "timeline.step2.title", subtitleKey: "timeline.step2.subtitle" },
-  { titleKey: "timeline.step3.title", subtitleKey: "timeline.step3.subtitle" },
-  { titleKey: "timeline.step4.title", subtitleKey: "timeline.step4.subtitle" },
-  { titleKey: "timeline.step5.title", subtitleKey: "timeline.step5.subtitle" },
-];
+const { lang } = Astro.props;
+
+// 3개 → 5개 (item4, item5는 i18n 키만 추가하면 됨)
+const timelineItems = ["item1", "item2", "item3", "item4", "item5"];
 ---
 
-<Section id="journey" class="relative overflow-hidden">
-  <div class="max-w-container mx-auto px-6 py-20">
-    <div class="mb-12">
-      <h2 class="text-4xl font-bold tracking-tight text-white mb-4">
-        {t(lang, "timeline.title")}
+<section class="py-16 md:py-24">
+  <div class="max-w-container mx-auto px-6">
+    <div class="mb-12" data-aos="fade-up">
+      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">
+        {t('timeline.title', lang)}
       </h2>
-      <!-- ✅ 1) 섹션 subtitle: 항상 왼쪽 정렬 -->
-      <p class="text-secondary/70 dark:text-white/70 max-w-2xl text-left">
-        {t(lang, "timeline.subtitle")}
+      <p class="text-secondary/70 dark:text-white/70 max-w-2xl">
+        {t('timeline.subtitle', lang)}
       </p>
     </div>
 
-    <div class="relative timeline-container">
-      <div class="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-white/10"></div>
+    <div id="timeline-container" class="relative">
+      <!-- Timeline line -->
+      <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700 transform md:translate-x-px"></div>
 
-      <ul class="space-y-10">
-        {timeline.map((item, index) => {
-          const isLeft = index % 2 === 0;
+      <div class="space-y-12">
+        {timelineItems.map((item, index) => (
+          <div
+            class={`relative flex flex-col md:flex-row gap-8 md:gap-0 ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
+            data-aos={index % 2 === 0 ? "fade-left" : "fade-right"}
+          >
+            {/* Timeline dot */}
+            <div class="timeline-dot absolute left-0 md:left-1/2 top-0 w-5 h-5 rounded-full bg-primary border-4 border-white dark:border-neutral-dark transform -translate-x-2 md:-translate-x-2.5"></div>
 
-          return (
-            <li class="relative timeline-item">
-              <div class={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-start`}>
-                {/* LEFT */}
-                <div class={`${isLeft ? "md:text-right" : "md:order-2 md:text-left"} px-2`}>
-                  <div class={`${isLeft ? "md:ml-auto" : ""} max-w-md`}>
-                    <h3 class="text-xl font-semibold text-white">
-                      {t(lang, item.titleKey)}
-                    </h3>
+            <!-- Content -->
+            <div class="md:w-1/2 pl-10 md:pl-0 md:pr-12 md:text-right">
+              <h3 class="font-heading text-xl text-secondary dark:text-white mb-1">
+                {t(`timeline.${item}Title`, lang)}
+              </h3>
+              <p class="text-secondary/70 dark:text-white/70 text-left">
+                {t(`timeline.${item}Description`, lang)}
+              </p>
+            </div>
 
-                    {/* ✅ 2) 각 아이템 subtitle(설명): 항상 왼쪽 정렬 */}
-                    <p class="mt-2 text-secondary/70 dark:text-white/70 text-left">
-                      {t(lang, item.subtitleKey)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* RIGHT (empty column to keep alternating layout) */}
-                <div class={`${isLeft ? "md:order-2" : ""} px-2`}></div>
-              </div>
-
-              {/* center dot */}
-              <span class="absolute left-1/2 top-2 h-3 w-3 -translate-x-1/2 rounded-full bg-white"></span>
-            </li>
-          );
-        })}
-      </ul>
+            <div class="md:w-1/2 md:pl-12">
+              <!-- Empty div to create the layout on alternating sides -->
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   </div>
-</Section>
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const timelineDots = document.querySelectorAll('.timeline-dot');
+
+    gsap.from(timelineDots, {
+      scrollTrigger: {
+        trigger: '#timeline-container',
+        start: 'top 80%',
+      },
+      scale: 0,
+      opacity: 0,
+      duration: 0.5,
+      stagger: 0.2,
+      ease: 'back.out(1.7)',
+    });
+  });
+</script>
