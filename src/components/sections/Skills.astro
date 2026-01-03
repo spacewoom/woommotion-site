@@ -1,5 +1,17 @@
 ---
-import { PaletteIcon, Code2Icon, MegaphoneIcon, KanbanSquareIcon, LayersIcon, ImageIcon, PenToolIcon, VideoIcon, ClapperboardIcon, CameraIcon, Mic2Icon, FigmaIcon, FileCodeIcon, BracesIcon, TerminalIcon, RocketIcon, Globe2Icon, LayoutGridIcon, LinkedinIcon, Edit3Icon, SearchCheckIcon, CheckSquareIcon, BookTextIcon, LayoutDashboardIcon } from '@lucide/astro';
+import {
+  VideoIcon,
+  PaletteIcon,
+  RocketIcon,
+  KanbanSquareIcon,
+  ClapperboardIcon,
+  PenToolIcon,
+  ImageIcon,
+  CameraIcon,
+  BracesIcon,
+  Globe2Icon,
+  Edit3Icon,
+} from '@lucide/astro';
 
 import { t } from '../../utils/i18n';
 
@@ -11,57 +23,54 @@ const { lang } = Astro.props;
 
 const skillClusters = [
   {
-    id: 'design-media',
-    title: t('skills.clusters.frontend.title', lang),
-    description: t('skills.clusters.frontend.description', lang),
+    id: 'motion-editing',
+    title: '모션/편집 툴 (Motion & Editing)',
+    description:
+      '브랜드 톤에 맞춘 모션그래픽·타이포 애니메이션·루프 영상 제작에 최적화된 툴 체인입니다.',
+    icon: VideoIcon,
+    tools: [
+      { name: 'After Effects', icon: ClapperboardIcon },
+      { name: 'Media Encoder', icon: RocketIcon },
+      { name: 'Procreate', icon: PenToolIcon },
+    ],
+  },
+  {
+    id: 'design-assets',
+    title: '디자인/에셋 제작 (Design & Assets)',
+    description:
+      '클라이언트의 니즈와 컨셉을 반영해 레이아웃·키비주얼·에셋을 목적에 맞게 설계합니다.',
     icon: PaletteIcon,
     tools: [
-      { name: 'Adobe Creative Cloud', icon: LayersIcon },
       { name: 'Photoshop', icon: ImageIcon },
       { name: 'Illustrator', icon: PenToolIcon },
-      { name: 'Premiere Pro', icon: VideoIcon },
-      { name: 'After Effects', icon: ClapperboardIcon },
-      { name: 'Lightroom', icon: CameraIcon },
-      { name: 'Adobe Audition', icon: Mic2Icon },
-      { name: 'Figma', icon: FigmaIcon },
-    ]
+      { name: 'Procreate', icon: PenToolIcon },
+    ],
   },
   {
-    id: 'web-it',
-    title: t('skills.clusters.design.title', lang),
-    description: t('skills.clusters.design.description', lang),
-    icon: Code2Icon,
+    id: 'ai-assisted',
+    title: 'AI 제작 보조 (AI Assisted)',
+    description:
+      '아이디어 확장과 레퍼런스 탐색, 숏폼 소재 제작, 반복 작업 효율화를 위해 AI 툴을 보조적으로 활용합니다.',
+    icon: RocketIcon,
     tools: [
-      { name: 'HTML/CSS', icon: FileCodeIcon },
-      { name: 'JavaScript', icon: BracesIcon },
-      { name: 'Python', icon: TerminalIcon },
-      { name: 'Astro', icon: RocketIcon },
-      { name: 'WordPress', icon: Globe2Icon },
-      { name: 'Elementor', icon: LayoutGridIcon },
-    ]
+      { name: 'Sora', icon: CameraIcon },
+      { name: 'Nanobanana', icon: ImageIcon },
+      { name: 'Veo', icon: VideoIcon },
+      { name: 'Kling', icon: ClapperboardIcon },
+      { name: 'ChatGPT', icon: BracesIcon },
+    ],
   },
   {
-    id: 'marketing-content',
-    title: t('skills.clusters.tools.title', lang),
-    description: t('skills.clusters.tools.description', lang),
-    icon: MegaphoneIcon,
-    tools: [
-      { name: 'LinkedIn Marketing', icon: LinkedinIcon },
-      { name: 'Content Creation', icon: Edit3Icon },
-      { name: 'SEO Basics', icon: SearchCheckIcon },
-    ]
-  },
-  {
-    id: 'management-organization',
-    title: 'Management & Organization',
-    description: 'Structured processes, efficient workflows, and collaborative project work.',
+    id: 'collab-delivery',
+    title: '협업 & 딜리버리 (Collaboration & Delivery)',
+    description:
+      '빠른 소통과 피드백 반영, 일정 준수, 명확한 기준으로 안정적으로 납품합니다.',
     icon: KanbanSquareIcon,
     tools: [
-      { name: 'Asana', icon: CheckSquareIcon },
-      { name: 'Notion', icon: BookTextIcon },
-      { name: 'Miro', icon: LayoutDashboardIcon },
-    ]
-  }
+      { name: 'KakaoTalk', icon: Edit3Icon },
+      { name: 'Google Drive', icon: Globe2Icon },
+    ],
+  },
 ];
 ---
 
@@ -85,8 +94,7 @@ const skillClusters = [
         >
           <div class="cluster-header flex items-center mb-4">
             <div class="icon-container mr-4 text-primary bg-primary/5 p-3 rounded-lg">
-              {/* SVG for Cluster Icon with specific paths */}
-              <cluster.icon size=26 stroke-width=1.75 />
+              <cluster.icon size={26} stroke-width={1.75} />
             </div>
             <h3 class="font-heading text-xl text-secondary dark:text-white">
               {cluster.title}
@@ -101,7 +109,7 @@ const skillClusters = [
             {cluster.tools.map((tool) => (
               <div class="tool-item flex flex-col items-center text-center">
                 <div class="tool-icon text-primary bg-primary/5 p-3 rounded-lg mb-2">
-                  <tool.icon size=20 stroke-width=1.75 />
+                  <tool.icon size={20} stroke-width={1.75} />
                 </div>
                 <p class="text-sm font-medium text-secondary dark:text-white">{tool.name}</p>
               </div>
