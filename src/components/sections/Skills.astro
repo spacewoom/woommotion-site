@@ -1,64 +1,77 @@
 ---
+import { t, type Language } from '../../utils/i18n';
+
+// Lucide icons
 import {
   VideoIcon,
   PaletteIcon,
-  RocketIcon,
   VideoIcon,
   KanbanSquareIcon,
-  ClapperboardIcon,
   PenToolIcon,
   ImageIcon,
-  CameraIcon,
-  BracesIcon,
   Globe2Icon,
   Edit3Icon,
-} from '@lucide/astro';
+} from 'lucide-react';
 
-import { t } from '../../utils/i18n';
-
-interface Props {
-  lang: string | undefined;
-}
-
-const { lang } = Astro.props;
+const lang = Astro.locals.lang as Language;
 
 const skillClusters = [
   {
     id: 'motion-editing',
-    title: '모션/편집 (Motion & Editing)',
+    title: '모션 & 편집 (Motion & Editing)',
     description:
-      '브랜드 톤에 맞춘 모션그래픽·타이포 애니메이션·루프 영상 제작에 최적화된 툴 체인입니다.',
+      '모션그래픽, 타이포 애니메이션, 루프 영상 제작에 최적화된 툴을 사용합니다.',
     icon: VideoIcon,
     tools: [
-      { name: 'After Effects', icon: ClapperboardIcon },
-      { name: 'Media Encoder', icon: VideoIcon },
-      { name: 'Procreate', icon: PenToolIcon },
+      { name: 'After Effects', icon: VideoIcon },
+      {
+        name: 'Media Encoder',
+        icon: VideoIcon,
+        iconSrc: '/icons/tools/media-encoder.svg',
+      },
+      {
+        name: 'Procreate',
+        icon: BrushIcon,
+        iconSrc: '/icons/tools/procreate.svg',
+      },
     ],
   },
   {
     id: 'design-assets',
-    title: '디자인/에셋 제작 (Design & Assets)',
+    title: '디자인 & 에셋 (Design & Assets)',
     description:
-      '클라이언트의 니즈와 컨셉을 반영해 레이아웃·키비주얼·에셋을 목적에 맞게 설계합니다.',
+      '레이아웃, 키비주얼, 에셋 디자인을 고객의 니즈/컨셉에 맞춰 설계합니다.',
     icon: PaletteIcon,
     tools: [
       { name: 'Photoshop', icon: ImageIcon },
       { name: 'Illustrator', icon: PenToolIcon },
-      { name: 'Procreate', icon: PenToolIcon },
+      {
+        name: 'Procreate',
+        icon: BrushIcon,
+        iconSrc: '/icons/tools/procreate.svg',
+      },
     ],
   },
   {
     id: 'ai-assisted',
-    title: 'AI 제작 보조 (AI Assisted)',
+    title: 'AI 기반 제작 보조 (AI Assisted)',
     description:
-      '아이디어 확장과 레퍼런스 탐색, 숏폼 소재 제작, 반복 작업 효율화를 위해 AI 툴을 보조적으로 활용합니다.',
-    icon: RocketIcon,
+      '레퍼런스 확장, 디자인 탐색, 숏폼 소스 제작, 반복 작업 효율화를 지원합니다.',
+    icon: BotIcon,
     tools: [
-      { name: 'Sora', icon: CameraIcon },
-      { name: 'Nanobanana', icon: ImageIcon },
-      { name: 'Veo', icon: VideoIcon },
+      { name: 'Sora', icon: BotIcon, iconSrc: '/icons/tools/sora.svg' },
+      {
+        name: 'Nanobanana',
+        icon: Wand2Icon,
+        iconSrc: '/icons/tools/nanobanana.svg',
+      },
+      { name: 'Veo', icon: SparklesIcon, iconSrc: '/icons/tools/veo.svg' },
+
+      // Kling: 파일을 따로 쓰고 싶으면 아래 iconSrc만 추가하면 됩니다.
+      // 예) iconSrc: '/icons/tools/video.svg' 를 쓰려면 해당 파일을 public/icons/tools/video.svg로 업로드
       { name: 'Kling', icon: VideoIcon },
-      { name: 'ChatGPT', icon: BracesIcon },
+
+      { name: 'ChatGPT', icon: BotIcon },
     ],
   },
   {
@@ -68,60 +81,80 @@ const skillClusters = [
       '빠른 소통과 피드백 반영, 일정 준수, 명확한 기준으로 안정적으로 납품합니다.',
     icon: KanbanSquareIcon,
     tools: [
-      { name: 'KakaoTalk', icon: Edit3Icon },
-      { name: 'Google Drive', icon: Globe2Icon },
+      {
+        name: 'KakaoTalk',
+        icon: Edit3Icon,
+        iconSrc: '/icons/tools/kakaotalk.svg',
+      },
+      {
+        name: 'Google Drive',
+        icon: Globe2Icon,
+        iconSrc: '/icons/tools/google-drive.svg',
+      },
     ],
   },
 ];
 ---
 
-<section id="skills" class="py-16 md:py-24">
-  <div class="max-w-container mx-auto px-6">
-    <div class="mb-8 md:mb-10 text-center" data-aos="fade-up" data-aos-duration="800">
-      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">{t('skills.title', lang)}</h2>
-      <p class="text-secondary/70 dark:text-white/70 max-w-2xl mx-auto">
+<section id="skills" class="relative py-24 sm:py-28">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="mb-10 max-w-2xl">
+      <p class="mb-2 text-sm font-semibold tracking-wider text-accent dark:text-accent-light">
+        {t('skills.label', lang)}
+      </p>
+      <h2 class="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+        {t('skills.title', lang)}
+      </h2>
+      <p class="mt-4 text-base leading-relaxed text-muted-foreground">
         {t('skills.subtitle', lang)}
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-      {skillClusters.map((cluster, index) => (
-        <div
-          id={cluster.id}
-          class="skill-cluster bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300"
-          data-aos="fade-up"
-          data-aos-duration="600"
-          data-aos-delay={index * 150}
-        >
-          <div class="cluster-header flex items-center mb-4">
-            <div class="icon-container mr-4 text-primary bg-primary/5 p-3 rounded-lg">
-              <cluster.icon size={26} stroke-width={1.75} />
-            </div>
-            <h3 class="font-heading text-xl text-secondary dark:text-white">
-              {cluster.title}
-            </h3>
-          </div>
-
-          <p class="text-secondary/70 dark:text-white/70 mb-4 cluster-description">
-            {cluster.description}
-          </p>
-
-          <div class="cluster-tools grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6">
-            {cluster.tools.map((tool) => (
-              <div class="tool-item flex flex-col items-center text-center">
-                <div class="tool-icon text-primary bg-primary/5 p-3 rounded-lg mb-2">
-                  <tool.icon size={20} stroke-width={1.75} />
-                </div>
-                <p class="text-sm font-medium text-secondary dark:text-white">{tool.name}</p>
+    <div class="grid gap-6 md:grid-cols-2">
+      {
+        skillClusters.map((cluster) => (
+          <article class="group relative overflow-hidden rounded-3xl border border-border bg-card/80 p-7 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:shadow-md">
+            <div class="flex items-start gap-4">
+              <div class="rounded-2xl border border-border bg-background/60 p-3 text-accent dark:text-accent-light">
+                <cluster.icon size={22} stroke-width={1.75} />
               </div>
-            ))}
-          </div>
-        </div>
-      ))}
+
+              <div class="min-w-0">
+                <h3 class="text-lg font-semibold text-foreground">
+                  {cluster.title}
+                </h3>
+                <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {cluster.description}
+                </p>
+
+                <div class="mt-5 flex flex-wrap gap-2">
+                  {cluster.tools.map((tool) => (
+                    <span class="inline-flex items-center gap-2 rounded-full border border-border bg-background/50 px-3 py-1.5 text-xs font-medium text-foreground/90">
+                      <span class="text-accent dark:text-accent-light">
+                        {
+                          tool.iconSrc ? (
+                            <img
+                              src={tool.iconSrc}
+                              alt={`${tool.name} icon`}
+                              width="20"
+                              height="20"
+                              loading="lazy"
+                              class="h-5 w-5 object-contain dark:invert"
+                            />
+                          ) : (
+                            <tool.icon size={20} stroke-width={1.75} />
+                          )
+                        }
+                      </span>
+                      <span class="whitespace-nowrap">{tool.name}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </article>
+        ))
+      }
     </div>
   </div>
 </section>
-
-<script>
-  // Skills section will be animated via the animations.js file
-</script>
