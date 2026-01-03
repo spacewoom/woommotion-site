@@ -3,7 +3,6 @@ import {
   VideoIcon,
   PaletteIcon,
   RocketIcon,
-  VideoIcon,
   KanbanSquareIcon,
   ClapperboardIcon,
   PenToolIcon,
@@ -22,42 +21,72 @@ interface Props {
 
 const { lang } = Astro.props;
 
-const skillClusters = [
+type Tool = {
+  name: string;
+  icon: any; // lucide astro component
+  iconSrc?: string; // /public 경로의 아이콘을 쓰고 싶을 때만 사용
+};
+
+type Cluster = {
+  id: string;
+  title: string;
+  description: string;
+  icon: any;
+  tools: Tool[];
+};
+
+const skillClusters: Cluster[] = [
   {
     id: 'motion-editing',
-    title: '모션/편집 (Motion & Editing)',
+    title: '모션 & 편집 (Motion & Editing)',
     description:
-      '브랜드 톤에 맞춘 모션그래픽·타이포 애니메이션·루프 영상 제작에 최적화된 툴 체인입니다.',
+      '모션그래픽, 타이포 애니메이션, 루프 영상 제작에 최적화된 툴 체인입니다.',
     icon: VideoIcon,
     tools: [
       { name: 'After Effects', icon: ClapperboardIcon },
-      { name: 'Media Encoder', icon: VideoIcon },
-      { name: 'Procreate', icon: PenToolIcon },
+      {
+        name: 'Media Encoder',
+        icon: VideoIcon,
+        iconSrc: '/icons/tools/media-encoder.svg',
+      },
+      {
+        name: 'Procreate',
+        icon: PenToolIcon,
+        iconSrc: '/icons/tools/procreate.svg',
+      },
     ],
   },
   {
     id: 'design-assets',
-    title: '디자인/에셋 제작 (Design & Assets)',
+    title: '디자인 & 에셋 (Design & Assets)',
     description:
       '클라이언트의 니즈와 컨셉을 반영해 레이아웃·키비주얼·에셋을 목적에 맞게 설계합니다.',
     icon: PaletteIcon,
     tools: [
       { name: 'Photoshop', icon: ImageIcon },
       { name: 'Illustrator', icon: PenToolIcon },
-      { name: 'Procreate', icon: PenToolIcon },
+      {
+        name: 'Procreate',
+        icon: PenToolIcon,
+        iconSrc: '/icons/tools/procreate.svg',
+      },
     ],
   },
   {
     id: 'ai-assisted',
-    title: 'AI 제작 보조 (AI Assisted)',
+    title: 'AI 기반 제작 보조 (AI Assisted)',
     description:
-      '아이디어 확장과 레퍼런스 탐색, 숏폼 소재 제작, 반복 작업 효율화를 위해 AI 툴을 보조적으로 활용합니다.',
+      '레퍼런스 확장, 디자인 탐색, 숏폼 소스 제작, 반복 작업 효율화를 지원합니다.',
     icon: RocketIcon,
     tools: [
-      { name: 'Sora', icon: CameraIcon },
-      { name: 'Nanobanana', icon: ImageIcon },
-      { name: 'Veo', icon: VideoIcon },
-      { name: 'Kling', icon: VideoIcon },
+      { name: 'Sora', icon: CameraIcon, iconSrc: '/icons/tools/sora.svg' },
+      {
+        name: 'Nanobanana',
+        icon: ImageIcon,
+        iconSrc: '/icons/tools/nanobanana.svg',
+      },
+      { name: 'Veo', icon: VideoIcon, iconSrc: '/icons/tools/veo.svg' },
+      { name: 'Kling', icon: VideoIcon }
       { name: 'ChatGPT', icon: BracesIcon },
     ],
   },
@@ -68,8 +97,16 @@ const skillClusters = [
       '빠른 소통과 피드백 반영, 일정 준수, 명확한 기준으로 안정적으로 납품합니다.',
     icon: KanbanSquareIcon,
     tools: [
-      { name: 'KakaoTalk', icon: Edit3Icon },
-      { name: 'Google Drive', icon: Globe2Icon },
+      {
+        name: 'KakaoTalk',
+        icon: Edit3Icon,
+        iconSrc: '/icons/tools/kakaotalk.svg',
+      },
+      {
+        name: 'Google Drive',
+        icon: Globe2Icon,
+        iconSrc: '/icons/tools/google-drive.svg',
+      },
     ],
   },
 ];
@@ -78,7 +115,9 @@ const skillClusters = [
 <section id="skills" class="py-16 md:py-24">
   <div class="max-w-container mx-auto px-6">
     <div class="mb-8 md:mb-10 text-center" data-aos="fade-up" data-aos-duration="800">
-      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">{t('skills.title', lang)}</h2>
+      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">
+        {t('skills.title', lang)}
+      </h2>
       <p class="text-secondary/70 dark:text-white/70 max-w-2xl mx-auto">
         {t('skills.subtitle', lang)}
       </p>
@@ -97,6 +136,7 @@ const skillClusters = [
             <div class="icon-container mr-4 text-primary bg-primary/5 p-3 rounded-lg">
               <cluster.icon size={26} stroke-width={1.75} />
             </div>
+
             <h3 class="font-heading text-xl text-secondary dark:text-white">
               {cluster.title}
             </h3>
@@ -110,7 +150,18 @@ const skillClusters = [
             {cluster.tools.map((tool) => (
               <div class="tool-item flex flex-col items-center text-center">
                 <div class="tool-icon text-primary bg-primary/5 p-3 rounded-lg mb-2">
-                  <tool.icon size={20} stroke-width={1.75} />
+                  {tool.iconSrc ? (
+                    <img
+                      src={tool.iconSrc}
+                      alt={`${tool.name} icon`}
+                      width="20"
+                      height="20"
+                      loading="lazy"
+                      class="w-5 h-5 object-contain invert-0 dark:invert"
+                    />
+                  ) : (
+                    <tool.icon size={20} stroke-width={1.75} />
+                  )}
                 </div>
                 <p class="text-sm font-medium text-secondary dark:text-white">{tool.name}</p>
               </div>
@@ -121,7 +172,3 @@ const skillClusters = [
     </div>
   </div>
 </section>
-
-<script>
-  // Skills section will be animated via the animations.js file
-</script>
