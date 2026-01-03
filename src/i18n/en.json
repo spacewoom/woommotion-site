@@ -11,7 +11,7 @@ const t = useTranslations(lang);
 // Timeline items based on keys in i18n files
 const timelineItems = ['item1', 'item2', 'item3', 'item4', 'item5'];
 
-// ✅ Two-line titles (Korean first, English second)
+// Two-line titles (Korean first, English second)
 const TITLE_LINES: Record<string, { ko: string; en: string }> = {
   item1: { ko: '클라이언트 요청 (결제)', en: 'Client Request (Payment)' },
   item2: { ko: '기획', en: 'Planning' },
@@ -20,7 +20,7 @@ const TITLE_LINES: Record<string, { ko: string; en: string }> = {
   item5: { ko: '전달 & 수정', en: 'Delivery & Revisions' },
 };
 
-// ✅ Force left alignment for these titles only
+// Force left alignment for these titles only
 const LEFT_TITLE = new Set(['item1', 'item3', 'item5']);
 ---
 
@@ -42,7 +42,7 @@ const LEFT_TITLE = new Set(['item1', 'item3', 'item5']);
           <div class={`flex flex-col md:flex-row md:items-center ${idx % 2 === 0 ? '' : 'md:flex-row-reverse'}`}>
             {/* Content */}
             <div class="md:w-1/2 md:text-right px-6 md:px-10 mb-6 md:mb-0">
-              {/* ✅ Title: 2 lines (KO + EN), with selective left alignment */}
+              {/* Title: 2 lines (KO + EN), with selective left alignment */}
               <h3
                 class={`font-heading text-xl md:text-2xl text-secondary dark:text-white mb-3 ${
                   LEFT_TITLE.has(item) ? 'text-left' : ''
@@ -54,7 +54,7 @@ const LEFT_TITLE = new Set(['item1', 'item3', 'item5']);
                 </span>
               </h3>
 
-              {/* ✅ Subtitle/description: always left aligned */}
+              {/*Subtitle/description: always left aligned */}
               <p class="text-secondary/70 dark:text-white/70 text-left">
                 {t(`timeline.${item}Description`, lang)}
               </p>
