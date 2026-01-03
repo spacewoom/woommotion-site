@@ -1,173 +1,120 @@
 ---
-import {
-  VideoIcon,
-  PaletteIcon,
-  RocketIcon,
-  KanbanSquareIcon,
-  ClapperboardIcon,
-  PenToolIcon,
-  ImageIcon,
-  CameraIcon,
-  BracesIcon,
-  Globe2Icon,
-  Edit3Icon,
-} from '@lucide/astro';
-
+import { VideoIcon, PaintbrushIcon, BotIcon, UsersIcon } from '@lucide/astro';
+import { getLangFromUrl } from '../../utils/getLangFromUrl';
 import { t } from '../../utils/i18n';
 
-interface Props {
-  lang: string | undefined;
-}
+const lang = getLangFromUrl(Astro.url);
 
-const { lang } = Astro.props;
-
-type Tool = {
-  name: string;
-  icon: any; // lucide astro component
-  iconSrc?: string; // /public 경로의 아이콘을 쓰고 싶을 때만 사용
-};
-
-type Cluster = {
-  id: string;
-  title: string;
-  description: string;
-  icon: any;
-  tools: Tool[];
-};
-
-const skillClusters: Cluster[] = [
+/**
+ * Notes
+ * - Keep all text via i18n keys (en/de structure preserved).
+ * - Only some tool icons are swapped to SVG files in /public/icons/tools/.
+ * - For dark mode, we rely on `dark:invert` (your icons are black-on-transparent).
+ */
+const skillClusters = [
   {
-    id: 'motion-editing',
-    title: '모션 & 편집 (Motion & Editing)',
-    description:
-      '모션그래픽, 타이포 애니메이션, 루프 영상 제작에 최적화된 툴 체인입니다.',
+    key: 'motion',
+    title: t('skills.motion.title', lang),
+    description: t('skills.motion.description', lang),
     icon: VideoIcon,
     tools: [
-      { name: 'After Effects', icon: ClapperboardIcon },
-      {
-        name: 'Media Encoder',
-        icon: VideoIcon,
-        iconSrc: '/icons/tools/media-encoder.svg',
-      },
-      {
-        name: 'Procreate',
-        icon: PenToolIcon,
-        iconSrc: '/icons/tools/procreate.svg',
-      },
+      { name: 'After Effects', icon: VideoIcon },
+      { name: 'Media Encoder', iconSrc: '/icons/tools/media-encoder.svg' },
+      { name: 'Procreate', iconSrc: '/icons/tools/procreate.svg' },
     ],
   },
   {
-    id: 'design-assets',
-    title: '디자인 & 에셋 (Design & Assets)',
-    description:
-      '클라이언트의 니즈와 컨셉을 반영해 레이아웃·키비주얼·에셋을 목적에 맞게 설계합니다.',
-    icon: PaletteIcon,
+    key: 'design',
+    title: t('skills.design.title', lang),
+    description: t('skills.design.description', lang),
+    icon: PaintbrushIcon,
     tools: [
-      { name: 'Photoshop', icon: ImageIcon },
-      { name: 'Illustrator', icon: PenToolIcon },
-      {
-        name: 'Procreate',
-        icon: PenToolIcon,
-        iconSrc: '/icons/tools/procreate.svg',
-      },
+      { name: 'Photoshop', icon: PaintbrushIcon },
+      { name: 'Illustrator', icon: PaintbrushIcon },
+      { name: 'Procreate', iconSrc: '/icons/tools/procreate.svg' },
     ],
   },
   {
-    id: 'ai-assisted',
-    title: 'AI 기반 제작 보조 (AI Assisted)',
-    description:
-      '레퍼런스 확장, 디자인 탐색, 숏폼 소스 제작, 반복 작업 효율화를 지원합니다.',
-    icon: RocketIcon,
+    key: 'ai',
+    title: t('skills.ai.title', lang),
+    description: t('skills.ai.description', lang),
+    icon: BotIcon,
     tools: [
-      { name: 'Sora', icon: CameraIcon, iconSrc: '/icons/tools/sora.svg' },
-      {
-        name: 'Nanobanana',
-        icon: ImageIcon,
-        iconSrc: '/icons/tools/nanobanana.svg',
-      },
-      { name: 'Veo', icon: VideoIcon, iconSrc: '/icons/tools/veo.svg' },
-      { name: 'Kling', icon: VideoIcon }
-      { name: 'ChatGPT', icon: BracesIcon },
+      { name: 'Sora', iconSrc: '/icons/tools/sora.svg' },
+      { name: 'Nanobanana', iconSrc: '/icons/tools/nanobanana.svg' },
+      { name: 'Veo', iconSrc: '/icons/tools/veo.svg' },
+      // Kling은 “video.svg” 아이콘을 재사용
+      { name: 'Kling', iconSrc: '/icons/tools/video.svg' },
+      { name: 'ChatGPT', icon: BotIcon },
     ],
   },
   {
-    id: 'collab-delivery',
-    title: '협업 & 딜리버리 (Collaboration & Delivery)',
-    description:
-      '빠른 소통과 피드백 반영, 일정 준수, 명확한 기준으로 안정적으로 납품합니다.',
-    icon: KanbanSquareIcon,
+    key: 'collab',
+    title: t('skills.collab.title', lang),
+    description: t('skills.collab.description', lang),
+    icon: UsersIcon,
     tools: [
-      {
-        name: 'KakaoTalk',
-        icon: Edit3Icon,
-        iconSrc: '/icons/tools/kakaotalk.svg',
-      },
-      {
-        name: 'Google Drive',
-        icon: Globe2Icon,
-        iconSrc: '/icons/tools/google-drive.svg',
-      },
+      { name: 'KakaoTalk', iconSrc: '/icons/tools/kakaotalk.svg' },
+      { name: 'Google Drive', iconSrc: '/icons/tools/google-drive.svg' },
     ],
   },
 ];
 ---
 
-<section id="skills" class="py-16 md:py-24">
-  <div class="max-w-container mx-auto px-6">
-    <div class="mb-8 md:mb-10 text-center" data-aos="fade-up" data-aos-duration="800">
-      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">
+<section id="skills" class="relative scroll-mt-24 py-24 sm:py-28">
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="mb-12 flex flex-col gap-4">
+      <p class="inline-flex w-fit items-center gap-2 rounded-full border border-border/60 bg-background/50 px-3 py-1 text-sm text-muted-foreground">
+        <span class="h-2 w-2 rounded-full bg-foreground/70"></span>
+        {t('skills.kicker', lang)}
+      </p>
+
+      <h2 class="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
         {t('skills.title', lang)}
       </h2>
-      <p class="text-secondary/70 dark:text-white/70 max-w-2xl mx-auto">
+      <p class="max-w-2xl text-pretty text-muted-foreground">
         {t('skills.subtitle', lang)}
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-      {skillClusters.map((cluster, index) => (
-        <div
-          id={cluster.id}
-          class="skill-cluster bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300"
+    <div class="grid gap-6 md:grid-cols-2">
+      {skillClusters.map((cluster) => (
+        <article
+          class="group rounded-2xl border border-border/60 bg-card/30 p-6 shadow-sm backdrop-blur transition hover:border-border"
           data-aos="fade-up"
-          data-aos-duration="600"
-          data-aos-delay={index * 150}
         >
-          <div class="cluster-header flex items-center mb-4">
-            <div class="icon-container mr-4 text-primary bg-primary/5 p-3 rounded-lg">
-              <cluster.icon size={26} stroke-width={1.75} />
+          <div class="flex items-start gap-4">
+            <div class="grid h-12 w-12 place-items-center rounded-xl border border-border/60 bg-background/60 shadow-sm">
+              <cluster.icon class="h-6 w-6 text-foreground" />
             </div>
 
-            <h3 class="font-heading text-xl text-secondary dark:text-white">
-              {cluster.title}
-            </h3>
-          </div>
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold leading-snug">{cluster.title}</h3>
+              <p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+                {cluster.description}
+              </p>
 
-          <p class="text-secondary/70 dark:text-white/70 mb-4 cluster-description">
-            {cluster.description}
-          </p>
-
-          <div class="cluster-tools grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6">
-            {cluster.tools.map((tool) => (
-              <div class="tool-item flex flex-col items-center text-center">
-                <div class="tool-icon text-primary bg-primary/5 p-3 rounded-lg mb-2">
-                  {tool.iconSrc ? (
-                    <img
-                      src={tool.iconSrc}
-                      alt={`${tool.name} icon`}
-                      width="20"
-                      height="20"
-                      loading="lazy"
-                      class="w-5 h-5 object-contain invert-0 dark:invert"
-                    />
-                  ) : (
-                    <tool.icon size={20} stroke-width={1.75} />
-                  )}
-                </div>
-                <p class="text-sm font-medium text-secondary dark:text-white">{tool.name}</p>
+              <div class="mt-5 flex flex-wrap gap-2">
+                {cluster.tools.map((tool) => (
+                  <span class="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/50 px-3 py-1 text-sm text-muted-foreground">
+                    {tool.iconSrc ? (
+                      <img
+                        src={tool.iconSrc}
+                        alt={tool.name}
+                        class="h-5 w-5 dark:invert"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <tool.icon class="h-5 w-5 text-foreground/80" />
+                    )}
+                    <span>{tool.name}</span>
+                  </span>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        </article>
       ))}
     </div>
   </div>
