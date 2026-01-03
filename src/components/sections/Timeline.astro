@@ -1,6 +1,6 @@
 ---
-import Button from './ui/Buttons.astro';
-import { t } from '././utils/i18n';
+import Button from '../ui/Buttons.astro';
+import { t } from '../../utils/i18n';
 
 interface Props {
   lang: string | undefined;
@@ -8,20 +8,22 @@ interface Props {
 
 const { lang } = Astro.props;
 
-// ✅ 3개 → 5개로만 변경 (최소 리스크)
+// 3개 → 5개 (item4, item5는 i18n 키만 추가하면 됨)
 const timelineItems = ["item1", "item2", "item3", "item4", "item5"];
 ---
 
 <section class="py-16 md:py-24">
   <div class="max-w-container mx-auto px-6">
     <div class="mb-12" data-aos="fade-up">
-      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">{t('timeline.title', lang)}</h2>
+      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">
+        {t('timeline.title', lang)}
+      </h2>
       <p class="text-secondary/70 dark:text-white/70 max-w-2xl">
         {t('timeline.subtitle', lang)}
       </p>
     </div>
 
-    <div id="timeline-container" class="relative"> {/* Added id for GSAP trigger */}
+    <div id="timeline-container" class="relative">
       <!-- Timeline line -->
       <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700 transform md:translate-x-px"></div>
 
@@ -31,13 +33,17 @@ const timelineItems = ["item1", "item2", "item3", "item4", "item5"];
             class={`relative flex flex-col md:flex-row gap-8 md:gap-0 ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
             data-aos={index % 2 === 0 ? "fade-left" : "fade-right"}
           >
-            {/* Timeline dot - Added class="timeline-dot" */}
+            {/* Timeline dot */}
             <div class="timeline-dot absolute left-0 md:left-1/2 top-0 w-5 h-5 rounded-full bg-primary border-4 border-white dark:border-neutral-dark transform -translate-x-2 md:-translate-x-2.5"></div>
 
             <!-- Content -->
             <div class="md:w-1/2 pl-10 md:pl-0 md:pr-12 md:text-right">
-              <h3 class="font-heading text-xl text-secondary dark:text-white mb-1">{t("timeline." + item + "Title", lang)}</h3>
-              <p class="text-secondary/70 dark:text-white/70">{t("timeline." + item + "Description", lang)}</p>
+              <h3 class="font-heading text-xl text-secondary dark:text-white mb-1">
+                {t(`timeline.${item}Title`, lang)}
+              </h3>
+              <p class="text-secondary/70 dark:text-white/70">
+                {t(`timeline.${item}Description`, lang)}
+              </p>
             </div>
 
             <div class="md:w-1/2 md:pl-12">
@@ -46,7 +52,6 @@ const timelineItems = ["item1", "item2", "item3", "item4", "item5"];
           </div>
         ))}
       </div>
-
     </div>
   </div>
 </section>
@@ -58,18 +63,18 @@ const timelineItems = ["item1", "item2", "item3", "item4", "item5"];
   gsap.registerPlugin(ScrollTrigger);
 
   document.addEventListener('DOMContentLoaded', () => {
-    const timelineDots = document.querySelectorAll('.timeline-dot'); // Selector is now correct
+    const timelineDots = document.querySelectorAll('.timeline-dot');
 
     gsap.from(timelineDots, {
       scrollTrigger: {
-        trigger: '#timeline-container', // Corrected trigger
+        trigger: '#timeline-container',
         start: 'top 80%',
       },
       scale: 0,
       opacity: 0,
       duration: 0.5,
       stagger: 0.2,
-      ease: 'back.out(1.7)'
+      ease: 'back.out(1.7)',
     });
   });
 </script>
