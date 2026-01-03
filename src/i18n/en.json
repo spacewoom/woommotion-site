@@ -1,130 +1,84 @@
----
-import { getLangFromUrl, useTranslations } from '././utils/i18n';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
-
-const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
-
-// Timeline items based on keys in i18n files
-const timelineItems = ['item1', 'item2', 'item3', 'item4', 'item5'];
-
-// Two-line titles (Korean first, English second)
-const TITLE_LINES: Record<string, { ko: string; en: string }> = {
-  item1: { ko: '클라이언트 요청 (결제)', en: 'Client Request (Payment)' },
-  item2: { ko: '기획', en: 'Planning' },
-  item3: { ko: '디자인', en: 'Design' },
-  item4: { ko: '모션', en: 'Motion' },
-  item5: { ko: '전달 & 수정', en: 'Delivery & Revisions' },
-};
-
-// Force left alignment for these titles only
-const LEFT_TITLE = new Set(['item1', 'item3', 'item5']);
----
-
-<section class="py-16 md:py-24">
-  <div class="max-w-container mx-auto px-6">
-    <div class="mb-12" data-aos="fade-up">
-      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">{t('timeline.title', lang)}</h2>
-      <p class="text-secondary/70 dark:text-white/70 max-w-2xl">
-        {t('timeline.subtitle', lang)}
-      </p>
-    </div>
-
-    <div id="timeline-container" class="relative"> {/* Added id for GSAP trigger */}
-      {/* Timeline line */}
-      <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-secondary/10 dark:bg-white/10 md:-translate-x-1/2"></div>
-
-      {timelineItems.map((item, idx) => (
-        <div class="relative mb-12 md:mb-16" data-timeline-item>
-          <div class={`flex flex-col md:flex-row md:items-center ${idx % 2 === 0 ? '' : 'md:flex-row-reverse'}`}>
-            {/* Content */}
-            <div class="md:w-1/2 md:text-right px-6 md:px-10 mb-6 md:mb-0">
-              {/* Title: 2 lines (KO + EN), with selective left alignment */}
-              <h3
-                class={`font-heading text-xl md:text-2xl text-secondary dark:text-white mb-3 ${
-                  LEFT_TITLE.has(item) ? 'text-left' : ''
-                }`}
-              >
-                <span class="block">{TITLE_LINES[item]?.ko ?? t(`timeline.${item}Title`, lang)}</span>
-                <span class="block text-sm md:text-base opacity-80">
-                  {TITLE_LINES[item]?.en ?? ''}
-                </span>
-              </h3>
-
-              {/*Subtitle/description: always left aligned */}
-              <p class="text-secondary/70 dark:text-white/70 text-left">
-                {t(`timeline.${item}Description`, lang)}
-              </p>
-            </div>
-
-            {/* Center point */}
-            <div class="absolute left-0 md:left-1/2 w-4 h-4 rounded-full bg-primary md:-translate-x-1/2 z-10"></div>
-
-            {/* Year/Label */}
-            <div class="md:w-1/2 px-6 md:px-10">
-              <div class={`inline-block px-4 py-2 rounded-full bg-primary/10 dark:bg-primary/20 text-primary font-medium ${idx % 2 === 0 ? 'md:ml-10' : 'md:mr-10 md:float-right'}`}>
-                {t(`timeline.${item}Label`, lang)}
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-</section>
-
-<script>
-  // Initialize animation only on client-side
-  if (typeof window !== 'undefined') {
-    // Wait for page to load
-    window.addEventListener('load', () => {
-      // Select all timeline items
-      const timelineItems = document.querySelectorAll('[data-timeline-item]');
-      
-      // Create a staggered animation for timeline items
-      gsap.fromTo(
-        timelineItems,
-        { 
-          opacity: 0,
-          y: 30
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.2,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: "#timeline-container",
-            start: "top 70%",
-            end: "bottom 20%",
-            toggleActions: "play none none none"
-          }
-        }
-      );
-      
-      // Animate the timeline line
-      gsap.fromTo(
-        "#timeline-container > div:first-child",
-        { 
-          scaleY: 0,
-          transformOrigin: "top"
-        },
-        {
-          scaleY: 1,
-          duration: 1.5,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: "#timeline-container",
-            start: "top 80%",
-            end: "top 30%",
-            toggleActions: "play none none none"
-          }
-        }
-      );
-    });
+{
+  "site": {
+    "title": "Portfolio",
+    "description": "A modern portfolio website built with Astro"
+  },
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "skills": "Skills",
+    "works": "Works",
+    "contact": "Contact"
+  },
+  "hero": {
+    "label": "Motion Studio WOOM",
+    "headline": "Imagine it, Create it!",
+    "subheadline": "움직임으로 브랜드 메시지를 설득력 있게 전달합니다.",
+    "pitch": "Menu Board · Promotion · Product/Event · Agency Outsourcing",
+    "ctaPrimary": "Works 보기",
+    "ctaSecondary": "견적 문의 (카카오톡)",
+    "ctaNote": "카카오톡 채널 홈에서 정보 확인 →"
+  },
+  "values": {
+    "title": "Services",
+    "subtitle": "Eye-catching, sensuous motion and clear information delivery. From planning to production, we visualize the client's needs and complete it at a reasonable cost.",
+    "card1TitleLine1": "Digital Menu Boards",
+    "card1TitleLine2": "Menu Boards",
+    "card1Text": "Produce menu board video/motion graphics tailored to the store environment and brand tone. We design readability and purchase inducement together.",
+    "card2TitleLine1": "Promotion Video",
+    "card2TitleLine2": "Promotion",
+    "card2Text": "Producing short-form and loop videos for new menus, events, and seasonal campaigns. Delivers key messages quickly and stylishly.",
+    "card3TitleLine1": "Product & Event",
+    "card3TitleLine2": "Visuals",
+    "card3Text": "Key visual/typo-based motion that quickly understands the product's USP and key information. Designed for purposes such as event openings/highlights.",
+    "card4TitleLine1": "Agency",
+    "card4TitleLine2": "Outsourcing",
+    "card4Text": "Production partnering optimized for agency/studio collaboration. We provide stable support by clearly meeting file structure, version management, and delivery standards."
+  },
+  "skills": {
+    "title": "Workflow & Tools",
+    "subtitle": "작업의 완성도는 과정과 디테일에서 결정됩니다. 툴은 목적에 맞게, 결과물은 브랜드 톤에 맞게 설계합니다.",
+    "card1Title": "Motion & Editing",
+    "card1Text": "모션그래픽, 타이포 애니메이션, 루프 영상 제작에 필요한 핵심 툴을 사용합니다.",
+    "card2Title": "Design & Assets",
+    "card2Text": "클라이언트의 니즈와 콘셉트에 맞는 레이아웃, 키비주얼, 에셋을 설계합니다.",
+    "card3Title": "AI Assisted",
+    "card3Text": "디자인 탐색/레퍼런스 확장, 숏폼 소재 제작, 반복 작업 효율화를 지원합니다.",
+    "card4Title": "Collaboration & Delivery",
+    "card4Text": "빠른 소통과 피드백 반영, 납기 준수로 안정적으로 결과물을 전달합니다."
+  },
+  "projects": {
+    "title": "Works",
+    "subtitle": "Selected projects and templates I've created.",
+    "cta": "View on GitHub"
+  },
+  "timeline": {
+    "title": "Work Process",
+    "subtitle": "의뢰부터 납품까지, 작업은 아래 흐름으로 진행됩니다.",
+    "item1Title": "Client Request (Payment)",
+    "item1Description": "의뢰 내용과 일정/예산을 확인한 뒤 결제(또는 계약) 확정 후 작업이 시작됩니다.",
+    "item2Title": "Planning",
+    "item2Description": "브랜드 톤, 목적, 타깃, 레퍼런스를 정리하고 제작 방향(구성/러닝타임/포맷)을 잡습니다.",
+    "item3Title": "Design",
+    "item3Description": "키비주얼/레이아웃/타이포/그래픽을 설계합니다. 디자인 결과를 공유하고 확정 후 모션 단계로 넘어갑니다.",
+    "item4Title": "Motion",
+    "item4Description": "확정된 디자인을 기반으로 리듬감 있는 모션과 감각적인 연출을 구현합니다. (기획/디자인이 제공된 경우: Motion → Delivery로 단축 가능)",
+    "item5Title": "Delivery & Revisions",
+    "item5Description": "최종 납품 후 기본 3회까지 무상 수정이 가능합니다. 단, 전체 방향을 바꾸는 수준의 변경은 추가 비용이 발생할 수 있으며, 운영자/클라이언트 측 오류로 인한 수정은 무상 수정 횟수에서 차감되지 않습니다."
+  },
+  "footerCTA": {
+    "title": "Need a Template?",
+    "subtitle": "Check out my open-source templates on GitHub and start building your next project today.",
+    "button": "Explore Templates"
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Let’s talk about your project. Send me a message and I’ll get back to you soon.",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "submit": "Send"
+    }
   }
-</script>
+}
