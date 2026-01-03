@@ -1,6 +1,6 @@
 ---
-import Button from '../ui/Buttons.astro';
-import { t } from '../../utils/i18n';
+import Button from './ui/Buttons.astro';
+import { t } from '././utils/i18n';
 
 interface Props {
   lang: string | undefined;
@@ -8,7 +8,8 @@ interface Props {
 
 const { lang } = Astro.props;
 
-const timelineItems = ["item1", "item2", "item3"];
+// ✅ 3개 → 5개로만 변경 (최소 리스크)
+const timelineItems = ["item1", "item2", "item3", "item4", "item5"];
 ---
 
 <section class="py-16 md:py-24">
