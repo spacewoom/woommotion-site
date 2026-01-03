@@ -1,144 +1,84 @@
 {
   "site": {
-    "title": "Nicremo - Portfolio",
-    "description": "Developer and creator of modern web templates focusing on Astro, multilingual support, and performance optimization."
+    "title": "Portfolio",
+    "description": "A modern portfolio website built with Astro"
   },
   "nav": {
     "home": "Home",
-    "works": "Works",
     "services": "Services",
+    "skills": "Skills",
+    "works": "Works",
     "contact": "Contact"
   },
   "hero": {
-    "greeting": "Hello, I am",
-    "name": "Nicremo",
-    "pitch": "I create modern, multilingual web templates and share them on GitHub to help developers build fast, accessible websites.",
-    "role": "Template Creator & Developer",
-    "ctaProjects": "View Projects",
-    "ctaAbout": "More About Me"
+    "label": "Motion Studio WOOM",
+    "headline": "Imagine it, Create it!",
+    "subheadline": "움직임으로 브랜드 메시지를 설득력 있게 전달합니다.",
+    "pitch": "Menu Board · Promotion · Product/Event · Agency Outsourcing",
+    "ctaPrimary": "Works 보기",
+    "ctaSecondary": "견적 문의 (카카오톡)",
+    "ctaNote": "카카오톡 채널 홈에서 정보 확인 →"
   },
   "values": {
     "title": "Services",
-    "subtitle": "눈길을 사로잡는 감각적인 모션과 명확한 정보 전달. 기획부터 제작까지, 클라이언트의 니즈를 시각화해 합리적인 비용으로 완성합니다.",
-    "card1Title": "디지털 메뉴보드 | Digital Menu Boards",
-    "card1Text": "매장 환경과 브랜드 톤에 맞춘 메뉴보드 영상/모션 그래픽 제작. 가독성과 구매 유도를 함께 설계합니다.",
-    "card2Title": "프로모션 영상 | Promotion",
-    "card2Text": "신메뉴·이벤트·시즌 캠페인용 숏폼·루프 영상 제작. 핵심 메시지를 빠르고 세련되게 전달합니다.",
-    "card3Title": "제품·행사 영상 | Product & Event Visuals",
-    "card3Text": "제품 USP와 핵심 정보를 빠르게 이해시키는 키비주얼/타이포 기반 모션. 행사 오프닝/하이라이트 등 목적에 맞게 설계합니다.",
-    "card4Title": "에이전시 아웃소싱 | Agency Outsourcing",
-    "card4Text": "대행사/스튜디오 협업에 최적화된 제작 파트너링. 일관된 무드·완성도·납기 기준을 명확히 맞춰 안정적으로 지원합니다."
+    "subtitle": "Eye-catching, sensuous motion and clear information delivery. From planning to production, we visualize the client's needs and complete it at a reasonable cost.",
+    "card1TitleLine1": "Digital Menu Boards",
+    "card1TitleLine2": "Menu Boards",
+    "card1Text": "Produce menu board video/motion graphics tailored to the store environment and brand tone. We design readability and purchase inducement together.",
+    "card2TitleLine1": "Promotion Video",
+    "card2TitleLine2": "Promotion",
+    "card2Text": "Producing short-form and loop videos for new menus, events, and seasonal campaigns. Delivers key messages quickly and stylishly.",
+    "card3TitleLine1": "Product & Event",
+    "card3TitleLine2": "Visuals",
+    "card3Text": "Key visual/typo-based motion that quickly understands the product's USP and key information. Designed for purposes such as event openings/highlights.",
+    "card4TitleLine1": "Agency",
+    "card4TitleLine2": "Outsourcing",
+    "card4Text": "Production partnering optimized for agency/studio collaboration. We provide stable support by clearly meeting file structure, version management, and delivery standards."
   },
   "skills": {
     "title": "Workflow & Tools",
-    "subtitle": "기획 의도와 브랜드 톤을 정확히 읽고, 움직임으로 설득력 있게 완성합니다.",
-    "clusters": {
-      "frontend": {
-        "title": "Frontend & Frameworks",
-        "description": "Modern web development with Astro, React, and static site generation."
-      },
-      "design": {
-        "title": "Design & Styling",
-        "description": "Beautiful interfaces with Tailwind CSS, responsive design, and dark mode support."
-      },
-      "tools": {
-        "title": "Development Tools",
-        "description": "Version control, deployment, and optimization for production-ready templates."
-      }
-    },
-    "category": {
-      "design": "Design",
-      "coding": "Coding",
-      "framework": "Framework",
-      "deployment": "Deployment"
-    },
-    "astro": {
-      "description": "Static Site Generation & Performance"
-    },
-    "react": {
-      "description": "Interactive Components & UI"
-    },
-    "tailwind": {
-      "description": "Utility-First Styling & Design"
-    },
-    "typescript": {
-      "description": "Type-Safe Development"
-    },
-    "git": {
-      "description": "Version Control & Collaboration"
-    },
-    "vercel": {
-      "description": "Deployment & Hosting"
-    }
+    "subtitle": "작업의 완성도는 과정과 디테일에서 결정됩니다. 툴은 목적에 맞게, 결과물은 브랜드 톤에 맞게 설계합니다.",
+    "card1Title": "Motion & Editing",
+    "card1Text": "모션그래픽, 타이포 애니메이션, 루프 영상 제작에 필요한 핵심 툴을 사용합니다.",
+    "card2Title": "Design & Assets",
+    "card2Text": "클라이언트의 니즈와 콘셉트에 맞는 레이아웃, 키비주얼, 에셋을 설계합니다.",
+    "card3Title": "AI Assisted",
+    "card3Text": "디자인 탐색/레퍼런스 확장, 숏폼 소재 제작, 반복 작업 효율화를 지원합니다.",
+    "card4Title": "Collaboration & Delivery",
+    "card4Text": "빠른 소통과 피드백 반영, 납기 준수로 안정적으로 결과물을 전달합니다."
   },
   "projects": {
-    "pageTitle": "Projects",
-    "pageDescription": "A collection of open-source templates and projects shared on GitHub.",
-    "heroTitle": "My Projects",
-    "heroSubtitle": "Explore my collection of web templates and open-source projects.",
-    "viewProject": "View Project",
-    "detailLabels": {
-      "challenge": "Challenge",
-      "approach": "Approach",
-      "result": "Result",
-      "technologiesUsed": "Technologies Used"
-    },
-    "title": "Selected Projects",
-    "subtitle": "Open-source templates and projects available on GitHub for developers worldwide.",
-    "astroPortfolio": {
-      "shortDescription": "Modern, multilingual portfolio template built with Astro and Tailwind CSS featuring dark mode and i18n support.",
-      "challenge": "Creating a performant, multilingual portfolio template that's easy to customize without touching code.",
-      "approach": "Using Astro for optimal performance, JSON-based content management, and comprehensive documentation for easy setup.",
-      "result": "100/100 Lighthouse score, fully responsive, available in multiple languages, and used by developers worldwide."
-    },
-    "coreprotectWebUI": {
-      "shortDescription": "Web interface for CoreProtect Minecraft plugin with real-time player activity tracking and analytics.",
-      "challenge": "Visualizing complex Minecraft server data in an intuitive, player-centric dashboard.",
-      "approach": "Astro SSR with React components, MySQL integration, and responsive dark-themed UI with real-time updates.",
-      "result": "663,000+ block changes tracked, 4,000+ container transactions, comprehensive player activity monitoring."
-    },
-    "templateCollection": {
-      "shortDescription": "Growing collection of Astro templates shared on GitHub focusing on different use cases and industries.",
-      "challenge": "Providing developers with production-ready templates that are easy to customize and deploy.",
-      "approach": "Creating modular, well-documented templates with SEO optimization and modern best practices.",
-      "result": "Multiple templates with growing community adoption and positive feedback from developers."
-    },
-    "buttonText": "View on GitHub",
-    "allProjectsButtonText": "All Projects on GitHub"
+    "title": "Works",
+    "subtitle": "Selected projects and templates I've created.",
+    "cta": "View on GitHub"
   },
   "timeline": {
-    "title": "작업 프로세스 (Workflow)",
-    "subtitle": "의뢰부터 납품까지, 명확한 단계로 진행합니다. 프로젝트 성격에 따라 단계는 조정될 수 있어요. (모션 단독: Motion → Delivery)",
-    "item1Title": "의뢰 · 견적 (Request)",
-    "item1Description": "요청 내용을 확인하고 범위·일정을 정리해 견적을 안내드립니다. 확정 후 결제/계약으로 착수합니다.",
-    "item2Title": "기획 (Planning)",
-    "item2Description": "목표·타깃·핵심 메시지를 정리하고 구성/레퍼런스/무드 방향을 제안합니다.",
-    "item3Title": "디자인 (Design)",
-    "item3Description": "키비주얼, 레이아웃, 타이포 스타일을 설계합니다. 시안 공유 → 피드백 반영 → 디자인 확정 후 모션 단계로 넘어갑니다.",
-    "item4Title": "모션 (Motion)",
-    "item4Description": "브랜드 톤에 맞는 모션/전환/리듬을 제작하고, 루프 및 송출 환경에 맞춰 최적화합니다.",
-    "item5Title": "납품 · 수정 (Delivery)",
-    "item5Description": "최종 파일 전달 후 기본 3회 수정은 무료입니다. 전면 재구성/방향 변경 등은 추가 비용이 발생할 수 있으며, 운영자 실수로 인한 수정은 회차에서 제외합니다."
-  }
-
+    "title": "Work Process",
+    "subtitle": "의뢰부터 납품까지, 작업은 아래 흐름으로 진행됩니다.",
+    "item1Title": "Client Request (Payment)",
+    "item1Description": "의뢰 내용과 일정/예산을 확인한 뒤 결제(또는 계약) 확정 후 작업이 시작됩니다.",
+    "item2Title": "Planning",
+    "item2Description": "브랜드 톤, 목적, 타깃, 레퍼런스를 정리하고 제작 방향(구성/러닝타임/포맷)을 잡습니다.",
+    "item3Title": "Design",
+    "item3Description": "키비주얼/레이아웃/타이포/그래픽을 설계합니다. 디자인 결과를 공유하고 확정 후 모션 단계로 넘어갑니다.",
+    "item4Title": "Motion",
+    "item4Description": "확정된 디자인을 기반으로 리듬감 있는 모션과 감각적인 연출을 구현합니다. (기획/디자인이 제공된 경우: Motion → Delivery로 단축 가능)",
+    "item5Title": "Delivery & Revisions",
+    "item5Description": "최종 납품 후 기본 3회까지 무상 수정이 가능합니다. 단, 전체 방향을 바꾸는 수준의 변경은 추가 비용이 발생할 수 있으며, 운영자/클라이언트 측 오류로 인한 수정은 무상 수정 횟수에서 차감되지 않습니다."
+  },
   "footerCTA": {
     "title": "Need a Template?",
     "subtitle": "Check out my open-source templates on GitHub and start building your next project today.",
-    "buttonText": "Browse on GitHub"
+    "button": "Explore Templates"
   },
   "contact": {
     "title": "Contact",
-    "subtitle": "Have questions about my templates or want to collaborate? Feel free to reach out!",
-    "emailTitle": "Email",
-    "emailButtonText": "Send Email",
-    "githubTitle": "GitHub",
-    "githubButtonText": "View Profile",
-    "linkedinTitle": "LinkedIn",
-    "linkedinButtonText": "Connect on LinkedIn"
-  },
-  "footer": {
-    "copyright": "All rights reserved.",
-    "imprint": "Imprint",
-    "privacyPolicy": "Privacy Policy"
+    "subtitle": "Let’s talk about your project. Send me a message and I’ll get back to you soon.",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "submit": "Send"
+    }
   }
 }
