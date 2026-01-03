@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Enhanced tool item hover animations
       toolItems.forEach(item => {
-        const icon = item.querySelector('.tool-icon svg');
+        const icon = item.querySelector('.tool-icon svg, .tool-icon img');
         const label = item.querySelector('p');
 
         if (icon && label) {
