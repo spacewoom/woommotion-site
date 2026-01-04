@@ -6,6 +6,14 @@ interface Props {
 }
 
 const { lang } = Astro.props;
+
+const nl2br = (value) =>
+  String(value ?? '')
+    // 실제 개행(\n) + 리터럴 "\\n" 둘 다 지원
+    .replaceAll('\\n', '\n')
+    .replaceAll('\r\n', '\n')
+    .replaceAll('\r', '\n')
+    .replaceAll('\n', '<br />');
 ---
 <section id="contact" class="py-16 md:py-24 bg-secondary dark:bg-neutral-dark text-white">
   <div class="max-w-container mx-auto px-6">
