@@ -39,7 +39,7 @@ const timelineItems = ['item1', 'item2', 'item3', 'item4', 'item5'];
             <div class="timeline-dot absolute left-6 top-0 w-5 h-5 rounded-full bg-primary border-4 border-white dark:border-neutral-dark transform -translate-x-2"></div>
             
             <!-- Content -->
-            <div class="md:w-1/2 pl-10 md:pl-0 md:pr-12 md:text-left">
+            <div class="pl-16 md:pl-[180px] text-left">
               <h3 class="font-heading text-xl text-secondary dark:text-white mb-1">
                 {t(`timeline.${item}Title`, locale)}
               </h3>
@@ -47,11 +47,8 @@ const timelineItems = ['item1', 'item2', 'item3', 'item4', 'item5'];
                 {t(`timeline.${item}Description`, locale)}
               </p>
             </div>
-
-            <div class="md:w-1/2 md:pl-12">
-              <!-- Empty div to create the layout on alternating sides -->
-            </div>
           </div>
+            <!-- Empty div to create the layout on alternating sides -->
         ))}
       </div>
     </div>
