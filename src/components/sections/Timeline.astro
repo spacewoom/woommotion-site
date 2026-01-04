@@ -1,72 +1,55 @@
 ---
-import Button from '../ui/Buttons.astro';
-import { t } from '../../utils/i18n';
+import Button from "../ui/Button.astro";
+import { t } from "../../utils/i18n";
 
 interface Props {
-  lang: string | undefined;
+  lang: "en" | "ko";
 }
 
 const { lang } = Astro.props;
 
-const timelineItems = [
-  { titleKey: "timeline.item1Title", subtitleKey: "timeline.item1Subtitle" },
-  { titleKey: "timeline.item2Title", subtitleKey: "timeline.item2Subtitle" },
-  { titleKey: "timeline.item3Title", subtitleKey: "timeline.item3Subtitle" },
-  { titleKey: "timeline.item4Title", subtitleKey: "timeline.item4Subtitle" },
-  { titleKey: "timeline.item5Title", subtitleKey: "timeline.item5Subtitle" },
-];
+const timelineItems = ["item1", "item2", "item3", "item4", "item5"] as const;
 ---
 
-<section id="timeline" class="relative py-24 overflow-hidden">
-  <!-- background blur (기존 톤 유지용) -->
-  <div class="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl opacity-60"></div>
-  <div class="absolute bottom-20 right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl opacity-60"></div>
-
-    <div class="max-w-container mx-auto px-6">
-    <div class="mb-12" data-aos="fade-up">
-      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">
-        {t('timeline.title', lang)}
+<section id="timeline" class="py-16 md:py-24">
+  <div id="timeline-container" class="max-w-container mx-auto px-6">
+    <!-- Header (left aligned) -->
+    <div class="mb-12 md:mb-16">
+      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4 text-left">
+        {t("timeline.title", lang)}
       </h2>
-      <p class="text-secondary/70 dark:text-white/70 max-w-2xl">
-        {t('timeline.subtitle', lang)}
+      <p class="text-secondary/70 dark:text-white/70 text-lg max-w-3xl text-left">
+        {t("timeline.subtitle", lang)}
       </p>
     </div>
 
-    <!-- timeline -->
-    <div class="timeline-container relative">
-      <!-- vertical line (왼쪽 고정) -->
-      <div class="absolute left-4 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700"></div>
+    <!-- Timeline -->
+    <div class="relative">
+      <!-- Left vertical line -->
+      <div class="absolute left-6 top-0 bottom-0 w-px bg-secondary/10 dark:bg-white/10"></div>
 
-      <div class="space-y-10">
-        {timelineItems.map((item) => (
+      <div class="space-y-10 md:space-y-12">
+        {timelineItems.map((item, index) => (
           <div class="timeline-item relative">
-            {/* dot */}
+            {/* Dot */}
             <div
-              class="
-                absolute left-4 top-6
-                -translate-x-1/2
-                w-3.5 h-3.5 rounded-full
-                bg-neutral-dark dark:bg-neutral-light
-                ring-4 ring-neutral-light dark:ring-neutral-dark
-              "
+              data-timeline-dot
+              class="absolute left-6 top-7 -translate-x-1/2 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-neutral-dark shadow-md"
               aria-hidden="true"
-            ></div>
+            />
 
-            {/* content: dot 기준 들여쓰기 (모바일은 과하지 않게, md에서 150px) */}
-            <div class="pl-16 sm:pl-20 md:pl-[150px]">
+            {/* Content (indented) */}
+            <div class="pl-12 md:pl-48">
               <div
-                class="
-                  rounded-2xl border border-neutral-dark/10 dark:border-neutral-light/10
-                  bg-neutral-light/60 dark:bg-neutral-dark/60
-                  backdrop-blur
-                  p-6 md:p-7
-                "
+                class="bg-white dark:bg-neutral-dark rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-secondary/10 dark:border-white/10"
+                data-aos="fade-left"
+                data-aos-delay={index * 100}
               >
-                <h3 class="text-xl md:text-2xl font-semibold text-secondary dark:text-white text-left">
-                  {t(item.titleKey, locale)}
+                <h3 class="font-heading text-h4 text-secondary dark:text-white mb-3 text-left">
+                  {t(`timeline.${item}Title`, lang)}
                 </h3>
-                <p class="mt-3 text-base md:text-lg text-secondary/80 dark:text-white/80 text-left">
-                  {t(item.subtitleKey, locale)}
+                <p class="text-secondary/70 dark:text-white/70 leading-relaxed text-left">
+                  {t(`timeline.${item}Subtitle`, lang)}
                 </p>
               </div>
             </div>
@@ -74,5 +57,36 @@ const timelineItems = [
         ))}
       </div>
     </div>
+
+    <div class="mt-12 md:mt-16 text-left">
+      <Button href="#contact">{t("timeline.cta", lang)}</Button>
+    </div>
   </div>
 </section>
+
+<script>
+  import gsap from "gsap";
+  import ScrollTrigger from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Dot pulse animation (keeps your dot motion style)
+  const dots = document.querySelectorAll("[data-timeline-dot]");
+
+  if (dots.length) {
+    gsap.fromTo(
+      dots,
+      { scale: 0.8 },
+      {
+        scale: 1,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: "#timeline-container",
+          start: "top 75%",
+        },
+      }
+    );
+  }
+</script>
