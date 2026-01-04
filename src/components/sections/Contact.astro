@@ -7,8 +7,25 @@ interface Props {
 
 const { lang } = Astro.props;
 
-// Ensure line breaks work whether JSON contains \n or actual newlines
-const formatMultiline = (value = '') => String(value).replace(/\\n/g, '\n');
+// Normalize line breaks for any of these cases:
+// 1) actual newline "\n"
+// 2) literal backslash-n "\\n"
+// 3) Windows newline "\r\n"
+const normalizeBreaks = (value = '') =>
+  String(value).replace(/\r\n/g, '\n').replace(/\\n/g, '\n');
+
+const toLines = (value = '') => normalizeBreaks(value).split('\n');
+
+// Pre-split once (stable + minimal runtime work)
+const subtitleLines = toLines(t('contact.subtitle', lang));
+
+const emailTextLines = toLines(t('contact.emailText', lang));
+const phoneTextLines = toLines(t('contact.phoneText', lang));
+const linkedinTextLines = toLines(t('contact.linkedinText', lang));
+
+const emailButtonLines = toLines(t('contact.emailButtonText', lang));
+const phoneButtonLines = toLines(t('contact.phoneButtonText', lang));
+const linkedinButtonLines = toLines(t('contact.linkedinButtonText', lang));
 ---
 
 <section id="contact" class="py-16 md:py-24 bg-secondary dark:bg-neutral-dark text-white">
@@ -17,8 +34,15 @@ const formatMultiline = (value = '') => String(value).replace(/\\n/g, '\n');
       <h2 class="font-heading text-h2 text-white mb-4">
         {t('contact.title', lang)}
       </h2>
-      <p class="text-white/70 mt-2 max-w-xl mx-auto whitespace-pre-line">
-        {formatMultiline(t('contact.subtitle', lang))}
+
+      <!-- widen subtitle area (~ +80px) -->
+      <p class="text-white/70 mt-2 max-w-2xl mx-auto">
+        {subtitleLines.map((line, i) => (
+          <>
+            {line}
+            {i < subtitleLines.length - 1 && <br />}
+          </>
+        ))}
       </p>
     </div>
 
@@ -37,12 +61,22 @@ const formatMultiline = (value = '') => String(value).replace(/\\n/g, '\n');
           {t('contact.emailTitle', lang)}
         </h3>
 
-        <p class="text-white/70 mb-6 whitespace-pre-line text-left">
-          {formatMultiline(t('contact.emailText', lang))}
+        <p class="text-white/70 mb-6 text-left">
+          {emailTextLines.map((line, i) => (
+            <>
+              {line}
+              {i < emailTextLines.length - 1 && <br />}
+            </>
+          ))}
         </p>
 
-        <div class="text-primary font-medium text-left whitespace-pre-line">
-          {formatMultiline(t('contact.emailButtonText', lang))}
+        <div class="text-primary font-medium text-left">
+          {emailButtonLines.map((line, i) => (
+            <>
+              {line}
+              {i < emailButtonLines.length - 1 && <br />}
+            </>
+          ))}
         </div>
       </div>
 
@@ -60,12 +94,22 @@ const formatMultiline = (value = '') => String(value).replace(/\\n/g, '\n');
           {t('contact.phoneTitle', lang)}
         </h3>
 
-        <p class="text-white/70 mb-6 whitespace-pre-line text-left">
-          {formatMultiline(t('contact.phoneText', lang))}
+        <p class="text-white/70 mb-6 text-left">
+          {phoneTextLines.map((line, i) => (
+            <>
+              {line}
+              {i < phoneTextLines.length - 1 && <br />}
+            </>
+          ))}
         </p>
 
-        <div class="text-primary font-medium text-left whitespace-pre-line">
-          {formatMultiline(t('contact.phoneButtonText', lang))}
+        <div class="text-primary font-medium text-left">
+          {phoneButtonLines.map((line, i) => (
+            <>
+              {line}
+              {i < phoneButtonLines.length - 1 && <br />}
+            </>
+          ))}
         </div>
       </div>
 
@@ -83,12 +127,22 @@ const formatMultiline = (value = '') => String(value).replace(/\\n/g, '\n');
           {t('contact.linkedinTitle', lang)}
         </h3>
 
-        <p class="text-white/70 mb-6 whitespace-pre-line text-left">
-          {formatMultiline(t('contact.linkedinText', lang))}
+        <p class="text-white/70 mb-6 text-left">
+          {linkedinTextLines.map((line, i) => (
+            <>
+              {line}
+              {i < linkedinTextLines.length - 1 && <br />}
+            </>
+          ))}
         </p>
 
-        <div class="text-primary font-medium text-left whitespace-pre-line">
-          {formatMultiline(t('contact.linkedinButtonText', lang))}
+        <div class="text-primary font-medium text-left">
+          {linkedinButtonLines.map((line, i) => (
+            <>
+              {line}
+              {i < linkedinButtonLines.length - 1 && <br />}
+            </>
+          ))}
         </div>
       </div>
     </div>
