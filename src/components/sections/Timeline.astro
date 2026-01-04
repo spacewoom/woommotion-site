@@ -1,8 +1,13 @@
 ---
-import Section from '../layout/Section.astro';
+import Button from '../ui/Buttons.astro';
 import { t } from '../../utils/i18n';
 
-const locale = Astro.currentLocale || 'en';
+interface Props {
+  lang: string | undefined;
+}
+
+const { lang } = Astro.props;
+
 
 const timelineItems = [
   {
