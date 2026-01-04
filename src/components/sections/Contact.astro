@@ -61,9 +61,10 @@ const { lang } = Astro.props;
         <h3 class="font-heading text-xl text-white mb-3">
           {t('contact.emailTitle', lang)}
         </h3>
-        <p class="text-white/70 mb-4">
-          <Obfuscate element="span" email={email} client:only="preact" />
+        <p class="text-white/70 mb-4 whitespace-pre-line">
+          {t('contact.emailText', lang)}
         </p>
+
         <span class="inline-flex items-center text-sm text-primary font-medium">
           <span>{t('contact.emailButtonText', lang)}</span>
           <svg
@@ -125,9 +126,11 @@ const { lang } = Astro.props;
         <h3 class="font-heading text-xl text-white mb-3">
           {t('contact.phoneTitle', lang)}
         </h3>
-        <p class="text-white/70 mb-4">
-          <Obfuscate element="span" tel={phone} client:only="preact" />
+        <p class="text-white/70 mb-4 whitespace-pre-line">
+          {t('contact.phoneText', lang)}
         </p>
+
+
         <span class="inline-flex items-center text-sm text-primary font-medium">
           {t('contact.phoneButtonText', lang)}
           <svg
@@ -193,9 +196,10 @@ const { lang } = Astro.props;
         <h3 class="font-heading text-xl text-white mb-3">
           {t('contact.linkedinTitle', lang)}
         </h3>
-        <p class="text-white/70 mb-4">
-          {linkedin_short}
+        <p class="text-white/70 mb-4 whitespace-pre-line">
+          {t('contact.linkedinText', lang)}
         </p>
+
         <span class="inline-flex items-center text-sm text-primary font-medium">
           {t('contact.linkedinButtonText', lang)}
           <svg
