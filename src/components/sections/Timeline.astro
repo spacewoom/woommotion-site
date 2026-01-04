@@ -1,80 +1,122 @@
 ---
-import Button from '../ui/Buttons.astro';
+import Section from '../layout/Section.astro';
 import { t } from '../../utils/i18n';
 
-interface Props {
-  lang: string | undefined;
-}
+const locale = Astro.currentLocale || 'en';
 
-const { lang } = Astro.props;
-
-// 3개 → 5개 (item4, item5는 i18n 키만 추가하면 됨)
-const timelineItems = ["item1", "item2", "item3", "item4", "item5"];
+const timelineItems = [
+  {
+    title: t('timeline.items.item1.title', locale),
+    englishTitle: t('timeline.items.item1.englishTitle', locale),
+    description: t('timeline.items.item1.description', locale),
+  },
+  {
+    title: t('timeline.items.item2.title', locale),
+    englishTitle: t('timeline.items.item2.englishTitle', locale),
+    description: t('timeline.items.item2.description', locale),
+  },
+  {
+    title: t('timeline.items.item3.title', locale),
+    englishTitle: t('timeline.items.item3.englishTitle', locale),
+    description: t('timeline.items.item3.description', locale),
+  },
+  {
+    title: t('timeline.items.item4.title', locale),
+    englishTitle: t('timeline.items.item4.englishTitle', locale),
+    description: t('timeline.items.item4.description', locale),
+  },
+  {
+    title: t('timeline.items.item5.title', locale),
+    englishTitle: t('timeline.items.item5.englishTitle', locale),
+    description: t('timeline.items.item5.description', locale),
+  },
+];
 ---
 
-<section class="py-16 md:py-24">
-  <div class="max-w-container mx-auto px-6">
-    <div class="mb-12" data-aos="fade-up">
-      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">
-        {t('timeline.title', lang)}
-      </h2>
-      <p class="text-secondary/70 dark:text-white/70 max-w-2xl">
-        {t('timeline.subtitle', lang)}
-      </p>
-    </div>
+<Section
+  id="timeline"
+  title={t('timeline.title', locale)}
+  subtitle={t('timeline.subtitle', locale)}
+>
+  <div class="timeline-container relative mx-auto mt-16 max-w-5xl">
+    <!-- LEFT LINE -->
+    <div class="absolute left-6 top-0 h-full w-px bg-primary/20"></div>
 
-    <div id="timeline-container" class="relative">
-      <!-- Timeline line -->
-      <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700 transform md:translate-x-px"></div>
-
-      <div class="space-y-12">
-        {timelineItems.map((item, index) => (
+    <!-- ITEMS (ONE COLUMN / LEFT ALIGNED) -->
+    <div class="space-y-12">
+      {
+        timelineItems.map((item, index) => (
           <div
-            class={`relative flex flex-col md:flex-row gap-8 md:gap-0 ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
-            data-aos={index % 2 === 0 ? "fade-left" : "fade-right"}
+            class="relative"
+            data-aos={index % 2 === 0 ? 'fade-left' : undefined}
           >
-            {/* Timeline dot */}
-            <div class="timeline-dot absolute left-0 md:left-1/2 top-0 w-5 h-5 rounded-full bg-primary border-4 border-white dark:border-neutral-dark transform -translate-x-2 md:-translate-x-2.5"></div>
+            {/* DOT */}
+            <div
+              class="timeline-dot absolute left-6 top-2 h-5 w-5 -translate-x-1/2 rounded-full bg-primary transition-transform duration-300"
+            ></div>
 
-            <!-- Content -->
-            <div class="md:w-1/2 pl-10 md:pl-0 md:pr-12 md:text-right">
-              <h3 class="font-heading text-xl text-secondary dark:text-white mb-1">
-                {t(`timeline.${item}Title`, lang)}
+            {/* CONTENT */}
+            <div class="w-full pl-16 md:pl-[190px]">
+              <h3 class="text-left text-xl font-bold text-primary">
+                {item.title}
+                <span class="block text-base font-medium text-primary/80">
+                  {item.englishTitle}
+                </span>
               </h3>
-              <p class="text-secondary/70 dark:text-white/70 text-left">
-                {t(`timeline.${item}Description`, lang)}
+
+              <p class="mt-2 text-left text-secondary/70">
+                {item.description}
               </p>
             </div>
-
-            <div class="md:w-1/2 md:pl-12">
-              <!-- Empty div to create the layout on alternating sides -->
-            </div>
           </div>
-        ))}
-      </div>
+        ))
+      }
     </div>
   </div>
-</section>
+</Section>
 
 <script>
-  import { gsap } from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-  gsap.registerPlugin(ScrollTrigger);
-
+  // Dot interaction + scroll highlight (keep minimal / no dependency changes)
   document.addEventListener('DOMContentLoaded', () => {
-    const timelineDots = document.querySelectorAll('.timeline-dot');
+    const dots = document.querySelectorAll('.timeline-dot');
 
-    gsap.from(timelineDots, {
-      scrollTrigger: {
-        trigger: '#timeline-container',
-        start: 'top 80%',
-      },
-      scale: 0,
-      opacity: 0,
-      duration: 0.5,
-      stagger: 0.2,
-      ease: 'back.out(1.7)',
+    // Add hover effect to dots
+    dots.forEach((dot) => {
+      dot.addEventListener('mouseenter', () => {
+        dot.style.transform = 'translateX(-50%) scale(1.5)';
+      });
+
+      dot.addEventListener('mouseleave', () => {
+        dot.style.transform = 'translateX(-50%) scale(1)';
+      });
+    });
+
+    // Add scroll effect to highlight active dot
+    window.addEventListener('scroll', () => {
+      const scrollPosition = window.scrollY + window.innerHeight / 2;
+
+      dots.forEach((dot) => {
+        const dotPosition = dot.getBoundingClientRect().top + window.scrollY;
+
+        if (dotPosition < scrollPosition) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
     });
   });
 </script>
+
+<style>
+  /* Active dot state */
+  .timeline-dot.active {
+    transform: translateX(-50%) scale(1.2);
+    box-shadow: 0 0 10px rgba(var(--color-primary), 0.5);
+  }
+
+  /* Smooth hover transition */
+  .timeline-dot {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+</style>
