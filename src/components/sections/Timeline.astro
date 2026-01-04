@@ -1,101 +1,77 @@
 ---
-/**
- * src/components/sections/Timeline.astro
- * - Single column, all left-aligned
- * - Keeps existing GSAP hook points: #timeline-section, .timeline-item, .timeline-dot
- * - No i18n/locale dependency (lowest risk)
- */
 import Button from '../ui/Buttons.astro';
+import { t } from '../../utils/i18n';
+
+interface Props {
+  lang: string | undefined;
+}
+
+const { lang } = Astro.props;
 
 const timelineItems = [
-  {
-    titleKr: '클라이언트 요청 (결제)',
-    titleEn: 'Client Request (Payment)',
-    text:
-      '의뢰 내용 확인 후 작업 범위/일정을 정리하고 견적을 안내합니다. 결제 확인 후 제작이 시작됩니다.',
-  },
-  {
-    titleKr: '기획',
-    titleEn: 'Planning',
-    text:
-      '목표/타겟/톤을 정리하고, 필요한 정보 구조와 연출 방향을 설계합니다.',
-  },
-  {
-    titleKr: '디자인',
-    titleEn: 'Design',
-    text:
-      '레이아웃과 키비주얼을 제작하고 시안 공유 → 피드백 반영 → 디자인 확정 후 모션 단계로 넘어갑니다.',
-  },
-  {
-    titleKr: '모션',
-    titleEn: 'Motion',
-    text:
-      '타이포/그래픽 애니메이션과 리듬, 속도감을 설계해 메시지가 “잘 읽히는” 움직임으로 완성합니다. (디자인이 확정된 후 진행)',
-  },
-  {
-    titleKr: '납품 & 수정',
-    titleEn: 'Delivery & Revisions',
-    text:
-      '최종 파일 납품 후 고객 피드백 기준 무료 수정 3회 제공. 전체 방향 변경/과도한 수정은 추가 비용이 발생할 수 있으며, 운영자(업로더) 실수로 인한 수정은 차감되지 않습니다.',
-  },
+  { titleKey: "timeline.item1Title", subtitleKey: "timeline.item1Subtitle" },
+  { titleKey: "timeline.item2Title", subtitleKey: "timeline.item2Subtitle" },
+  { titleKey: "timeline.item3Title", subtitleKey: "timeline.item3Subtitle" },
+  { titleKey: "timeline.item4Title", subtitleKey: "timeline.item4Subtitle" },
+  { titleKey: "timeline.item5Title", subtitleKey: "timeline.item5Subtitle" },
 ];
 ---
 
-<section id="timeline-section" class="relative py-16 md:py-24">
-  <div class="mx-auto w-full max-w-6xl px-6">
-    <!-- Header -->
-    <div class="mb-10 md:mb-14">
-      <h2 class="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50 md:text-3xl">
-        My Journey
+<section id="timeline" class="relative py-24 overflow-hidden">
+  <!-- background blur (기존 톤 유지용) -->
+  <div class="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl opacity-60"></div>
+  <div class="absolute bottom-20 right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl opacity-60"></div>
+
+    <div class="max-w-container mx-auto px-6">
+    <div class="mb-12" data-aos="fade-up">
+      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">
+        {t('timeline.title', lang)}
       </h2>
-      <!-- ✅ 요구사항: 모든 subtitle은 왼쪽 정렬 -->
-      <p class="mt-3 max-w-2xl text-left text-sm leading-6 text-neutral-600 dark:text-neutral-400 md:text-base">
-        작업은 요청 확인부터 납품까지, 명확한 단계와 기준으로 진행됩니다.
+      <p class="text-secondary/70 dark:text-white/70 max-w-2xl">
+        {t('timeline.subtitle', lang)}
       </p>
     </div>
 
-    <!-- Timeline -->
-    <div id="timeline-container" class="relative">
-      <!-- ✅ Line (always left) -->
-      <div class="pointer-events-none absolute left-6 top-0 h-full w-px bg-neutral-200 dark:bg-neutral-800"></div>
+    <!-- timeline -->
+    <div class="timeline-container relative">
+      <!-- vertical line (왼쪽 고정) -->
+      <div class="absolute left-4 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-700"></div>
 
-      <ol class="space-y-8 md:space-y-10">
+      <div class="space-y-10">
         {timelineItems.map((item) => (
-          <li class="timeline-item relative">
-            <!-- ✅ Dot (always left) -->
-            <span
-              class="timeline-dot absolute left-6 top-7 h-3 w-3 -translate-x-1/2 rounded-full border border-neutral-300 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-950"
+          <div class="timeline-item relative">
+            {/* dot */}
+            <div
+              class="
+                absolute left-4 top-6
+                -translate-x-1/2
+                w-3.5 h-3.5 rounded-full
+                bg-neutral-dark dark:bg-neutral-light
+                ring-4 ring-neutral-light dark:ring-neutral-dark
+              "
               aria-hidden="true"
-            />
+            ></div>
 
-            <!-- ✅ 요구사항: dot 기준으로 150px 정도 더 들여쓰기 -->
-            <div class="pl-[150px]">
-              <div class="rounded-2xl border border-neutral-200 bg-white/60 p-6 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/40 md:p-7">
-                <!-- ✅ 요구사항: title/subtitle 모두 왼쪽 정렬 -->
-                <h3 class="text-left leading-tight text-neutral-900 dark:text-neutral-50">
-                  <span class="block text-base font-semibold md:text-lg">
-                    {item.titleKr}
-                  </span>
-                  <!-- ✅ 요구사항: 영문 타이틀 80% 투명도 -->
-                  <span class="block text-sm font-medium opacity-80 md:text-base">
-                    {item.titleEn}
-                  </span>
+            {/* content: dot 기준 들여쓰기 (모바일은 과하지 않게, md에서 150px) */}
+            <div class="pl-16 sm:pl-20 md:pl-[150px]">
+              <div
+                class="
+                  rounded-2xl border border-neutral-dark/10 dark:border-neutral-light/10
+                  bg-neutral-light/60 dark:bg-neutral-dark/60
+                  backdrop-blur
+                  p-6 md:p-7
+                "
+              >
+                <h3 class="text-xl md:text-2xl font-semibold text-secondary dark:text-white text-left">
+                  {t(item.titleKey, locale)}
                 </h3>
-
-                <p class="mt-3 text-left text-sm leading-6 text-neutral-600 dark:text-neutral-400 md:text-base">
-                  {item.text}
+                <p class="mt-3 text-base md:text-lg text-secondary/80 dark:text-white/80 text-left">
+                  {t(item.subtitleKey, locale)}
                 </p>
               </div>
             </div>
-          </li>
+          </div>
         ))}
-      </ol>
-
-      <!-- CTA (optional) -->
-      <div class="mt-10 md:mt-12">
-        <Button href="#contact" variant="secondary">
-          문의하기
-        </Button>
       </div>
     </div>
   </div>
