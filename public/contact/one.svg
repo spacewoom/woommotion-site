@@ -1,5 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M11.9805 17H13.9561V7.0332H13.7441L9.62207 8.50977V10.1162L11.9805 9.38477V17Z" fill="#000000"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12ZM20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12Z" fill="#000000"/>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 23.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 800 800" style="enable-background:new 0 0 800 800;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#0A84FF;}
+	.st1{fill-rule:evenodd;clip-rule:evenodd;fill:#0A84FF;}
+</style>
+<path class="st0" d="M399.4,566.7h65.9V234.4h-7.1l-137.4,49.2v53.5l78.6-24.4V566.7z"/>
+<path class="st1" d="M733.3,400c0,184.1-149.2,333.3-333.3,333.3C215.9,733.3,66.7,584.1,66.7,400C66.7,215.9,215.9,66.7,400,66.7
+	C584.1,66.7,733.3,215.9,733.3,400z M666.7,400c0,147.3-119.4,266.7-266.7,266.7c-147.3,0-266.7-119.4-266.7-266.7
+	c0-147.3,119.4-266.7,266.7-266.7C547.3,133.3,666.7,252.7,666.7,400z"/>
 </svg>
