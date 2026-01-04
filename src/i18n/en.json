@@ -58,9 +58,9 @@
     "item3Title": "디자인 | Design",
     "item3Description": "디자인 결과(키비주얼/레이아웃/타이포/그래픽)를 공유하고 확정 후 모션 단계로 넘어갑니다.",
     "item4Title": "모션 | Motion",
-    "item4Description": "확정된 디자인을 기반으로 리듬감 있는 모션과 감각적인 연출을 구현합니다. * 기획/디자인이 제공된 경우: Motion → Delivery로 단축 가능",
+    "item4Description": "확정된 디자인을 기반으로 리듬감 있는 모션과 감각적인 연출을 구현합니다.\n* 기획/디자인이 제공된 경우: Motion → Delivery로 단축 가능",
     "item5Title": "납품 · 수정 | Delivery",
-    "item5Description": "최종 파일 전달 후 기본 3회까지 무상 수정이 가능합니다. 단, 작업자 실수로 인한 수정은 수정 횟수에서 차감되지 않으며, 합의된 기획의 방향성을 바꾸는 수준의 변경은 추가 비용이 발생합니다."
+    "item5Description": "최종 파일 전달 후 기본 3회까지 무상 수정이 가능합니다.\n단, 작업자 실수로 인한 수정은 수정 횟수에서 차감되지 않으며, 합의된 기획의 방향성을 바꾸는 수준의 변경은 추가 비용이 발생합니다."
   },
   "footerCTA": {
     "title": "Need a Template?",
