@@ -66,19 +66,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // Scroll-triggered animations for sections
 
   // Timeline section animation
-  const timelineItems = document.querySelectorAll('#timeline .timeline-item');
+  const timelineSection = document.querySelector('#timeline-section');
 
-  if (timelineItems.length > 0) {
+  if (timelineSection) {
+    const timelineItems = gsap.utils.toArray('.timeline-item');
+    const timelineDots = gsap.utils.toArray('.timeline-dot');
+
+    // Items: 오른쪽에서 왼쪽으로 등장 (요구사항 통일)
     gsap.from(timelineItems, {
-      scrollTrigger: {
-        trigger: '#timeline',
-        start: 'top 70%',
-      },
-      y: 50,
+      x: 60,
       opacity: 0,
-      duration: 0.8,
-      stagger: 0.2,
-      ease: 'power3.out'
+      duration: 0.9,
+      ease: 'power2.out',
+      stagger: 0.12,
+      scrollTrigger: {
+        trigger: timelineSection,
+        start: 'top 70%',
+        toggleActions: 'play none none reverse',
+      },
+    });
+
+    // Dots: 살짝 스케일 업
+    gsap.from(timelineDots, {
+      scale: 0,
+      opacity: 0,
+      duration: 0.5,
+      ease: 'back.out(1.6)',
+      stagger: 0.08,
+      scrollTrigger: {
+        trigger: timelineSection,
+        start: 'top 70%',
+        toggleActions: 'play none none reverse',
+      },
     });
   }
 
