@@ -12,6 +12,25 @@ const locale = lang === 'de' ? 'de' : 'en';
 
 // 5개 아이템(키만 있으면 됨)
 const timelineItems = ['item1', 'item2', 'item3', 'item4', 'item5'];
+
+/**
+ * "한글 | English" 형태를 2줄로 분리.
+ * - 구분자(|)가 없으면 1줄로만 출력 (안전)
+ */
+function splitTitle(raw: string) {
+  const parts = raw.split('|');
+  const ko = (parts[0] ?? '').trim();
+  const en = parts.length > 1 ? parts.slice(1).join('|').trim() : '';
+  return { ko, en };
+}
+
+/**
+ * JSON 문자열에 \n 이 들어가면 여러 줄로 렌더.
+ * - \n 없으면 단일 줄 (안전)
+ */
+function splitLines(raw: string) {
+  return raw.split('\n');
+}
 ---
 
 <section class="py-16 md:py-24">
@@ -30,26 +49,46 @@ const timelineItems = ['item1', 'item2', 'item3', 'item4', 'item5'];
       <div class="absolute left-6 top-0 h-full w-px bg-gray-200 dark:bg-gray-700 transform md:translate-x-px"></div>
 
       <div class="space-y-12">
-        {timelineItems.map((item, index) => (
-          <div
-            class={`relative flex flex-col md:flex-row gap-8 md:gap-0`}
-            data-aos={'fade-left'}
-          >
-            {/* Timeline dot */}
-            <div class="timeline-dot absolute left-6 top-0 w-5 h-5 rounded-full bg-primary border-4 border-white dark:border-neutral-dark transform -translate-x-2"></div>
-            
-            <!-- Content -->
-            <div class="pl-16 md:pl-[130px] text-left">
-              <h3 class="font-heading text-xl text-secondary dark:text-white mb-1">
-                {t(`timeline.${item}Title`, locale)}
-              </h3>
-              <p class="text-secondary/70 dark:text-white/70 text-left">
-                {t(`timeline.${item}Description`, locale)}
-              </p>
+        {timelineItems.map((item) => {
+          const rawTitle = t(`timeline.${item}Title`, locale);
+          const { ko, en } = splitTitle(rawTitle);
+
+          const rawDesc = t(`timeline.${item}Description`, locale);
+          const descLines = splitLines(rawDesc);
+
+          return (
+            <div
+              class={`relative flex flex-col md:flex-row gap-8 md:gap-0`}
+              data-aos={'fade-left'}
+            >
+              {/* Timeline dot */}
+              <div class="timeline-dot absolute left-6 top-0 w-5 h-5 rounded-full bg-primary border-4 border-white dark:border-neutral-dark transform -translate-x-2"></div>
+
+              {/* Content */}
+              <div class="pl-16 md:pl-[130px] text-left">
+                <h3 class="font-heading text-xl text-secondary dark:text-white mb-1 leading-snug">
+                  {/* 1st line: Korean */}
+                  <span class="block">{ko}</span>
+
+                  {/* 2nd line: English (smaller + lighter + 70% tone) */}
+                  {en && (
+                    <span class="block text-sm font-normal text-secondary/70 dark:text-white/70">
+                      {en}
+                    </span>
+                  )}
+                </h3>
+
+                <p class="text-secondary/70 dark:text-white/70 text-left">
+                  {descLines.map((line, idx) => (
+                    <span class="block" key={`${item}-line-${idx}`}>
+                      {line}
+                    </span>
+                  ))}
+                </p>
+              </div>
             </div>
-          </div>
-            <!-- Empty div to create the layout on alternating sides -->
-        ))}
+          );
+        })}
       </div>
     </div>
   </div>
