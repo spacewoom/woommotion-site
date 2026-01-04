@@ -21,9 +21,10 @@ const nl2br = (value) =>
       <h2 class="font-heading text-h2 text-white mb-4">
         {t('contact.title', lang)}
       </h2>
-      <p class="text-white/70 max-w-2xl mx-auto whitespace-pre-line">
-        {t('contact.subtitle', lang)}
-      </p>
+      <p
+        class="text-secondary mt-4 max-w-xl mx-auto whitespace-pre-line"
+        set:html={nl2br(t('contact.subtitle', lang))}
+      />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -35,20 +36,16 @@ const nl2br = (value) =>
         data-aos-delay="100"
       >
         <div class="relative w-16 h-16 mx-auto mb-8 bg-primary/20 rounded-full flex items-center justify-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
+          <img
+            src="/contact/one.svg"
             width="28"
             height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.75"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="text-primary"
-            role="img"
-            aria-labelledby="emailContactIconTitle"
-          >
+            alt={`${t('contact.emailTitle', lang)} icon`}
+            class="w-7 h-7"
+            loading="lazy"
+            decoding="async"
+            />
+
             <title id="emailContactIconTitle">
               {t('contact.emailTitle', lang)} Icon
             </title>
@@ -65,9 +62,10 @@ const nl2br = (value) =>
         </h3>
 
         <!-- ✅ left align + keep \n line breaks -->
-        <p class="text-sm text-primary font-medium whitespace-pre-line">
-          {t('contact.emailText', lang)}
-        </p>
+        <p
+          class="text-secondary mb-8 text-left whitespace-pre-line"
+          set:html={nl2br(t('contact.emailText', lang))}
+        />
 
         <!-- ✅ no link + no arrow -->
         <div class="text-white/70 mb-4 whitespace-pre-line text-left">
@@ -82,20 +80,16 @@ const nl2br = (value) =>
         data-aos-delay="200"
       >
         <div class="w-16 h-16 mx-auto mb-8 bg-primary/20 rounded-full flex items-center justify-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
+          <img
+            src="/contact/two.svg"
             width="28"
             height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.75"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="text-primary"
-            role="img"
-            aria-labelledby="phoneContactIconTitle"
-          >
+            alt={`${t('contact.phoneTitle', lang)} icon`}
+            class="w-7 h-7"
+            loading="lazy"
+            decoding="async"
+            />
+
             <title id="phoneContactIconTitle">
               {t('contact.phoneTitle', lang)} Icon
             </title>
@@ -110,9 +104,10 @@ const nl2br = (value) =>
         </h3>
 
         <!-- ✅ left align + keep \n line breaks -->
-        <p class="text-sm text-primary font-medium whitespace-pre-line">
-          {t('contact.phoneText', lang)}
-        </p>
+        <p
+          class="text-secondary mb-8 text-left whitespace-pre-line"
+          set:html={nl2br(t('contact.phoneText', lang))}
+        />
 
         <!-- ✅ no link + no arrow -->
         <div class="text-white/70 mb-4 whitespace-pre-line text-left">
@@ -127,20 +122,16 @@ const nl2br = (value) =>
         data-aos-delay="300"
       >
         <div class="w-16 h-16 mx-auto mb-8 bg-primary/20 rounded-full flex items-center justify-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
+          <img
+            src="/contact/three.svg"
             width="28"
             height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.75"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="text-primary"
-            role="img"
-            aria-labelledby="linkedinContactIconTitle"
-          >
+            alt={`${t('contact.linkedinTitle', lang)} icon`}
+            class="w-7 h-7"
+            loading="lazy"
+            decoding="async"
+            />
+
             <title id="linkedinContactIconTitle">
               {t('contact.linkedinTitle', lang)} Icon
             </title>
@@ -157,10 +148,10 @@ const nl2br = (value) =>
         </h3>
 
         <!-- ✅ left align + keep \n line breaks -->
-        <p class="text-sm text-primary font-medium whitespace-pre-line">
-          {t('contact.linkedinText', lang)}
-        </p>
-
+         <p
+          class="text-secondary mb-8 text-left whitespace-pre-line"
+          set:html={nl2br(t('contact.linkedinText', lang))}
+        />
         <!-- ✅ no link + no arrow -->
         <div class="text-white/70 mb-4 whitespace-pre-line text-left">
           {t('contact.linkedinButtonText', lang)}
