@@ -33,13 +33,13 @@ const timelineItems = ['item1', 'item2', 'item3', 'item4', 'item5'];
         {timelineItems.map((item, index) => (
           <div
             class={`relative flex flex-col md:flex-row gap-8 md:gap-0`}
-            data-aos={'fade-right'}
+            data-aos={'fade-left'}
           >
             {/* Timeline dot */}
-            <div class="timeline-dot absolute left-6 top-0 w-5 h-5 rounded-full bg-primary border-4 border-white dark:border-neutral-dark transform -translate-x-2.5"></div>
+            <div class="timeline-dot absolute left-6 top-0 w-5 h-5 rounded-full bg-primary border-4 border-white dark:border-neutral-dark transform -translate-x-2"></div>
             
             <!-- Content -->
-            <div class="md:w-1/2 pl-10 md:pl-0 md:pr-12 md:text-left">
+            <div class="md:w-1 pl-10 md:pl-0 md:pr-12 md:text-left">
               <h3 class="font-heading text-xl text-secondary dark:text-white mb-1">
                 {t(`timeline.${item}Title`, locale)}
               </h3>
@@ -48,7 +48,7 @@ const timelineItems = ['item1', 'item2', 'item3', 'item4', 'item5'];
               </p>
             </div>
 
-            <div class="md:w-1/2 md:pl-12">
+            <div class="md:w-1 md:pl-12">
               <!-- Empty div to create the layout on alternating sides -->
             </div>
           </div>
