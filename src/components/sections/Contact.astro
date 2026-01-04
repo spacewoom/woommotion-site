@@ -7,192 +7,90 @@ interface Props {
 
 const { lang } = Astro.props;
 
-const nl2br = (value) =>
-  String(value ?? '')
-    // 실제 개행(\n) + 리터럴 "\\n" 둘 다 지원
-    .replaceAll('\\n', '\n')
-    .replaceAll('\r\n', '\n')
-    .replaceAll('\r', '\n')
-    .replaceAll('\n', '<br />');
+// Ensure line breaks work whether JSON contains \n or actual newlines
+const formatMultiline = (value = '') => String(value).replace(/\\n/g, '\n');
 ---
+
 <section id="contact" class="py-16 md:py-24 bg-secondary dark:bg-neutral-dark text-white">
   <div class="max-w-container mx-auto px-6">
     <div class="mb-12 text-center" data-aos="fade-up">
       <h2 class="font-heading text-h2 text-white mb-4">
         {t('contact.title', lang)}
       </h2>
-      <p class="text-white/70 max-w-2xl mx-auto">
-         set:html={n12br(t('contact.subtitle', lang))}
+      <p class="text-white/70 mt-2 max-w-xl mx-auto whitespace-pre-line">
+        {formatMultiline(t('contact.subtitle', lang))}
       </p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <!-- Basic Card -->
+      <!-- Basic -->
       <div
-        id="price-card-basic"
-        class="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 text-center hover:bg-white/10 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+        class="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors"
         data-aos="fade-up"
-        data-aos-delay="100"
+        data-aos-delay="0"
       >
-        <div class="relative w-16 h-16 mx-auto mb-8 bg-primary/20 rounded-full flex items-center justify-center">
-         <img
-            src="/contact/one.svg"
-            width="28"
-            height="28"
-            alt={`${t('contact.emailTitle', lang)} icon`}
-            class="w-7 h-7"
-            loading="lazy"
-            decoding="async"
-            />
-
-            <title id="emailContactIconTitle">
-              {t('contact.emailTitle', lang)} Icon
-            </title>
-            <rect width="20" height="16" x="2" y="4" rx="2"></rect>
-            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-          </svg>
-
-          <!-- Lottie Animation Placeholder - Paper Plane -->
-          <div id="email-animation" class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-6 mx-auto">
+          <img src="/contact/one.svg" alt="" class="w-7 h-7 dark:invert" loading="lazy" />
         </div>
 
-        <h3 class="font-heading text-xl text-white mb-3">
+        <h3 class="text-xl font-semibold mb-3 mt-6 text-center">
           {t('contact.emailTitle', lang)}
         </h3>
 
-        <!-- ✅ left align + keep \n line breaks -->
-        <p class="text-sm text-primary font-medium whitespace-pre-line">
-           set:html={n12br(t('contact.emailText', lang))}
-        />
+        <p class="text-white/70 mb-6 whitespace-pre-line text-left">
+          {formatMultiline(t('contact.emailText', lang))}
+        </p>
 
-        <!-- ✅ no link + no arrow -->
-        <div class="text-white/70 mb-4 whitespace-pre-line text-left">
-             set:html={n12br(t('contact.emailButtonText', lang))}
-        />
+        <div class="text-primary font-medium text-left whitespace-pre-line">
+          {formatMultiline(t('contact.emailButtonText', lang))}
+        </div>
       </div>
 
-      <!-- Standard Card -->
+      <!-- Standard -->
       <div
-        class="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 text-center hover:bg-white/10 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+        class="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors"
         data-aos="fade-up"
-        data-aos-delay="200"
+        data-aos-delay="100"
       >
-        <div class="w-16 h-16 mx-auto mb-8 bg-primary/20 rounded-full flex items-center justify-center">
-         <img
-            src="/contact/two.svg"
-            width="28"
-            height="28"
-            alt={`${t('contact.phoneTitle', lang)} icon`}
-            class="w-7 h-7"
-            loading="lazy"
-            decoding="async"
-            />
-
-            <title id="phoneContactIconTitle">
-              {t('contact.phoneTitle', lang)} Icon
-            </title>
-            <path
-              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
-            ></path>
-          </svg>
+        <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-6 mx-auto">
+          <img src="/contact/two.svg" alt="" class="w-7 h-7 dark:invert" loading="lazy" />
         </div>
 
-        <h3 class="font-heading text-xl text-white mb-3">
+        <h3 class="text-xl font-semibold mb-3 mt-6 text-center">
           {t('contact.phoneTitle', lang)}
         </h3>
 
-        <!-- ✅ left align + keep \n line breaks -->
-        <p class="text-sm text-primary font-medium whitespace-pre-line">
-           set:html={n12br(t('contact.phoneText', lang))}
-        />
+        <p class="text-white/70 mb-6 whitespace-pre-line text-left">
+          {formatMultiline(t('contact.phoneText', lang))}
+        </p>
 
-        <!-- ✅ no link + no arrow -->
-        <div class="text-white/70 mb-4 whitespace-pre-line text-left">
-             set:html={n12br(t('contact.phoneButtonText', lang))}
-        />
+        <div class="text-primary font-medium text-left whitespace-pre-line">
+          {formatMultiline(t('contact.phoneButtonText', lang))}
+        </div>
       </div>
 
-      <!-- Premium Card -->
+      <!-- Premium -->
       <div
-        class="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 text-center hover:bg-white/10 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+        class="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors"
         data-aos="fade-up"
-        data-aos-delay="300"
+        data-aos-delay="200"
       >
-        <div class="w-16 h-16 mx-auto mb-8 bg-primary/20 rounded-full flex items-center justify-center">
-          <img
-            src="/contact/three.svg"
-            width="28"
-            height="28"
-            alt={`${t('contact.linkedinTitle', lang)} icon`}
-            class="w-7 h-7"
-            loading="lazy"
-            decoding="async"
-            />
-
-            <title id="linkedinContactIconTitle">
-              {t('contact.linkedinTitle', lang)} Icon
-            </title>
-            <path
-              d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
-            ></path>
-            <rect width="4" height="12" x="2" y="9"></rect>
-            <circle cx="4" cy="4" r="2"></circle>
-          </svg>
+        <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-6 mx-auto">
+          <img src="/contact/three.svg" alt="" class="w-7 h-7 dark:invert" loading="lazy" />
         </div>
 
-        <h3 class="font-heading text-xl text-white mb-3">
+        <h3 class="text-xl font-semibold mb-3 mt-6 text-center">
           {t('contact.linkedinTitle', lang)}
         </h3>
 
-        <!-- ✅ left align + keep \n line breaks -->
-        <p class="text-sm text-primary font-medium whitespace-pre-line">
-           set:html={n12br(t('contact.linkedinText', lang))}
-        />
+        <p class="text-white/70 mb-6 whitespace-pre-line text-left">
+          {formatMultiline(t('contact.linkedinText', lang))}
+        </p>
 
-        <!-- ✅ no link + no arrow -->
-        <div class="text-white/70 mb-4 whitespace-pre-line text-left">
-             set:html={n12br(t('contact.linkedinButtonText', lang))}
-        />
+        <div class="text-primary font-medium text-left whitespace-pre-line">
+          {formatMultiline(t('contact.linkedinButtonText', lang))}
+        </div>
       </div>
     </div>
   </div>
 </section>
-
-<script>
-  import { gsap } from 'gsap';
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // Keep the existing hover animation behavior,
-    // but no longer depend on a mailto <a> element.
-    const emailCard = document.getElementById('price-card-basic');
-    const emailAnimation = document.getElementById('email-animation');
-
-    if (emailCard && emailAnimation) {
-      emailCard.addEventListener('mouseenter', () => {
-        gsap.to('#email-animation', { opacity: 1, duration: 0.3 });
-
-        const paperPlane = document.createElement('div');
-        paperPlane.style.position = 'absolute';
-        paperPlane.style.width = '20px';
-        paperPlane.style.height = '20px';
-        paperPlane.style.backgroundColor = 'transparent';
-        paperPlane.style.left = '50%';
-        paperPlane.style.top = '50%';
-        paperPlane.style.transform = 'translate(-50%, -50%)';
-
-        emailAnimation.innerHTML = '';
-        emailAnimation.appendChild(paperPlane);
-
-        gsap.fromTo(
-          paperPlane,
-          { opacity: 0, scale: 0.5 },
-          { opacity: 1, scale: 1, rotation: 360, duration: 0.8, ease: 'back.out(1.7)' }
-        );
-      });
-
-      emailCard.addEventListener('mouseleave', () => {
-        gsap.to('#email-animation', { opacity: 0, duration: 0.3 });
-      });
-    }
-  });
-</script>
