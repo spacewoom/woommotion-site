@@ -1,127 +1,102 @@
 ---
+/**
+ * src/components/sections/Timeline.astro
+ * - Single column, all left-aligned
+ * - Keeps existing GSAP hook points: #timeline-section, .timeline-item, .timeline-dot
+ * - No i18n/locale dependency (lowest risk)
+ */
 import Button from '../ui/Buttons.astro';
-import { t } from '../../utils/i18n';
-
-interface Props {
-  lang: string | undefined;
-}
-
-const { lang } = Astro.props;
-
 
 const timelineItems = [
   {
-    title: t('timeline.items.item1.title', locale),
-    englishTitle: t('timeline.items.item1.englishTitle', locale),
-    description: t('timeline.items.item1.description', locale),
+    titleKr: '클라이언트 요청 (결제)',
+    titleEn: 'Client Request (Payment)',
+    text:
+      '의뢰 내용 확인 후 작업 범위/일정을 정리하고 견적을 안내합니다. 결제 확인 후 제작이 시작됩니다.',
   },
   {
-    title: t('timeline.items.item2.title', locale),
-    englishTitle: t('timeline.items.item2.englishTitle', locale),
-    description: t('timeline.items.item2.description', locale),
+    titleKr: '기획',
+    titleEn: 'Planning',
+    text:
+      '목표/타겟/톤을 정리하고, 필요한 정보 구조와 연출 방향을 설계합니다.',
   },
   {
-    title: t('timeline.items.item3.title', locale),
-    englishTitle: t('timeline.items.item3.englishTitle', locale),
-    description: t('timeline.items.item3.description', locale),
+    titleKr: '디자인',
+    titleEn: 'Design',
+    text:
+      '레이아웃과 키비주얼을 제작하고 시안 공유 → 피드백 반영 → 디자인 확정 후 모션 단계로 넘어갑니다.',
   },
   {
-    title: t('timeline.items.item4.title', locale),
-    englishTitle: t('timeline.items.item4.englishTitle', locale),
-    description: t('timeline.items.item4.description', locale),
+    titleKr: '모션',
+    titleEn: 'Motion',
+    text:
+      '타이포/그래픽 애니메이션과 리듬, 속도감을 설계해 메시지가 “잘 읽히는” 움직임으로 완성합니다. (디자인이 확정된 후 진행)',
   },
   {
-    title: t('timeline.items.item5.title', locale),
-    englishTitle: t('timeline.items.item5.englishTitle', locale),
-    description: t('timeline.items.item5.description', locale),
+    titleKr: '납품 & 수정',
+    titleEn: 'Delivery & Revisions',
+    text:
+      '최종 파일 납품 후 고객 피드백 기준 무료 수정 3회 제공. 전체 방향 변경/과도한 수정은 추가 비용이 발생할 수 있으며, 운영자(업로더) 실수로 인한 수정은 차감되지 않습니다.',
   },
 ];
 ---
 
-<Section
-  id="timeline"
-  title={t('timeline.title', locale)}
-  subtitle={t('timeline.subtitle', locale)}
->
-  <div class="timeline-container relative mx-auto mt-16 max-w-5xl">
-    <!-- LEFT LINE -->
-    <div class="absolute left-6 top-0 h-full w-px bg-primary/20"></div>
+<section id="timeline-section" class="relative py-16 md:py-24">
+  <div class="mx-auto w-full max-w-6xl px-6">
+    <!-- Header -->
+    <div class="mb-10 md:mb-14">
+      <h2 class="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50 md:text-3xl">
+        My Journey
+      </h2>
+      <!-- ✅ 요구사항: 모든 subtitle은 왼쪽 정렬 -->
+      <p class="mt-3 max-w-2xl text-left text-sm leading-6 text-neutral-600 dark:text-neutral-400 md:text-base">
+        작업은 요청 확인부터 납품까지, 명확한 단계와 기준으로 진행됩니다.
+      </p>
+    </div>
 
-    <!-- ITEMS (ONE COLUMN / LEFT ALIGNED) -->
-    <div class="space-y-12">
-      {
-        timelineItems.map((item, index) => (
-          <div
-            class="relative"
-            data-aos={index % 2 === 0 ? 'fade-left' : undefined}
-          >
-            {/* DOT */}
-            <div
-              class="timeline-dot absolute left-6 top-2 h-5 w-5 -translate-x-1/2 rounded-full bg-primary transition-transform duration-300"
-            ></div>
+    <!-- Timeline -->
+    <div id="timeline-container" class="relative">
+      <!-- ✅ Line (always left) -->
+      <div class="pointer-events-none absolute left-6 top-0 h-full w-px bg-neutral-200 dark:bg-neutral-800"></div>
 
-            {/* CONTENT */}
-            <div class="w-full pl-16 md:pl-[190px]">
-              <h3 class="text-left text-xl font-bold text-primary">
-                {item.title}
-                <span class="block text-base font-medium text-primary/80">
-                  {item.englishTitle}
-                </span>
-              </h3>
+      <ol class="space-y-8 md:space-y-10">
+        {timelineItems.map((item) => (
+          <li class="timeline-item relative">
+            <!-- ✅ Dot (always left) -->
+            <span
+              class="timeline-dot absolute left-6 top-7 h-3 w-3 -translate-x-1/2 rounded-full border border-neutral-300 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-950"
+              aria-hidden="true"
+            />
 
-              <p class="mt-2 text-left text-secondary/70">
-                {item.description}
-              </p>
+            <!-- ✅ 요구사항: dot 기준으로 150px 정도 더 들여쓰기 -->
+            <div class="pl-[150px]">
+              <div class="rounded-2xl border border-neutral-200 bg-white/60 p-6 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/40 md:p-7">
+                <!-- ✅ 요구사항: title/subtitle 모두 왼쪽 정렬 -->
+                <h3 class="text-left leading-tight text-neutral-900 dark:text-neutral-50">
+                  <span class="block text-base font-semibold md:text-lg">
+                    {item.titleKr}
+                  </span>
+                  <!-- ✅ 요구사항: 영문 타이틀 80% 투명도 -->
+                  <span class="block text-sm font-medium opacity-80 md:text-base">
+                    {item.titleEn}
+                  </span>
+                </h3>
+
+                <p class="mt-3 text-left text-sm leading-6 text-neutral-600 dark:text-neutral-400 md:text-base">
+                  {item.text}
+                </p>
+              </div>
             </div>
-          </div>
-        ))
-      }
+          </li>
+        ))}
+      </ol>
+
+      <!-- CTA (optional) -->
+      <div class="mt-10 md:mt-12">
+        <Button href="#contact" variant="secondary">
+          문의하기
+        </Button>
+      </div>
     </div>
   </div>
-</Section>
-
-<script>
-  // Dot interaction + scroll highlight (keep minimal / no dependency changes)
-  document.addEventListener('DOMContentLoaded', () => {
-    const dots = document.querySelectorAll('.timeline-dot');
-
-    // Add hover effect to dots
-    dots.forEach((dot) => {
-      dot.addEventListener('mouseenter', () => {
-        dot.style.transform = 'translateX(-50%) scale(1.5)';
-      });
-
-      dot.addEventListener('mouseleave', () => {
-        dot.style.transform = 'translateX(-50%) scale(1)';
-      });
-    });
-
-    // Add scroll effect to highlight active dot
-    window.addEventListener('scroll', () => {
-      const scrollPosition = window.scrollY + window.innerHeight / 2;
-
-      dots.forEach((dot) => {
-        const dotPosition = dot.getBoundingClientRect().top + window.scrollY;
-
-        if (dotPosition < scrollPosition) {
-          dot.classList.add('active');
-        } else {
-          dot.classList.remove('active');
-        }
-      });
-    });
-  });
-</script>
-
-<style>
-  /* Active dot state */
-  .timeline-dot.active {
-    transform: translateX(-50%) scale(1.2);
-    box-shadow: 0 0 10px rgba(var(--color-primary), 0.5);
-  }
-
-  /* Smooth hover transition */
-  .timeline-dot {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-</style>
+</section>
