@@ -7,6 +7,13 @@ interface Props {
 
 const { lang } = Astro.props;
 ---
+/**
+ * JSON 문자열에 \n 이 들어가면 여러 줄로 렌더.
+ * - \n 없으면 단일 줄 (안전)
+ */
+function splitLines(raw: string) {
+  return raw.split('\n');
+}
 
 <section id="contact" class="py-16 md:py-24 bg-secondary dark:bg-neutral-dark text-white">
   <div class="max-w-container mx-auto px-6">
