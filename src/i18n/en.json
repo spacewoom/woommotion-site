@@ -63,12 +63,12 @@
     "item5Description": "최종 파일 전달 후 기본 3회까지 무상 수정이 가능합니다.\n단, 작업자 실수로 인한 수정은 수정 횟수에서 차감되지 않으며, 합의된 기획의 방향성을 바꾸는 수준의 변경은 추가 비용이 발생합니다."
   },
   "footerCTA": {
-    "title": "Need a Template?",
+    "title": "Contact",
     "subtitle": "Check out my open-source templates on GitHub and start building your next project today.",
     "button": "Explore Templates"
   },
   "contact": {
-    "title": "Contact",
+    "title": "price",
     "subtitle": "Let’s talk about your project. Send me a message and I’ll get back to you soon.",
     "form": {
       "name": "Name",
