@@ -21,16 +21,19 @@ const KAKAO_TALK_URL = "https://pf.kakao.com/_pSgdn/chat";
         {t('footerCTA.title', lang)}
       </h2>
 
-      <p class="text-secondary/70 dark:text-white/70 max-w-2xl mx-auto mb-8">
+      <!-- ✅ 폭 +150px 정도(2xl=672px → 822px) + \n 줄바꿈 표시 -->
+      <p class="text-secondary/70 dark:text-white/70 max-w-[822px] mx-auto mb-8 whitespace-pre-line">
         {t('footerCTA.subtitle', lang)}
       </p>
 
+      <!-- ✅ 버튼 텍스트도 \n 줄바꿈이 보이도록 class 전달(Buttons.astro가 class를 전달하는 구조면 즉시 적용됨) -->
       <Button
         text={t('footerCTA.buttonText', lang)}
         href={KAKAO_TALK_URL}
         variant="primary"
         size="lg"
         target="_blank"
+        class="whitespace-pre-line"
       />
     </div>
   </div>
