@@ -73,11 +73,11 @@
 
     "emailTitle": "Basic",
     "emailText": "10–15초 내\n150,000원(VAT 포함)~",
-    "emailButtonText": "디자인 확정본이 제공되는 경우에 적합합니다.\n\n<진행과정>\n     요청 → 모션 → 납품",
+    "emailButtonText": "디자인 확정본이 제공되는 경우에 적합합니다.\n\n\n<진행과정>\n     요청 → 모션 → 납품",
 
     "phoneTitle": "Standard",
     "phoneText": "25–35초 내\n500,000원(VAT 포함)~",
-    "phoneButtonText": "디자인 제작 후 모션까지 진행합니다.\n\n\n <진행과정>\n    요청 → 디자인 → 모션 → 납품",
+    "phoneButtonText": "디자인 제작 후 모션까지 진행합니다.\n\n\n\n <진행과정>\n    요청 → 디자인 → 모션 → 납품",
 
     "linkedinTitle": "Premium",
     "linkedinText": "40초 이상\n800,000원(VAT 포함)~",
