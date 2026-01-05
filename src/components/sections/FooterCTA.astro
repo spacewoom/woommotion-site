@@ -7,6 +7,11 @@ interface Props {
 }
 
 const { lang } = Astro.props;
+
+// ✅ 여기에 본인 카카오톡 상담 링크만 넣어줘
+// 예) 오픈채팅: https://open.kakao.com/o/XXXXXXX
+// 예) 카카오채널: https://pf.kakao.com/_XXXXXXX/chat
+const KAKAO_TALK_URL = "https://open.kakao.com/o/PUT_YOUR_LINK_HERE";
 ---
 
 <section id="footerCTA" class="py-16 md:py-24 bg-neutral-bg dark:bg-neutral-dark/60 text-center">
@@ -15,13 +20,14 @@ const { lang } = Astro.props;
       <h2 class="font-heading text-h2 text-secondary dark:text-white mb-6">
         {t('footerCTA.title', lang)}
       </h2>
+
       <p class="text-secondary/70 dark:text-white/70 max-w-2xl mx-auto mb-8">
         {t('footerCTA.subtitle', lang)}
       </p>
 
       <Button
         text={t('footerCTA.buttonText', lang)}
-        href="https://github.com/nicremo"
+        href={KAKAO_TALK_URL}
         variant="primary"
         size="lg"
         target="_blank"
