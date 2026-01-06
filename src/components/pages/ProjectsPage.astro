@@ -1,0 +1,257 @@
+---
+import { works as allWorks, CATEGORIES } from "../../data/works.js";
+
+const { lang, category } = Astro.props;
+
+const isDe = lang === "de";
+const base = isDe ? "/de" : "";
+
+const hrefAll = `${base}/projects`;
+const hrefAgency = `${base}/projects/agency-outsourcing`;
+const hrefSignage = `${base}/projects/digital-signage-content`;
+
+const works = category ? allWorks.filter((w) => w.category === category) : allWorks;
+
+function getYoutubeId(url = "") {
+  // youtu.be/ID 또는 watch?v=ID 또는 embed/ID 대응
+  const m =
+    url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
+    url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
+    url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
+  return m ? m[1] : "";
+}
+
+function getYoutubeThumb(url = "") {
+  const id = getYoutubeId(url);
+  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
+}
+---
+
+<section class="pt-28 pb-16 md:pt-36 md:pb-24 bg-neutral-bg dark:bg-neutral-dark/60">
+  <div class="max-w-container mx-auto px-6">
+
+    <!-- Title / Subtitle (중앙 정렬) -->
+    <div class="mb-10 text-center flex flex-col items-center" data-aos="fade-up">
+      <h1 class="font-heading text-h2 text-secondary dark:text-white mb-4">
+        Works
+      </h1>
+      <p class="text-body text-secondary/70 dark:text-white/70 max-w-5xl mx-auto lg:whitespace-nowrap">
+        흥미로운 연출, 명확한 정보 전달, 감각적인 모션으로 브랜드와 제품의 핵심 메시지를 설득력 있게 보여줍니다.
+      </p>
+    </div>
+
+    <!-- Top Buttons (Hero 버튼 스타일 유지) -->
+    <div class="flex flex-col sm:flex-row gap-3 justify-center mb-12" data-aos="fade-up">
+      <a
+        href={hrefAgency}
+        class="inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-6 border border-primary text-primary hover:bg-primary/10 bg-transparent"
+      >
+        Agency Outsourcing
+      </a>
+
+      <a
+        href={hrefSignage}
+        class="inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-6 bg-primary text-white hover:bg-primary/90"
+      >
+        Digital Signage Content
+      </a>
+    </div>
+
+    <!-- Works Grid (3 columns on md+) -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+      {works.map((work, index) => {
+        const thumb =
+          work.media?.poster ||
+          (work.media?.kind === "youtube" ? getYoutubeThumb(work.media.src) : "") ||
+          work.image ||
+          "/images/projects/card.jpg";
+
+        return (
+          <article
+            class="md:col-span-4 group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+            data-aos="fade-up"
+            data-aos-delay={index * 40}
+          >
+            <!-- Media (thumbnail only) -->
+            <button
+              type="button"
+              class="relative w-full overflow-hidden aspect-video text-left"
+              data-open-video
+              data-video-kind={work.media?.kind}
+              data-video-src={work.media?.src}
+              data-video-title={work.title}
+            >
+              <img
+                src={thumb}
+                alt={work.title}
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+
+              <!-- Tags -->
+              <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+                {work.tags?.map((tag) => (
+                  <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              <!-- Play Icon Overlay -->
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-black/50 backdrop-blur-sm border border-white/20">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z"></path>
+                  </svg>
+                </span>
+              </div>
+            </button>
+
+            <div class="p-6">
+              <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
+                {work.title}
+              </h3>
+
+              <p class="text-secondary/70 dark:text-white/70 mb-4">
+                {work.summary}
+              </p>
+
+              <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1">
+                <li><span class="font-mono">작업연도</span> · {work.info?.year}</li>
+                <li><span class="font-mono">러닝타임</span> · {work.info?.duration}</li>
+                <li><span class="font-mono">역할</span> · {work.info?.role}</li>
+              </ul>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+
+    <!-- Optional: back to all -->
+    {category ? (
+      <div class="mt-12 text-center" data-aos="fade-up">
+        <a
+          href={hrefAll}
+          class="inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-6 border border-primary text-primary hover:bg-primary/10 bg-transparent"
+        >
+          View all work
+        </a>
+      </div>
+    ) : null}
+  </div>
+
+  <!-- Video Modal -->
+  <div
+    id="work-video-modal"
+    class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 p-4"
+    aria-hidden="true"
+  >
+    <div class="w-full max-w-4xl bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+      <div class="flex items-center justify-between px-4 py-3 bg-black/60">
+        <p id="work-video-title" class="text-sm md:text-base text-white/90 truncate pr-3"></p>
+        <button
+          id="work-video-close"
+          type="button"
+          class="text-white/80 hover:text-white px-3 py-1 rounded-lg border border-white/10 hover:border-white/20"
+          aria-label="Close video modal"
+        >
+          Close
+        </button>
+      </div>
+
+      <div class="relative w-full bg-black" style="padding-top:56.25%;">
+        <div id="work-video-player" class="absolute inset-0"></div>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline>
+    (() => {
+      const modal = document.getElementById("work-video-modal");
+      const closeBtn = document.getElementById("work-video-close");
+      const titleEl = document.getElementById("work-video-title");
+      const player = document.getElementById("work-video-player");
+
+      if (!modal || !closeBtn || !titleEl || !player) return;
+
+      const getYoutubeId = (url = "") => {
+        const m =
+          url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
+        return m ? m[1] : "";
+      };
+
+      const openModal = (kind, src, title) => {
+        titleEl.textContent = title || "";
+        player.innerHTML = "";
+
+        // YouTube
+        if (kind === "youtube") {
+          const id = getYoutubeId(src);
+          const embed = id
+            ? `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1`
+            : src;
+
+          const iframe = document.createElement("iframe");
+          iframe.className = "w-full h-full";
+          iframe.src = embed;
+          iframe.title = title || "YouTube video";
+          iframe.loading = "lazy";
+          iframe.setAttribute("frameborder", "0");
+          iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+          iframe.setAttribute("allowfullscreen", "true");
+          player.appendChild(iframe);
+        }
+
+        // Local file
+        if (kind === "file") {
+          const video = document.createElement("video");
+          video.className = "w-full h-full";
+          video.src = src;
+          video.controls = true;
+          video.autoplay = true;
+          video.playsInline = true;
+          player.appendChild(video);
+        }
+
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      };
+
+      const closeModal = () => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        modal.setAttribute("aria-hidden", "true");
+        player.innerHTML = "";
+        document.body.style.overflow = "";
+      };
+
+      document.addEventListener("click", (e) => {
+        const btn = e.target?.closest?.("[data-open-video]");
+        if (!btn) return;
+
+        const kind = btn.getAttribute("data-video-kind");
+        const src = btn.getAttribute("data-video-src");
+        const title = btn.getAttribute("data-video-title");
+
+        if (!kind || !src) return;
+        openModal(kind, src, title);
+      });
+
+      closeBtn.addEventListener("click", closeModal);
+
+      // click outside modal content
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      // ESC close
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
+      });
+    })();
+  </script>
+</section>
