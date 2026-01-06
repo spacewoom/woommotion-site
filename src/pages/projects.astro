@@ -1,173 +1,30 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Button from "../components/ui/Buttons.astro";
+// src/pages/projects.astro
+import Layout from '../layouts/Layout.astro';
+import ProjectsPage from '../components/pages/ProjectsPage.astro';
+import { works, makePlaceholders } from '../data/works';
 
-const lang = Astro.currentLocale ?? "en";
+const lang = Astro.currentLocale;
 
-/**
- * ✅ 상단 2개 버튼 (Hero 버튼과 같은 Button 컴포넌트 계열 사용)
- * - 2단계에서 각각의 페이지(/projects/agency, /projects/digital-signage)를 실제로 만들면 됨
- */
+// 상단 2개 버튼
 const topButtons = [
-  { text: "Agency Outsourcing", href: "/projects/agency", variant: "primary" },
-  { text: "Digital Signage Content", href: "/projects/digital-signage", variant: "outline" },
+  { text: 'Agency Outsourcing', href: '/projects/agency', variant: 'primary' },
+  { text: 'Digital Signage Content', href: '/projects/digital-signage', variant: 'outline' },
 ];
 
-/**
- * ✅ Works 섹션과 동일 카드 데이터 구조(기존 유지)
- * - 필요하면 여기 배열에 계속 추가하면 됨
- */
-const baseProjects = [
-  {
-    title: "인포그래픽 | 기후동행카드 (35s)",
-    slug: "infographics-01",
-    image: "/images/projects/card.jpg",
-    tags: ["인포그래픽", "모션그래픽"],
-    summary:
-      "텍스트를 최소화하고 직관적인 이미지 중심으로 구성해, 짧은 시간 안에 핵심 정보가 이해되도록 디자인했습니다.",
-    info: {
-      year: "2024",
-      duration: "35s",
-      role: "기획 · 디자인 · 애니메이션",
-      youtubeUrl: "https://youtu.be/LLY3FR1Sb3I?si=1O3wcJZANL766oDf",
-    },
-  },
-  {
-    title: "프로모션 | Prmr 크루 모집",
-    slug: "promotion-01",
-    image: "/images/projects/prmr.jpg",
-    tags: ["타이포그래픽", "프로모션"],
-    summary:
-      "리드미컬한 타이포 키네틱과 화면 템포를 중심으로, 메시지가 빠르고 선명하게 전달되도록 제작했습니다.",
-    info: {
-      year: "2024",
-      duration: "15s",
-      role: "기획 · 디자인 · 애니메이션",
-      youtubeUrl: "https://youtu.be/K_o555Ywq28?si=hvlUgRNbGhntTqAI",
-    },
-  },
-  {
-    title: "제품 홍보 | Grida pencil",
-    slug: "product-01",
-    image: "/images/projects/grida.jpg",
-    tags: ["제품 홍보", "모션그래픽"],
-    summary:
-      "“아이디어는 끄적이는 순간부터 시작된다”는 메시지를 중심으로 드로잉 요소와 모션을 결합해 생동감 있게 표현했습니다.",
-    info: {
-      year: "2022",
-      duration: "30s 내외",
-      role: "기획 · 디자인· 애니메이션 · 3D 모델링",
-      youtubeUrl: "https://youtu.be/dcmq0tn98So?si=jOl7SytoZ3DJiQWZ",
-    },
-  },
-];
-
-/**
- * ✅ 목표: 30개 카드(3열 x 10행)
- * - 아직 작업이 부족하면 placeholder로 채워두고,
- * - 추후 실제 프로젝트로 교체하면 됨.
- */
-const TARGET_COUNT = 30;
-
-const placeholders = Array.from(
-  { length: Math.max(0, TARGET_COUNT - baseProjects.length) },
-  (_, i) => ({
-    title: `추가 작업 준비중 #${i + 1}`,
-    slug: `placeholder-${i + 1}`,
-    image: "/images/projects/card.jpg",
-    tags: ["Coming soon"],
-    summary: "업로드 준비 중입니다.",
-    info: {
-      year: "-",
-      duration: "-",
-      role: "-",
-      youtubeUrl: "",
-    },
-  })
-);
-
-const projects = [...baseProjects, ...placeholders];
+// 카드 30개 유지(부족하면 placeholder로 채움)
+const base = works;
+const placeholders = makePlaceholders(30 - base.length);
+const projects = [...base, ...placeholders];
 ---
 
 <Layout title="Works" description="View all work" lang={lang}>
   <main>
-    <section class="py-16 md:py-24 bg-neutral-bg dark:bg-neutral-dark/60">
-      <div class="max-w-container mx-auto px-6">
-        <!-- ✅ 타이틀/서브타이틀 중앙 정렬 -->
-        <div class="mb-10 text-center flex flex-col items-center">
-          <h1 class="font-heading text-h2 text-secondary dark:text-white mb-4">
-            Works
-          </h1>
-
-          <!-- ✅ 서브타이틀 영역 “쪼개짐” 방지: 넓게 + 큰 화면에서 한 줄 유지 -->
-          <p class="text-body text-secondary/70 dark:text-white/70 max-w-6xl mx-auto lg:whitespace-nowrap">
-            지금까지 제작한 작업을 한 페이지에서 확인할 수 있습니다.
-          </p>
-        </div>
-
-        <!-- ✅ 상단 2개 버튼 (Hero 느낌 유지: primary + outline) -->
-        <div class="mb-10 flex flex-wrap justify-center gap-3">
-          {topButtons.map((b) => (
-            <Button text={b.text} href={b.href} variant={b.variant} />
-          ))}
-        </div>
-
-        <!-- ✅ Works 섹션과 동일한 3열 카드 레이아웃 -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
-          {projects.map((project, index) => (
-            <div
-              class="md:col-span-4 group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
-            >
-              <div class="relative overflow-hidden aspect-video">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-                <div class="absolute top-4 left-4 flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
-                    <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div class="p-6">
-                <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
-                  {project.title}
-                </h3>
-
-                <p class="text-secondary/70 dark:text-white/70 mb-4">
-                  {project.summary}
-                </p>
-
-                <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1 mb-6">
-                  <li><span class="font-mono">작업연도</span> · {project.info.year}</li>
-                  <li><span class="font-mono">러닝타임</span> · {project.info.duration}</li>
-                  <li><span class="font-mono">역할</span> · {project.info.role}</li>
-                </ul>
-
-                {project.info.youtubeUrl ? (
-                  <Button
-                    text="YouTube에서 보기"
-                    href={project.info.youtubeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    variant="outline"
-                    size="sm"
-                  />
-                ) : (
-                  <span class="inline-flex items-center justify-center rounded-md border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm text-secondary/60 dark:text-white/60">
-                    준비중
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+    <ProjectsPage
+      title="Works"
+      subtitle="지금까지 제작한 작업을 한 페이지에서 확인할 수 있습니다."
+      topButtons={topButtons}
+      projects={projects}
+    />
   </main>
 </Layout>
