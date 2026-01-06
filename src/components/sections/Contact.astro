@@ -1,96 +1,83 @@
 ---
-import { t } from '../../utils/i18n';
-
 interface Props {
-  lang: string | undefined;
+  lang: string;
+  t: (key: string, lang: string) => string;
 }
 
-const { lang } = Astro.props;
+const { lang, t } = Astro.props;
 
-// Ensure line breaks work whether JSON contains \n or actual newlines
-const formatMultiline = (value = '') => String(value).replace(/\\n/g, '\n');
+// HTML은 기본적으로 개행을 무시하므로,
+// 텍스트를 escape한 다음 \n(실개행/리터럴 모두)을 <br />로 치환해서 확실히 줄바꿈 처리
+const escapeHtml = (str = "") =>
+  String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+// Ensure both literal "\\n" and real newlines render as line breaks
+const nl2br = (value = "") => {
+  const normalized = String(value).replace(/\\n/g, "\n");
+  return escapeHtml(normalized).replace(/\r?\n/g, "<br />");
+};
+
+const contacts = [
+  {
+    titleKey: "contact.emailTitle",
+    textKey: "contact.emailText",
+    buttonKey: "contact.emailButtonText",
+    icon: "/contact/one.svg",
+  },
+  {
+    titleKey: "contact.phoneTitle",
+    textKey: "contact.phoneText",
+    buttonKey: "contact.phoneButtonText",
+    icon: "/contact/two.svg",
+  },
+  {
+    titleKey: "contact.linkedinTitle",
+    textKey: "contact.linkedinText",
+    buttonKey: "contact.linkedinButtonText",
+    icon: "/contact/three.svg",
+  },
+];
 ---
 
-<section id="contact" class="py-16 md:py-24 bg-secondary dark:bg-neutral-dark text-white">
-  <div class="max-w-container mx-auto px-6">
+<section id="contact" class="py-20 bg-black text-white">
+  <div class="container mx-auto px-4">
     <div class="mb-12 text-center" data-aos="fade-up">
-      <h2 class="font-heading text-h2 text-white mb-4">
-        {t('contact.title', lang)}
-      </h2>
-      <p class="text-white/70 mt-2 max-w-xl mx-auto whitespace-pre-line">
-        {formatMultiline(t('contact.subtitle', lang))}
-      </p>
+      <h2 class="text-4xl font-bold">{t("contact.title", lang)}</h2>
+      <p
+        class="text-white/70 mt-2 max-w-[726px] mx-auto whitespace-pre-line"
+        set:html={nl2br(t("contact.subtitle", lang))}
+      ></p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <!-- Basic -->
-      <div
-        class="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors"
-        data-aos="fade-up"
-        data-aos-delay="0"
-      >
-        <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-6 mx-auto">
-          <img src="/contact/one.svg" alt="" class="w-7 h-7" loading="lazy" />
+    <div class="grid md:grid-cols-3 gap-6">
+      {contacts.map((c) => (
+        <div
+          class="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:bg-white/10 transition"
+          data-aos="fade-up"
+        >
+          <div>
+            <div class="flex items-center gap-3 mb-3">
+              <img src={c.icon} alt="" class="w-6 h-6" loading="lazy" />
+              <h3 class="text-xl font-semibold">{t(c.titleKey, lang)}</h3>
+            </div>
+
+            <p
+              class="text-white/70 mb-6 whitespace-pre-line text-left"
+              set:html={nl2br(t(c.textKey, lang))}
+            ></p>
+          </div>
+
+          <div
+            class="text-sm text-white/70 text-left whitespace-pre-line"
+            set:html={nl2br(t(c.buttonKey, lang))}
+          ></div>
         </div>
-
-        <h3 class="text-xl font-semibold mb-3 mt-6 text-center">
-          {t('contact.emailTitle', lang)}
-        </h3>
-
-        <p class="text-white/70 mb-6 whitespace-pre-line text-left">
-          {formatMultiline(t('contact.emailText', lang))}
-        </p>
-
-        <div class="text-primary font-medium text-left whitespace-pre-line">
-          {formatMultiline(t('contact.emailButtonText', lang))}
-        </div>
-      </div>
-
-      <!-- Standard -->
-      <div
-        class="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors"
-        data-aos="fade-up"
-        data-aos-delay="100"
-      >
-        <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-6 mx-auto">
-          <img src="/contact/two.svg" alt="" class="w-7 h-7" loading="lazy" />
-        </div>
-
-        <h3 class="text-xl font-semibold mb-3 mt-6 text-center">
-          {t('contact.phoneTitle', lang)}
-        </h3>
-
-        <p class="text-white/70 mb-6 whitespace-pre-line text-left">
-          {formatMultiline(t('contact.phoneText', lang))}
-        </p>
-
-        <div class="text-primary font-medium text-left whitespace-pre-line">
-          {formatMultiline(t('contact.phoneButtonText', lang))}
-        </div>
-      </div>
-
-      <!-- Premium -->
-      <div
-        class="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors"
-        data-aos="fade-up"
-        data-aos-delay="200"
-      >
-        <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-6 mx-auto">
-          <img src="/contact/three.svg" alt="" class="w-7 h-7" loading="lazy" />
-        </div>
-
-        <h3 class="text-xl font-semibold mb-3 mt-6 text-center">
-          {t('contact.linkedinTitle', lang)}
-        </h3>
-
-        <p class="text-white/70 mb-6 whitespace-pre-line text-left">
-          {formatMultiline(t('contact.linkedinText', lang))}
-        </p>
-
-        <div class="text-primary font-medium text-left whitespace-pre-line">
-          {formatMultiline(t('contact.linkedinButtonText', lang))}
-        </div>
-      </div>
+      ))}
     </div>
   </div>
 </section>
