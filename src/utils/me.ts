@@ -22,7 +22,7 @@ export const github_username = "spacewoom";
  |     btoa('space_woom@gmail.com')                                            |
  |                                                                             |
  \============================================================================*/
-const email_base64_encoded = "a29udGFrdEBiaXR6ZXItZmFiaWFuLmRl";
+const email_base64_encoded = "c3BhY2Vfd29vbUBnbWFpbC5jb20=";
 const phone_base64_encoded = "KzQ5IDE3OCA3MjY5MTc4";
 
 // The address fields below are for the privacy policy. They are also Base64 encoded.
