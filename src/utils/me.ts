@@ -11,11 +11,11 @@ export const github_username = "spacewoom";
  |                                                                             |
  | Mac command to Base64 encode (and copy the encoded data to the clipboard):  |
  |                                                                             |
- |     echo -n 'kontakt@bitzer-fabian.de' | base64 | pbcopy                    |
+ |     echo -n 'space_woom@gmail.com' | base64 | pbcopy                        |
  |                                                                             |
  | Linux command to Base64 encode:                                             |
  |                                                                             |
- |     echo -n 'kontakt@bitzer-fabian.de' | base64                             |
+ |     echo -n 'space_woom@gmail.com' | base64                                 |
  |                                                                             |
  | JavaScript command to Base64 encode:                                        |
  |                                                                             |
