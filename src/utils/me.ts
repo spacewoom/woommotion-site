@@ -1,7 +1,7 @@
 export const name = "Woom";
-export const homepage_url = "https://fabian-bitzer.de/";
+export const homepage_url = "https://woommotion.com//";
 export const linkedin_username = "fabian-bitzer";
-export const github_username = "nicremo";
+export const github_username = "spacewoom";
 
 /*=============================================================================\
  | The email, phone number, and address fields below are Base64 encoded to     |
