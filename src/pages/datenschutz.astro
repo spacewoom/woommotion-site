@@ -3,68 +3,111 @@ import Layout from '../layouts/Layout.astro';
 import { t } from '../utils/i18n';
 import { name, email, address_line_1, address_line_2 } from '../utils/me';
 
-const lang = 'de'; // Explicitly German for this page
-const pageTitle = "Datenschutzerklärung | " + t('site.title', lang);
-const pageDescription = "Datenschutzerklärung der Webseite " + t('site.title', lang);
+const lang = 'de';
+const pageTitle = `개인정보처리방침 | ${t('site.title', lang)}`;
+const pageDescription = '개인정보의 수집·이용·보관·파기 및 이용자 권리 안내';
+const effectiveDate = '2026-01-06';
 ---
 
 <Layout title={pageTitle} description={pageDescription} lang={lang}>
   <section class="py-16 md:py-24">
     <div class="max-w-container mx-auto px-6">
       <header class="mb-12 text-center">
-        <h1 class="font-heading text-h1 text-secondary dark:text-white">Datenschutzerklärung</h1>
+        <h1 class="font-heading text-h1 text-secondary dark:text-white">
+          개인정보처리방침
+          <span class="block mt-3 text-base font-normal text-secondary/70 dark:text-white/70">Privacy Policy</span>
+        </h1>
+        <p class="mt-4 text-sm text-secondary/70 dark:text-white/70">시행일: {effectiveDate}</p>
       </header>
 
       <article class="prose dark:prose-invert max-w-none mx-auto bg-white dark:bg-neutral-dark p-6 md:p-8 rounded-lg shadow">
-        <p>Verantwortlicher im Sinne der Datenschutzgesetze, insbesondere der EU-Datenschutzgrundverordnung (DSGVO), ist:</p>
         <p>
-          {name}<br />
-          {address_line_1}<br />
-          {address_line_2}<br />
-          E-Mail: {email}
+          <strong>{name}</strong> (이하 “WOOM”)은(는) 「개인정보 보호법」 등 관련 법령을 준수하며,
+          이용자의 개인정보를 안전하게 보호하기 위해 다음과 같이 개인정보처리방침을 공개합니다.
         </p>
 
-        <h2>Ihre Betroffenenrechte</h2>
-        <p>Unter den angegebenen Kontaktdaten unseres Datenschutzbeauftragten können Sie jederzeit folgende Rechte ausüben:</p>
+        <h2>1. 개인정보의 처리 목적</h2>
+        <p>WOOM은 다음 목적을 위해 개인정보를 처리합니다.</p>
         <ul>
-          <li>Auskunft über Ihre bei uns gespeicherten Daten und deren Verarbeitung (Art. 15 DSGVO),</li>
-          <li>Berichtigung unrichtiger personenbezogener Daten (Art. 16 DSGVO),</li>
-          <li>Löschung Ihrer bei uns gespeicherten Daten (Art. 17 DSGVO),</li>
-          <li>Einschränkung der Datenverarbeitung, sofern wir Ihre Daten aufgrund gesetzlicher Pflichten noch nicht löschen dürfen (Art. 18 DSGVO),</li>
-          <li>Widerspruch gegen die Verarbeitung Ihrer Daten bei uns (Art. 21 DSGVO) und</li>
-          <li>Datenübertragbarkeit, sofern Sie in die Datenverarbeitung eingewilligt haben oder einen Vertrag mit uns abgeschlossen haben (Art. 20 DSGVO).</li>
+          <li>문의/상담 응대 및 커뮤니케이션(견적, 일정, 요구사항 확인)</li>
+          <li>계약 및 프로젝트 진행(결제 확인, 산출물 전달, 수정 요청 처리)</li>
+          <li>서비스 품질 개선 및 분쟁 대응(요청 이력 관리, 증빙 보관)</li>
         </ul>
-        <p>Sofern Sie uns eine Einwilligung erteilt haben, können Sie diese jederzeit mit Wirkung für die Zukunft widerrufen.</p>
-        <p>Sie können sich jederzeit mit einer Beschwerde an eine Aufsichtsbehörde wenden, z. B. an die zuständige Aufsichtsbehörde des Bundeslands Ihres Wohnsitzes oder an die für uns als verantwortliche Stelle zuständige Behörde.</p>
 
-        <h2>Erfassung allgemeiner Informationen beim Besuch unserer Website</h2>
-        <h3>Art und Zweck der Verarbeitung:</h3>
-        <p>Wenn Sie auf unsere Website zugreifen, d.h., wenn Sie sich nicht registrieren oder anderweitig Informationen übermitteln, werden automatisch Informationen allgemeiner Natur erfasst. Diese Informationen (Server-Logfiles) beinhalten etwa die Art des Webbrowsers, das verwendete Betriebssystem, den Domainnamen Ihres Internet-Service-Providers, Ihre IP-Adresse und ähnliches.</p>
-        <p>Sie werden insbesondere zu folgenden Zwecken verarbeitet:</p>
+        <h2>2. 처리하는 개인정보 항목 및 수집 방법</h2>
+        <p>수집하는 항목은 문의/계약 방식에 따라 달라질 수 있으며, 최소한의 범위에서 수집합니다.</p>
         <ul>
-          <li>Sicherstellung eines problemlosen Verbindungsaufbaus der Website,</li>
-          <li>Sicherstellung einer reibungslosen Nutzung unserer Website,</li>
-          <li>Auswertung der Systemsicherheit und -stabilität sowie</li>
-          <li>zur Optimierung unserer Website.</li>
+          <li><strong>필수(문의 시):</strong> 이름(또는 닉네임), 이메일/연락처, 문의 내용</li>
+          <li><strong>프로젝트 진행 시:</strong> 결제/세금계산서 발행에 필요한 정보(사업자 정보 등)</li>
+          <li><strong>자동 수집:</strong> 접속 로그, IP, 브라우저/기기 정보(호스팅/CDN 사업자 로그 포함)</li>
         </ul>
-        <p>Wir verwenden Ihre Daten nicht, um Rückschlüsse auf Ihre Person zu ziehen. Informationen dieser Art werden von uns ggfs. anonymisiert statistisch ausgewertet, um unseren Internetauftritt und die dahinterstehende Technik zu optimieren.</p>
-        <h3>Rechtsgrundlage und berechtigtes Interesse:</h3>
-        <p>Die Verarbeitung erfolgt gemäß Art. 6 Abs. 1 lit. f DSGVO auf Basis unseres berechtigten Interesses an der Verbesserung der Stabilität und Funktionalität unserer Website.</p>
-        <h3>Empfänger:</h3>
-        <p>Empfänger der Daten sind ggf. technische Dienstleister, die für den Betrieb und die Wartung unserer Webseite als Auftragsverarbeiter tätig werden.</p>
-        <h3>Speicherdauer:</h3>
-        <p>Die Daten werden gelöscht, sobald diese für den Zweck der Erhebung nicht mehr erforderlich sind. Dies ist für die Daten, die der Bereitstellung der Webseite dienen, grundsätzlich der Fall, wenn die jeweilige Sitzung beendet ist.</p>
+        <p>수집 방법: 웹사이트 문의, 이메일, 카카오톡 상담 등 이용자가 직접 제공하는 방식으로 수집됩니다.</p>
 
-        <h2>Cookies</h2>
-        <p>Diese Webseite verwendet möglicherweise Cookies. Für detaillierte Informationen zu Cookies und Ihren Einstellungsmöglichkeiten, konsultieren Sie bitte unsere Cookie-Richtlinie (falls vorhanden) oder die Cookie-Einstellungen auf unserer Webseite.</p>
+        <h2>3. 개인정보의 보유 및 이용기간</h2>
+        <p>
+          개인정보는 처리 목적 달성 시 지체 없이 파기합니다. 다만, 관련 법령에 따라 일정 기간 보관이 필요한 경우
+          해당 기간 동안 보관 후 파기합니다.
+        </p>
+        <ul>
+          <li><strong>문의/상담 이력:</strong> 목적 달성 후 최대 1년(분쟁 대응을 위해 보관할 수 있음)</li>
+          <li><strong>계약/거래 관련 기록:</strong> 관계 법령이 정한 보관 기간에 따름</li>
+        </ul>
 
-        <h2>Änderung unserer Datenschutzbestimmungen</h2>
-        <p>Wir behalten uns vor, diese Datenschutzerklärung anzupassen, damit sie stets den aktuellen rechtlichen Anforderungen entspricht oder um Änderungen unserer Leistungen in der Datenschutzerklärung umzusetzen, z.B. bei der Einführung neuer Services. Für Ihren erneuten Besuch gilt dann die neue Datenschutzerklärung.</p>
+        <h2>4. 개인정보의 제3자 제공</h2>
+        <p>
+          WOOM은 이용자의 개인정보를 원칙적으로 외부에 제공하지 않습니다.
+          단, 법령에 근거가 있거나 이용자의 동의를 받은 경우에 한해 제공될 수 있습니다.
+        </p>
 
-        <h2>Fragen an den Datenschutzbeauftragten</h2>
-        <p>Wenn Sie Fragen zum Datenschutz haben, schreiben Sie uns bitte eine E-Mail oder wenden Sie sich direkt an die für den Datenschutz verantwortliche Person in unserer Organisation:</p>
-        <p>[Falls vorhanden: Name und Kontaktdaten des Datenschutzbeauftragten]</p>
-        <p><em>Stand: Mai 2024</em></p>
+        <h2>5. 개인정보 처리의 위탁</h2>
+        <p>
+          원활한 서비스 제공을 위해 일부 업무를 외부에 위탁할 수 있으며, 위탁 시 관련 법령에 따라
+          안전하게 관리·감독합니다. (예: 웹 호스팅/인프라, 이메일/파일 전달 서비스 등)
+        </p>
+
+        <h2>6. 정보주체의 권리·의무 및 행사 방법</h2>
+        <p>이용자는 언제든지 다음 권리를 행사할 수 있습니다.</p>
+        <ul>
+          <li>개인정보 열람, 정정, 삭제, 처리정지 요구</li>
+          <li>동의 철회 요청(동의 기반 처리의 경우)</li>
+        </ul>
+        <p>요청은 아래 “개인정보 보호책임자” 연락처로 접수해 주세요. 확인 후 지체 없이 조치합니다.</p>
+
+        <h2>7. 개인정보의 파기 절차 및 방법</h2>
+        <ul>
+          <li><strong>파기 절차:</strong> 목적 달성 또는 보관 기간 종료 후 내부 방침에 따라 파기</li>
+          <li><strong>파기 방법:</strong> 전자적 파일은 복구 불가능한 방식으로 삭제, 종이는 분쇄/소각</li>
+        </ul>
+
+        <h2>8. 개인정보의 안전성 확보 조치</h2>
+        <ul>
+          <li>접근 권한 최소화 및 계정/비밀번호 관리</li>
+          <li>업무용 기기 보안(백신, OS 업데이트 등)</li>
+          <li>전송 구간 보호(보안 프로토콜 사용), 보관 자료 접근 통제</li>
+        </ul>
+
+        <h2>9. 쿠키(Cookie) 및 유사 기술</h2>
+        <p>
+          WOOM은 서비스 제공을 위해 쿠키를 사용할 수 있습니다. 이용자는 브라우저 설정을 통해 쿠키 저장을 거부하거나
+          삭제할 수 있습니다. (쿠키 거부 시 일부 기능이 제한될 수 있습니다.)
+        </p>
+
+        <h2>10. 개인정보 보호책임자 및 문의</h2>
+        <p>개인정보 관련 문의 및 권리 행사 요청은 아래로 연락해 주세요.</p>
+        <ul>
+          <li><strong>책임자:</strong> {name}</li>
+          <li><strong>이메일:</strong> {email}</li>
+          <li><strong>주소:</strong> {address_line_1}</li>
+          {address_line_2 && <li><strong>상세 주소:</strong> {address_line_2}</li>}
+        </ul>
+
+        <h2>11. 방침의 변경</h2>
+        <p>본 방침은 법령/서비스 변경에 따라 수정될 수 있으며, 변경 시 본 페이지를 통해 공지합니다.</p>
+
+        <hr />
+        <p class="text-sm">
+          ※ 본 방침은 「개인정보 보호법」 제30조(개인정보 처리방침의 수립 및 공개) 및 관련 시행령의 취지에 따라 작성되었습니다.
+        </p>
       </article>
     </div>
   </section>
