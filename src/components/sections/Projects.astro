@@ -63,7 +63,7 @@ const projects = [
       <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">
         {sectionTitle}
       </h2>
-      <p class="text-secondary/70 dark:text-white/70 max-w-2x1">
+      <p class="text-secondary/70 dark:text-white/70 max-w-2xl">
         {sectionSubtitle}
       </p>
     </div>
@@ -106,16 +106,14 @@ const projects = [
               <li><span class="font-mono">역할</span> · {project.info.role}</li>
             </ul>
 
-          {project.info.youtubeUrl && (
             <Button
               text="YouTube에서 보기"
-              href={project.info.youtubeUrl}
+              href={project.youtubeUrl}
               target="_blank"
               rel="noopener noreferrer"
               variant="outline"
               size="sm"
             />
-          )}
           </div>
         </div>
       ))}
