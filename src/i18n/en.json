@@ -82,7 +82,10 @@
     "linkedinTitle": "Premium",
     "linkedinText": "40초 이상\n800,000원(VAT 포함)~",
     "linkedinButtonText": "연출 난이도가 높거나 긴 러닝타임 산출물에 적합합니다.\n복잡한 모션 구성, 고급 편집/합성, 다회차 제작 등.\n<진행과정>\n     요청 → 기획 → 디자인 → 모션 → 납품"
+  },
+   "footer": {
+    "copyright": "All rights reserved.",
+    "imprint": "환불·취소·수정 정책",
+    "privacyPolicy": "개인정보처리방침"
   }
-
-
 }
