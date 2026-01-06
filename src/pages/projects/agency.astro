@@ -1,26 +1,25 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ProjectsPage from '../../components/pages/ProjectsPage.astro';
-import { works, makePlaceholders } from '../../data/works';
+import { buildGrid } from '../../data/works.js';
 
-const lang = Astro.currentLocale;
+const lang = Astro.currentLocale ?? 'en';
+const prefix = lang === 'de' ? '/de' : '';
 
 const topButtons = [
-  { text: 'Agency Outsourcing', href: '/projects/agency', variant: 'primary' },
-  { text: 'Digital Signage Content', href: '/projects/digital-signage', variant: 'outline' },
+  { text: 'Agency Outsourcing', href: `${prefix}/projects/agency`, variant: 'primary' },
+  { text: 'Digital Signage Content', href: `${prefix}/projects/digital-signage`, variant: 'outline' },
 ];
 
-const filtered = works.filter(w => w.category === 'agency');
-const projects = [...filtered, ...makePlaceholders(30 - filtered.length)];
+const projects = buildGrid({ category: 'agency', targetCount: 30 });
 ---
 
-<Layout title="Works | Agency" description="Agency works" lang={lang}>
-  <main>
-    <ProjectsPage
-      title="Agency Outsourcing"
-      subtitle="의뢰 기반 제작 작업을 모아볼 수 있습니다."
-      topButtons={topButtons}
-      projects={projects}
-    />
-  </main>
+<Layout title="Agency Outsourcing" description="Agency Outsourcing works" lang={lang}>
+  <ProjectsPage
+    lang={lang}
+    title="Agency Outsourcing"
+    subtitle="에이전시/스튜디오 협업용 작업들을 모아볼 수 있습니다."
+    topButtons={topButtons}
+    projects={projects}
+  />
 </Layout>
