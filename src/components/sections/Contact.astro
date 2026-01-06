@@ -1,83 +1,54 @@
 ---
+import Button from '../ui/Buttons.astro';
+import * as i18n from '../../utils/i18n';
+
 interface Props {
-  lang: string;
-  t: (key: string, lang: string) => string;
+  lang?: string;
 }
 
-const { lang, t } = Astro.props;
+const { lang } = Astro.props;
 
-// HTML은 기본적으로 개행을 무시하므로,
-// 텍스트를 escape한 다음 \n(실개행/리터럴 모두)을 <br />로 치환해서 확실히 줄바꿈 처리
-const escapeHtml = (str = "") =>
-  String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+// ✅ locale 미정의 에러 방지
+const locale = lang ?? 'en';
 
-// Ensure both literal "\\n" and real newlines render as line breaks
-const nl2br = (value = "") => {
-  const normalized = String(value).replace(/\\n/g, "\n");
-  return escapeHtml(normalized).replace(/\r?\n/g, "<br />");
+// ✅ t가 함수가 아닐 때도 빌드가 안 깨지도록 안전 래퍼
+const translate = (key: string) => {
+  const maybeT = (i18n as any)?.t ?? (i18n as any)?.default;
+  return typeof maybeT === 'function' ? maybeT(key, locale) : key;
 };
 
-const contacts = [
-  {
-    titleKey: "contact.emailTitle",
-    textKey: "contact.emailText",
-    buttonKey: "contact.emailButtonText",
-    icon: "/contact/one.svg",
-  },
-  {
-    titleKey: "contact.phoneTitle",
-    textKey: "contact.phoneText",
-    buttonKey: "contact.phoneButtonText",
-    icon: "/contact/two.svg",
-  },
-  {
-    titleKey: "contact.linkedinTitle",
-    textKey: "contact.linkedinText",
-    buttonKey: "contact.linkedinButtonText",
-    icon: "/contact/three.svg",
-  },
-];
+// ✅ \n / \\n 모두 줄바꿈으로 처리 (브라우저에서 확실히 보이게 <br/>로 렌더)
+const toLines = (value: unknown) => String(value ?? '').replace(/\\n/g, '\n').split(/\r?\n/);
+
+// ✅ 카카오톡 상담 링크 (네가 쓰는 오픈채팅 URL로 유지/교체)
+const KAKAO_OPENCHAT_URL = 'https://open.kakao.com/o/sU2CPZkg';
 ---
 
-<section id="contact" class="py-20 bg-black text-white">
-  <div class="container mx-auto px-4">
-    <div class="mb-12 text-center" data-aos="fade-up">
-      <h2 class="text-4xl font-bold">{t("contact.title", lang)}</h2>
-      <p
-        class="text-white/70 mt-2 max-w-[726px] mx-auto whitespace-pre-line"
-        set:html={nl2br(t("contact.subtitle", lang))}
-      ></p>
-    </div>
+<section class="py-16 md:py-24 bg-secondary dark:bg-neutral-dark text-white">
+  <div class="max-w-container mx-auto px-6">
+    <div class="bg-white/5 border border-white/10 rounded-3xl p-10 md:p-14 text-center backdrop-blur-sm" data-aos="fade-up">
+      <h2 class="font-heading text-h2 text-white mb-4">
+        {translate('footerCTA.title')}
+      </h2>
 
-    <div class="grid md:grid-cols-3 gap-6">
-      {contacts.map((c) => (
-        <div
-          class="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:bg-white/10 transition"
-          data-aos="fade-up"
-        >
-          <div>
-            <div class="flex items-center gap-3 mb-3">
-              <img src={c.icon} alt="" class="w-6 h-6" loading="lazy" />
-              <h3 class="text-xl font-semibold">{t(c.titleKey, lang)}</h3>
-            </div>
+      <p class="text-white/70 mt-3 max-w-2xl mx-auto">
+        {toLines(translate('footerCTA.subtitle')).map((line, idx, arr) => (
+          <>
+            {line}
+            {idx < arr.length - 1 && <br />}
+          </>
+        ))}
+      </p>
 
-            <p
-              class="text-white/70 mb-6 whitespace-pre-line text-left"
-              set:html={nl2br(t(c.textKey, lang))}
-            ></p>
-          </div>
-
-          <div
-            class="text-sm text-white/70 text-left whitespace-pre-line"
-            set:html={nl2br(t(c.buttonKey, lang))}
-          ></div>
-        </div>
-      ))}
+      <div class="mt-10 flex justify-center">
+        <Button
+          text={translate('footerCTA.buttonText')}
+          href={KAKAO_OPENCHAT_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="primary"
+        />
+      </div>
     </div>
   </div>
 </section>
