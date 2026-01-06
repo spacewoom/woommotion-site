@@ -1,4 +1,4 @@
-export const name = "Fabian Bitzer";
+export const name = "Woom";
 export const homepage_url = "https://fabian-bitzer.de/";
 export const linkedin_username = "fabian-bitzer";
 export const github_username = "nicremo";
