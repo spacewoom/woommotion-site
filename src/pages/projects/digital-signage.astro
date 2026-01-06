@@ -1,26 +1,25 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ProjectsPage from '../../components/pages/ProjectsPage.astro';
-import { works, makePlaceholders } from '../../data/works';
+import { buildGrid } from '../../data/works.js';
 
-const lang = Astro.currentLocale;
+const lang = Astro.currentLocale ?? 'en';
+const prefix = lang === 'de' ? '/de' : '';
 
 const topButtons = [
-  { text: 'Agency Outsourcing', href: '/projects/agency', variant: 'outline' },
-  { text: 'Digital Signage Content', href: '/projects/digital-signage', variant: 'primary' },
+  { text: 'Agency Outsourcing', href: `${prefix}/projects/agency`, variant: 'outline' },
+  { text: 'Digital Signage Content', href: `${prefix}/projects/digital-signage`, variant: 'primary' },
 ];
 
-const filtered = works.filter(w => w.category === 'digital');
-const projects = [...filtered, ...makePlaceholders(30 - filtered.length)];
+const projects = buildGrid({ category: 'digital-signage', targetCount: 30 });
 ---
 
-<Layout title="Works | Digital Signage" description="Digital signage works" lang={lang}>
-  <main>
-    <ProjectsPage
-      title="Digital Signage Content"
-      subtitle="DID/사이니지 환경에 최적화된 콘텐츠 작업을 모아볼 수 있습니다."
-      topButtons={topButtons}
-      projects={projects}
-    />
-  </main>
+<Layout title="Digital Signage Content" description="Digital signage works" lang={lang}>
+  <ProjectsPage
+    lang={lang}
+    title="Digital Signage Content"
+    subtitle="DID/매장 사이니지 환경에 최적화된 콘텐츠 작업들을 모아볼 수 있습니다."
+    topButtons={topButtons}
+    projects={projects}
+  />
 </Layout>
