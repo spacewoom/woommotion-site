@@ -19,7 +19,7 @@ export const github_username = "nicremo";
  |                                                                             |
  | JavaScript command to Base64 encode:                                        |
  |                                                                             |
- |     btoa('kontakt@bitzer-fabian.de')                                        |
+ |     btoa('space_woom@gmail.com')                                            |
  |                                                                             |
  \============================================================================*/
 const email_base64_encoded = "a29udGFrdEBiaXR6ZXItZmFiaWFuLmRl";
