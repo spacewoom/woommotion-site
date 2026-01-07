@@ -1,5 +1,5 @@
 ---
-// src/components/pages/ProjectsPage.astro
+/** src/components/pages/ProjectsPage.astro */
 import Button from '../ui/Buttons.astro';
 
 const {
@@ -19,7 +19,7 @@ const {
         {title}
       </h1>
 
-      <!-- ✅ subtitle 영역: 반갈림 방지 + 한 줄 유지 옵션 -->
+      <!-- subtitle 영역: 반갈림 방지 + 한 줄 유지 옵션 -->
       <p class="text-body text-secondary/70 dark:text-white/70 max-w-6xl mx-auto lg:whitespace-nowrap">
         {subtitle}
       </p>
@@ -37,7 +37,11 @@ const {
     <!-- 카드 그리드 -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
       {projects.map((project) => {
-        const youtubeUrl = project?.info?.youtubeUrl ?? '';
+        const safeTitle = project?.title ?? 'Work';
+        const tags = Array.isArray(project?.tags) ? project.tags : [];
+        const info = project?.info ?? {};
+
+        const youtubeUrl = info?.youtubeUrl ?? '';
         const canOpen = Boolean(youtubeUrl);
 
         return (
@@ -46,21 +50,21 @@ const {
               <button
                 type="button"
                 class={`w-full h-full text-left ${canOpen ? 'cursor-pointer' : 'cursor-default'}`}
-                data-work-open
+                data-work-open={canOpen ? '' : undefined}
                 data-youtube={youtubeUrl}
-                data-title={project.title}
-                aria-label={canOpen ? `${project.title} 재생` : `${project.title}`}
+                data-title={safeTitle}
+                aria-label={canOpen ? `${safeTitle} 재생` : safeTitle}
               >
                 <img
-                  src={project.image}
-                  alt={project.title}
+                  src={project?.image ?? '/images/projects/card.jpg'}
+                  alt={safeTitle}
                   class={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${canOpen ? '' : 'opacity-70'}`}
                   loading="lazy"
                 />
               </button>
 
               <div class="absolute top-4 left-4 flex flex-wrap gap-2">
-                {project.tags.map((tag) => (
+                {tags.map((tag) => (
                   <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
                     {tag}
                   </span>
@@ -70,23 +74,23 @@ const {
 
             <div class="p-6">
               <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
-                {project.title}
+                {safeTitle}
               </h3>
 
               <p class="text-secondary/70 dark:text-white/70 mb-4">
-                {project.summary}
+                {project?.summary ?? ''}
               </p>
 
               <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1 mb-6">
-                <li><span class="font-mono">작업연도</span> · {project.info.year}</li>
-                <li><span class="font-mono">러닝타임</span> · {project.info.duration}</li>
-                <li><span class="font-mono">역할</span> · {project.info.role}</li>
+                <li><span class="font-mono">작업연도</span> · {info?.year ?? '-'}</li>
+                <li><span class="font-mono">러닝타임</span> · {info?.duration ?? '-'}</li>
+                <li><span class="font-mono">역할</span> · {info?.role ?? '-'}</li>
               </ul>
 
-              {project?.info?.youtubeUrl ? (
+              {youtubeUrl ? (
                 <Button
                   text="YouTube에서 보기"
-                  href={project.info.youtubeUrl}
+                  href={youtubeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   variant="outline"
@@ -102,7 +106,7 @@ const {
     </div>
   </div>
 
-  <!-- ✅ Modal -->
+  <!-- Modal -->
   <div
     id="workModal"
     class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/70 p-4"
@@ -143,15 +147,12 @@ const {
       if (!url) return '';
       try {
         const u = new URL(url);
-        // youtu.be/ID
         if (u.hostname.includes('youtu.be')) {
           const id = u.pathname.replace('/', '');
           return id ? `https://www.youtube.com/embed/${id}?autoplay=1&rel=0` : '';
         }
-        // youtube.com/watch?v=ID
         const v = u.searchParams.get('v');
         if (v) return `https://www.youtube.com/embed/${v}?autoplay=1&rel=0`;
-        // youtube.com/embed/ID
         if (u.pathname.includes('/embed/')) {
           return `${u.origin}${u.pathname}?autoplay=1&rel=0`;
         }
@@ -203,7 +204,6 @@ const {
       });
     }
 
-    // Astro view transitions 대응 + 일반 로드 대응
     document.addEventListener('DOMContentLoaded', initWorkModal);
     document.addEventListener('astro:page-load', initWorkModal);
   </script>
