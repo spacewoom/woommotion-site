@@ -1,11 +1,11 @@
 ---
-import ThemeToggle from './ui/ThemeToggle.astro';
-import Button from './ui/Buttons.astro'; // (현재 미사용이어도 빌드엔 문제 없음)
+import ThemeToggle from '../ui/ThemeToggle.astro';
+import Button from '../ui/Buttons.astro'; // Ensuring .astro extension
 import { Image } from 'astro:assets';
-import logoLight from '././assets/fb_logo.png';
-import logoDark from '././assets/fb_logo_white.png';
+import logoLight from '../../assets/fb_logo.png';
+import logoDark from '../../assets/fb_logo_white.png';
 
-const lang = Astro.currentLocale ?? 'en';
+const lang = Astro.currentLocale;
 const prefix = lang === 'de' ? '/de' : '';
 
 // 현재 페이지가 홈인지 판별 (/, /de, /de/ 등)
