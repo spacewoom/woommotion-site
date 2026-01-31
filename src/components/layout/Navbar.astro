@@ -22,12 +22,13 @@ const homeLink = (hash) => (isHome ? hash : `${prefix}/${hash}`);
   <div class="max-w-container mx-auto px-6 py-4 flex items-center justify-between">
     <!-- Logo/Monogram with dark/light mode versions -->
     <a href={homeLink('#home')} class="block" aria-label="Homepage">
-      <!-- Light mode logo (hidden in dark mode) -->
-      <Image src={logoLight} alt="Portfolio Logo" class="h-8 w-auto dark:hidden transition-opacity duration-300" />
+  <!-- Light mode logo (hidden in dark mode) -->
+  <Image src={logoLight} alt="Portfolio Logo" class="h-10 w-auto dark:hidden transition-opacity duration-300" />
 
-      <!-- Dark mode logo (hidden in light mode) -->
-      <Image src={logoDark} alt="Portfolio Logo" class="h-8 w-auto hidden dark:block transition-opacity duration-300" />
-    </a>
+  <!-- Dark mode logo (hidden in light mode) -->
+  <Image src={logoDark} alt="Portfolio Logo" class="h-10 w-auto hidden dark:block transition-opacity duration-300" />
+</a>
+
 
     <!-- Desktop Navigation -->
     <nav class="hidden md:flex items-center space-x-8">
