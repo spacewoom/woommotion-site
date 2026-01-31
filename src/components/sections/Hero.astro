@@ -3,108 +3,132 @@ import { Image } from 'astro:assets';
 
 import heroBg from '../../assets/Hero_BG.jpg';
 import logoCatchphrase from '../../assets/Logo_Catchphrase.svg';
+import logoCatchphraseWh from '../../assets/Logo_Catchphrase_Wh.png';
 
 const KAKAO_CHANNEL_HOME = "https://pf.kakao.com/_pSgdn";
 const KAKAO_DIRECT_CHAT = "https://pf.kakao.com/_pSgdn/chat";
 
-// YouTube video id from https://youtu.be/7oYcwL0jLuk
 const BRAND_VIDEO_ID = "7oYcwL0jLuk";
 const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mute=1&controls=1&rel=0&playsinline=1&loop=1&playlist=${BRAND_VIDEO_ID}`;
 ---
 
-<section
-  id="home"
-  class="relative pt-28 pb-16 md:pt-36 md:pb-24"
-  style={`background-image:url(${heroBg.src}); background-size:cover; background-position:center;`}
->
-  <!-- (선택) 텍스트 가독성용 아주 약한 오버레이: 필요 없으면 이 div 삭제 -->
-  <div class="absolute inset-0 bg-white/40 dark:bg-black/35"></div>
+<section id="home" class="relative pt-28 pb-16 md:pt-36 md:pb-24">
+  <div class="max-w-container mx-auto px-6">
 
-  <div class="relative max-w-container mx-auto px-6">
-    <!-- 중앙 정렬 레이아웃 -->
-    <div class="min-h-[68vh] flex flex-col items-center text-center">
-      <!-- 중앙 로고(캐치프레이즈 SVG) -->
-      <div class="mt-6 md:mt-10">
-        <Image
-          src={logoCatchphrase}
-          alt="WOOM Logo Catchphrase"
-          class="w-[260px] sm:w-[320px] md:w-[420px] h-auto"
-          loading="eager"
-        />
-      </div>
+    <!-- ✅ BG가 적용되는 '상단 패널' (고정 비율 2000×1120, 비디오는 이 밖으로) -->
+    <div class="mx-auto w-full max-w-[1100px]">
+      <div
+        class="relative overflow-hidden rounded-2xl shadow-lg"
+        style={`--hero-bg:url(${heroBg.src});`}
+      >
+        <!-- BG 레이어 (93% 불투명도) -->
+        <div
+          class="absolute inset-0 -z-10 bg-center bg-cover opacity-[0.93]"
+          style="background-image: var(--hero-bg);"
+        ></div>
 
-      <!-- 카피 (1번 이미지 문구로 교체) -->
-      <div class="mt-6 md:mt-7 space-y-2">
-        <p class="text-base sm:text-lg md:text-xl text-secondary dark:text-white/90">
-          ‘움’은 모션그래픽을 기반으로 브랜드 메시지를 설득력 있게 전달합니다.
-        </p>
-        <p class="text-sm sm:text-base md:text-lg text-secondary/70 dark:text-white/75">
-          ‘Woom’ brings brand messages to life with compelling motion graphics.
-        </p>
-      </div>
+        <!-- (선택) 아주 약한 오버레이: 필요 없으면 삭제 -->
+        <div class="absolute inset-0 -z-10 bg-white/20 dark:bg-black/20"></div>
 
-      <!-- 버튼: 중앙 배치 -->
-      <div class="mt-7 md:mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-        <a
-          href="/projects"
-          class="inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-8 border border-primary text-primary hover:bg-primary/10 bg-transparent"
-        >
-          Works 보기
-        </a>
+        <!-- ✅ 비율 유지 (2000/1120) : 패널 자체가 이미지 비율을 따라감 -->
+        <div class="aspect-[2000/1120] flex flex-col items-center justify-center text-center px-6">
+          <!-- ✅ 중앙 로고 (라이트/다크 모드 로고 스왑) -->
+          <div>
+            <!-- Light mode -->
+            <Image
+              src={logoCatchphrase}
+              alt="WOOM Logo Catchphrase"
+              class="w-[260px] sm:w-[320px] md:w-[420px] h-auto dark:hidden"
+              loading="eager"
+            />
 
-        <a
-          href={KAKAO_DIRECT_CHAT}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-8 bg-primary text-white hover:bg-primary/90"
-          aria-label="카카오톡으로 견적 문의 (새 탭)"
-        >
-          견적 문의 (카카오톡)
-        </a>
-      </div>
-
-      <!-- 영상: 버튼 아래로 이동 + 더 크게 -->
-      <div class="mt-8 md:mt-10 w-full max-w-[980px]">
-        <div class="w-full rounded-2xl overflow-hidden shadow-lg border border-gray-100/70 dark:border-gray-800/70 bg-black">
-          <div class="relative w-full" style="padding-top: 56.25%;">
-            <iframe
-              class="absolute top-0 left-0 w-full h-full"
-              src={YT_EMBED}
-              title="WOOM brand video"
-              loading="lazy"
-              frameborder="0"
-              allow="autoplay; encrypted-media; picture-in-picture"
-              allowfullscreen
-            ></iframe>
+            <!-- Dark mode -->
+            <Image
+              src={logoCatchphraseWh}
+              alt="WOOM Logo Catchphrase (White)"
+              class="w-[260px] sm:w-[320px] md:w-[420px] h-auto hidden dark:block"
+              loading="eager"
+            />
           </div>
-        </div>
 
-        <p class="text-xs text-secondary/50 dark:text-white/50 mt-3 text-center">
-          * 자동재생은 브라우저 정책에 따라 제한될 수 있어요.
-        </p>
+          <!-- 카피 (1번 이미지 문구) -->
+          <div class="mt-6 space-y-2">
+            <p class="text-base sm:text-lg md:text-xl text-secondary dark:text-white/90">
+              ‘움’은 모션그래픽을 기반으로 브랜드 메시지를 설득력 있게 전달합니다.
+            </p>
+            <p class="text-sm sm:text-base md:text-lg text-secondary/70 dark:text-white/75">
+              ‘Woom’ brings brand messages to life with compelling motion graphics.
+            </p>
+          </div>
 
-        <!-- 채널 홈 링크(원하면 유지, 필요 없으면 삭제) -->
-        <div class="mt-3">
-          <a
-            href={KAKAO_CHANNEL_HOME}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-sm text-secondary/60 dark:text-white/60 hover:text-primary"
-          >
-            카카오톡 채널 홈에서 정보 확인 →
-          </a>
+          <!-- ✅ 버튼: 컬러 #003124, 둘 다 'stroke only' (outline)로 통일 -->
+          <div class="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+              href="/projects"
+              class="inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-8
+                     border border-[#003124] text-[#003124]
+                     hover:bg-[#003124]/10 bg-transparent"
+            >
+              Works 보기
+            </a>
+
+            <a
+              href={KAKAO_DIRECT_CHAT}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-8
+                     border border-[#003124] text-[#003124]
+                     hover:bg-[#003124]/10 bg-transparent"
+              aria-label="KakaoTalk Inquiry (새 탭)"
+            >
+              KakaoTalk Inquiry
+            </a>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- ✅ 비디오 영역: BG 패널 밖 (Hero_BG 영향 X) + 더 크게 -->
+    <div class="mt-10 md:mt-12 mx-auto w-full max-w-[1100px]">
+      <div class="w-full rounded-2xl overflow-hidden shadow-lg border border-gray-100/70 dark:border-gray-800/70 bg-black">
+        <div class="relative w-full" style="padding-top: 56.25%;">
+          <iframe
+            class="absolute top-0 left-0 w-full h-full"
+            src={YT_EMBED}
+            title="WOOM brand video"
+            loading="lazy"
+            frameborder="0"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+
+      <p class="text-xs text-secondary/50 dark:text-white/50 mt-3 text-center">
+        * 자동재생은 브라우저 정책에 따라 제한될 수 있어요.
+      </p>
+
+      <div class="mt-3 text-center">
+        <a
+          href={KAKAO_CHANNEL_HOME}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-sm text-secondary/60 dark:text-white/60 hover:text-[#003124]"
+        >
+          카카오톡 채널 홈에서 정보 확인 →
+        </a>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Scroll Down Indicator (원하면 유지 / 필요 없으면 이 블록 삭제) -->
+  <!-- Scroll Down Indicator (원하면 유지 / 필요 없으면 삭제) -->
   <div
     id="scroll-indicator"
     class="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-100 animate-bounce cursor-pointer"
     onclick="document.getElementById('works')?.scrollIntoView({ behavior: 'smooth' });"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary dark:text-highlightBlue">
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#003124] dark:text-[#003124]">
       <path d="M12 5v14"></path>
       <path d="m19 12-7 7-7-7"></path>
     </svg>
