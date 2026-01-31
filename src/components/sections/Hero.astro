@@ -1,4 +1,9 @@
 ---
+import { Image } from 'astro:assets';
+
+import heroBg from '../../assets/Hero_BG.jpg';
+import logoCatchphrase from '../../assets/Logo_Catchphrase.svg';
+
 const KAKAO_CHANNEL_HOME = "https://pf.kakao.com/_pSgdn";
 const KAKAO_DIRECT_CHAT = "https://pf.kakao.com/_pSgdn/chat";
 
@@ -7,76 +12,60 @@ const BRAND_VIDEO_ID = "7oYcwL0jLuk";
 const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mute=1&controls=1&rel=0&playsinline=1&loop=1&playlist=${BRAND_VIDEO_ID}`;
 ---
 
-<section id="home" class="pt-28 pb-16 md:pt-36 md:pb-24 relative">
-  <div class="max-w-container mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-gutter md:gap-x-16">
-    <!-- LEFT : Copy / CTA -->
-    <div class="md:col-span-5 flex flex-col justify-center md:pr-12">
-      <!-- Label only -->
-      <div class="mb-6">
-        <span class="font-mono text-primary text-sm">
-          Motion Studio WOOM
-        </span>
+<section
+  id="home"
+  class="relative pt-28 pb-16 md:pt-36 md:pb-24"
+  style={`background-image:url(${heroBg.src}); background-size:cover; background-position:center;`}
+>
+  <!-- (선택) 텍스트 가독성용 아주 약한 오버레이: 필요 없으면 이 div 삭제 -->
+  <div class="absolute inset-0 bg-white/40 dark:bg-black/35"></div>
+
+  <div class="relative max-w-container mx-auto px-6">
+    <!-- 중앙 정렬 레이아웃 -->
+    <div class="min-h-[68vh] flex flex-col items-center text-center">
+      <!-- 중앙 로고(캐치프레이즈 SVG) -->
+      <div class="mt-6 md:mt-10">
+        <Image
+          src={logoCatchphrase}
+          alt="WOOM Logo Catchphrase"
+          class="w-[260px] sm:w-[320px] md:w-[420px] h-auto"
+          loading="eager"
+        />
       </div>
 
-      <!-- Slogan (smaller, single line) -->
-      <h1
-        class="font-heading text-secondary dark:text-white mb-6 leading-[1.05] tracking-tight whitespace-nowrap text-[clamp(1.85rem,3.1vw,3.2rem)]"
-      >
-        Imagine it, Create it!
-      </h1>
+      <!-- 카피 (1번 이미지 문구로 교체) -->
+      <div class="mt-6 md:mt-7 space-y-2">
+        <p class="text-base sm:text-lg md:text-xl text-secondary dark:text-white/90">
+          ‘움’은 모션그래픽을 기반으로 브랜드 메시지를 설득력 있게 전달합니다.
+        </p>
+        <p class="text-sm sm:text-base md:text-lg text-secondary/70 dark:text-white/75">
+          ‘Woom’ brings brand messages to life with compelling motion graphics.
+        </p>
+      </div>
 
-      <!-- Main/Sub text -->
-      <p class="text-lg md:text-xl text-secondary/70 dark:text-white/80 mb-4 max-w-3xl mx-auto lg:whitespace-nowrap">
-        움직임으로 브랜드 메시지를 설득력 있게 전달합니다.
-      </p>
-
-      <p class="text-secondary/70 dark:text-white/70 mb-8 max-w-2xl">
-        Menu Board · Promotion · Product/Event · Agency Outsourcing
-      </p>
-
-      <!-- CTA buttons -->
-      <div class="flex flex-col sm:flex-row gap-3 mt-2">
-        <!-- Left: Works -->
+      <!-- 버튼: 중앙 배치 -->
+      <div class="mt-7 md:mt-8 flex flex-col sm:flex-row gap-3 justify-center">
         <a
-          href='/projects'
-          class="inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-6 border border-primary text-primary hover:bg-primary/10 bg-transparent"
+          href="/projects"
+          class="inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-8 border border-primary text-primary hover:bg-primary/10 bg-transparent"
         >
           Works 보기
         </a>
 
-        <!-- Right: Quote Inquiry (direct chat) -->
         <a
           href={KAKAO_DIRECT_CHAT}
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-6 bg-primary text-white hover:bg-primary/90"
+          class="inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-8 bg-primary text-white hover:bg-primary/90"
           aria-label="카카오톡으로 견적 문의 (새 탭)"
         >
           견적 문의 (카카오톡)
         </a>
       </div>
 
-      <!-- optional trust link -->
-      <div class="mt-4">
-        <a
-          href={KAKAO_CHANNEL_HOME}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-sm text-secondary/60 dark:text-white/60 hover:text-primary"
-        >
-          카카오톡 채널 홈에서 정보 확인 →
-        </a>
-      </div>
-    </div>
-
-    <!-- RIGHT : Brand video -->
-    <div class="md:col-span-7 mt-10 md:mt-0">
-      <!-- ↓ 핵심: 여기 max-w를 줘서 영상만 살짝 줄임(비율 유지) -->
-      <div class="relative w-full md:max-w-[92%] lg:max-w-[90%] md:ml-auto">
-        <!-- Decorative bg -->
-        <div class="absolute -top-8 -right-8 w-80 h-80 md:w-[34rem] md:h-[34rem] bg-gradient-to-br from-primary/10 to-orange-400/10 rounded-3xl -z-10"></div>
-
-        <div class="w-full rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 bg-black">
+      <!-- 영상: 버튼 아래로 이동 + 더 크게 -->
+      <div class="mt-8 md:mt-10 w-full max-w-[980px]">
+        <div class="w-full rounded-2xl overflow-hidden shadow-lg border border-gray-100/70 dark:border-gray-800/70 bg-black">
           <div class="relative w-full" style="padding-top: 56.25%;">
             <iframe
               class="absolute top-0 left-0 w-full h-full"
@@ -93,11 +82,23 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
         <p class="text-xs text-secondary/50 dark:text-white/50 mt-3 text-center">
           * 자동재생은 브라우저 정책에 따라 제한될 수 있어요.
         </p>
+
+        <!-- 채널 홈 링크(원하면 유지, 필요 없으면 삭제) -->
+        <div class="mt-3">
+          <a
+            href={KAKAO_CHANNEL_HOME}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-sm text-secondary/60 dark:text-white/60 hover:text-primary"
+          >
+            카카오톡 채널 홈에서 정보 확인 →
+          </a>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Scroll Down Indicator (to Works) -->
+  <!-- Scroll Down Indicator (원하면 유지 / 필요 없으면 이 블록 삭제) -->
   <div
     id="scroll-indicator"
     class="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-100 animate-bounce cursor-pointer"
