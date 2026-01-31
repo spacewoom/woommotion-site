@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 
-import heroBg from '../../assets/Hero_BG.jpg';
+import heroBg from '../../assets/Hero_BG.png';
 import logoCatchphrase from '../../assets/Logo_Catchphrase.svg';
 import logoCatchphraseWh from '../../assets/Logo_Catchphrase_Wh.png';
 
@@ -24,17 +24,19 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
     <!-- (선택) 오버레이: 가독성용 -->
     <div class="absolute inset-0 -z-10 bg-white/15 dark:bg-black/25"></div>
 
-    <!-- ✅ BG 영역 높이 -->
-    <div class="relative h-[clamp(520px,72vh,860px)]">
+    <!-- ✅ BG 영역 높이: 조금 더 크게 + 상단 공간 확보 -->
+    <div class="relative h-[clamp(580px,78vh,980px)]">
       <div class="max-w-container mx-auto px-6 h-full">
-        <div class="h-full flex flex-col items-center justify-center text-center">
-          <!-- ✅ 로고 (크기 확대 + 비율 유지) -->
-          <div>
+        <!-- ✅ 상단 여백을 늘려 로고가 더 아래에서 시작 -->
+        <div class="h-full flex flex-col items-center text-center pt-14 md:pt-20 pb-10">
+          
+          <!-- ✅ 로고: 카피 폭에 맞춰 제한 (비율 유지) -->
+          <div class="w-full max-w-[680px]">
             <!-- Light mode -->
             <Image
               src={logoCatchphrase}
               alt="WOOM Logo Catchphrase"
-              class="w-[420px] sm:w-[560px] md:w-[780px] h-auto dark:hidden"
+              class="w-full h-auto dark:hidden"
               loading="eager"
             />
 
@@ -42,13 +44,13 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
             <Image
               src={logoCatchphraseWh}
               alt="WOOM Logo Catchphrase (White)"
-              class="w-[420px] sm:w-[560px] md:w-[780px] h-auto hidden dark:block"
+              class="w-full h-auto hidden dark:block"
               loading="eager"
             />
           </div>
 
-          <!-- ✅ 카피: 카피-카피 간격 넓힘 -->
-          <div class="mt-6 space-y-4">
+          <!-- ✅ 카피: 간격 확대 -->
+          <div class="mt-8 w-full max-w-[680px] space-y-5">
             <p class="text-base sm:text-lg md:text-xl text-secondary dark:text-white">
               ‘움’은 모션그래픽을 기반으로 브랜드 메시지를 설득력 있게 전달합니다.
             </p>
@@ -58,7 +60,7 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
           </div>
 
           <!-- ✅ 버튼: 라이트(#003124) / 다크(#e4f5f0) outline only -->
-          <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+          <div class="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href="/projects"
               class="inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-8
@@ -84,6 +86,7 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
               KakaoTalk 문의
             </a>
           </div>
+
         </div>
       </div>
     </div>
@@ -92,7 +95,8 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
   <!-- ✅ 비디오 영역: BG 밖 -->
   <div class="max-w-container mx-auto px-6">
     <div class="mt-10 md:mt-12 mx-auto w-full max-w-[1100px]">
-      <div class="w-full rounded-2xl overflow-hidden shadow-lg border border-gray-100/70 dark:border-gray-800/70 bg-black">
+      <!-- ✅ border 제거: stroke 없음 -->
+      <div class="w-full rounded-2xl overflow-hidden shadow-lg bg-black">
         <div class="relative w-full" style="padding-top: 56.25%;">
           <iframe
             class="absolute top-0 left-0 w-full h-full"
@@ -114,9 +118,4 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
     class="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-100 animate-bounce cursor-pointer"
     onclick="document.getElementById('works')?.scrollIntoView({ behavior: 'smooth' });"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#003124] dark:text-[#e4f5f0]">
-      <path d="M12 5v14"></path>
-      <path d="m19 12-7 7-7-7"></path>
-    </svg>
-  </div>
-</section>
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0
