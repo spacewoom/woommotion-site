@@ -13,11 +13,24 @@ const lang = Astro.currentLocale;
 ---
 
 <Layout title={t('site.title', lang)} description={t('site.description', lang)}>
+  <!-- hero -->
   <Hero lang={lang} />
-  <Values lang={lang} />
-  <Skills lang={lang} />
+
+  <!-- Works -->
   <Projects lang={lang} />
+
+  <!-- services -->
+  <Values lang={lang} />
+
+  <!-- work process -->
   <Timeline lang={lang} />
+
+  <!-- workflow&Tools -->
+  <Skills lang={lang} />
+
+  <!-- price -->
   <Contact lang={lang} />
+
+  <!-- contact -->
   <FooterCTA lang={lang} />
 </Layout>
