@@ -19,6 +19,13 @@
     "ctaSecondary": "견적 문의 (카카오톡)",
     "ctaNote": "카카오톡 채널 홈에서 정보 확인 →"
   },
+
+  "projects": {
+    "title": "Works",
+    "subtitle": "Selected projects and templates I've created.",
+    "cta": "View on GitHub"
+  },
+
   "values": {
     "title": "Services",
     "subtitle": "눈길을 사로잡는 감각적인 모션과 명확한 정보 전달을 목표로\n기획부터 제작까지, 클라이언트의 니즈를 시각화해 합리적인 비용으로 완성합니다.",
@@ -31,23 +38,7 @@
     "card4Title": "에이전시 아웃소싱 | Agency Outsourcing",
     "card4Text": "대행사/스튜디오 협업에 최적화된 제작 파트너링. 일관된 무드·완성도·납기 기준을 명확히 맞춰 안정적으로 지원합니다."
   },
-  "skills": {
-    "title": "Workflow & Tools",
-    "subtitle": "작업 과정에서 툴은 목적에 맞게, 결과물은 브랜드 톤에 맞게 설계합니다.",
-    "card1Title": "Motion & Editing",
-    "card1Text": "모션그래픽, 타이포 애니메이션, 루프 영상 제작에 필요한 핵심 툴을 사용합니다.",
-    "card2Title": "Design & Assets",
-    "card2Text": "클라이언트의 니즈와 콘셉트에 맞는 레이아웃, 키비주얼, 에셋을 설계합니다.",
-    "card3Title": "AI Assisted",
-    "card3Text": "디자인 탐색/레퍼런스 확장, 숏폼 소재 제작, 반복 작업 효율화를 지원합니다.",
-    "card4Title": "Collaboration & Delivery",
-    "card4Text": "빠른 소통과 피드백 반영, 납기 준수로 안정적으로 결과물을 전달합니다."
-  },
-  "projects": {
-    "title": "Works",
-    "subtitle": "Selected projects and templates I've created.",
-    "cta": "View on GitHub"
-  },
+
   "timeline": {
     "title": "Work Process",
     "subtitle": "의뢰부터 납품까지, 작업은 아래 흐름으로 진행됩니다.",
@@ -62,28 +53,41 @@
     "item5Title": "수정 · 납품 | Delivery",
     "item5Description": "최종 파일 전달 후 기본 3회까지 무상 수정이 가능합니다.\n단, 작업자 실수로 인한 수정은 수정 횟수에서 차감되지 않으며, 합의된 기획의 방향성을 바꾸는 수준의 변경은 추가 비용이 발생합니다."
   },
+
+  "skills": {
+    "title": "Workflow & Tools",
+    "subtitle": "작업 과정에서 툴은 목적에 맞게, 결과물은 브랜드 톤에 맞게 설계합니다.",
+    "card1Title": "Motion & Editing",
+    "card1Text": "모션그래픽, 타이포 애니메이션, 루프 영상 제작에 필요한 핵심 툴을 사용합니다.",
+    "card2Title": "Design & Assets",
+    "card2Text": "클라이언트의 니즈와 콘셉트에 맞는 레이아웃, 키비주얼, 에셋을 설계합니다.",
+    "card3Title": "AI Assisted",
+    "card3Text": "디자인 탐색/레퍼런스 확장, 숏폼 소재 제작, 반복 작업 효율화를 지원합니다.",
+    "card4Title": "Collaboration & Delivery",
+    "card4Text": "빠른 소통과 피드백 반영, 납기 준수로 안정적으로 결과물을 전달합니다."
+  },
+
+  "contact": {
+    "title": "Price",
+    "subtitle": "프로젝트 범위를 빠르게 정리하실 수 있도록 3가지 기준 패키지를 안내드립니다.\n기획 내용과 제작 범위(러닝타임/난이도)에 따라 최종 견적은 달라질 수 있어요.",
+    "emailTitle": "Basic",
+    "emailText": "10–15초 내\n150,000원(VAT 포함)~",
+    "emailButtonText": "<진행과정>\n요청 → 모션 → 납품\n\n디자인 확정본이 제공되는 경우에 적합합니다.",
+    "phoneTitle": "Standard",
+    "phoneText": "25–35초 내\n500,000원(VAT 포함)~",
+    "phoneButtonText": "<진행과정>\n요청 → 디자인 → 모션 → 납품\n\n디자인 제작 후 모션까지 진행합니다.",
+    "linkedinTitle": "Premium",
+    "linkedinText": "40초 이상\n800,000원(VAT 포함)~",
+    "linkedinButtonText": "<진행과정>\n요청 → 기획 → 디자인 → 모션 → 납품\n\n연출 난이도가 높거나 긴 러닝타임 산출물에 적합합니다."
+  },
+
   "footerCTA": {
     "title": "Contact",
     "subtitle": "프로젝트 목적, 기획내용, 러닝타임, 레퍼런스를 알려주시면 제작 범위에 맞춰 견적과 일정부터 안내드립니다.\n최종 금액은 기획/디자인 포함 여부와 작업 난이도에 따라 달라질 수 있습니다.",
     "buttonText": "카카오톡으로 상담하기"
   },
-  "contact": {
-    "title": "Price",
-    "subtitle": "프로젝트 범위를 빠르게 정리하실 수 있도록 3가지 기준 패키지를 안내드립니다.\n기획 내용과 제작 범위(러닝타임/난이도)에 따라 최종 견적은 달라질 수 있어요.",
 
-    "emailTitle": "Basic",
-    "emailText": "10–15초 내\n150,000원(VAT 포함)~",
-    "emailButtonText": "<진행과정>\n요청 → 모션 → 납품\n\n디자인 확정본이 제공되는 경우에 적합합니다.",
-
-    "phoneTitle": "Standard",
-    "phoneText": "25–35초 내\n500,000원(VAT 포함)~",
-    "phoneButtonText": "<진행과정>\n요청 → 디자인 → 모션 → 납품\n\n디자인 제작 후 모션까지 진행합니다.",
-
-    "linkedinTitle": "Premium",
-    "linkedinText": "40초 이상\n800,000원(VAT 포함)~",
-    "linkedinButtonText": "<진행과정>\n요청 → 기획 → 디자인 → 모션 → 납품\n\n연출 난이도가 높거나 긴 러닝타임 산출물에 적합합니다."
-  },
-   "footer": {
+  "footer": {
     "copyright": "All rights reserved. Built with an open-source template.",
     "imprint": "환불·취소·수정 정책",
     "privacyPolicy": "개인정보처리방침"
