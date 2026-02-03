@@ -12,12 +12,6 @@ function displayTitle(raw = "") {
   return String(raw ?? "").replace(/\s*\d{2}\s*$/u, "").trim();
 }
 
-function summary65(raw = "") {
-  const s = String(raw ?? "").replace(/\s+/g, " ").trim();
-  if (s.length <= 65) return s;
-  return s.slice(0, 64) + "…";
-}
-
 function getVideo(work) {
   const src = work?.media?.src || work?.info?.youtubeUrl || "";
   const kind = work?.media?.kind || (src ? "youtube" : "");
@@ -90,6 +84,7 @@ const pageList =
 
         const hasVideo = Boolean(src);
 
+        // ✅ 모달에 넘길 데이터(안전하게 인코딩)
         const summaryEncoded = encodeURIComponent(String(work?.summary ?? ""));
         const roleEncoded = encodeURIComponent(String(work?.info?.role ?? ""));
         const yearEncoded = encodeURIComponent(String(work?.info?.year ?? ""));
@@ -146,8 +141,9 @@ const pageList =
                 {t}
               </h3>
 
+              <!-- ✅ summary: "2줄까지만" + 말줄임표 + 폰트 85% -->
               <p class="work-summary text-secondary/70 dark:text-white/70 mb-4">
-                {summary65(work.summary)}
+                {work.summary}
               </p>
 
               <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1 mb-3">
@@ -218,15 +214,13 @@ const pageList =
     ) : null}
   </div>
 
-  <!-- ✅ Work Detail Modal (센터 정렬 + 더 큰 사이즈 + 영상 영역 확대) -->
+  <!-- ✅ Work Detail Modal -->
   <div
     id="work-detail-modal"
     class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 p-3 md:p-6"
     aria-hidden="true"
   >
-    <!-- ✅ 모달 자체 크기 확대: max-w-7xl + 화면 높이 기반 -->
     <div class="w-full max-w-7xl max-h-[92vh] rounded-2xl overflow-hidden border border-white/10 bg-black shadow-2xl">
-      <!-- Header -->
       <div class="flex items-start justify-between gap-3 px-4 py-3 bg-black/70 border-b border-white/10">
         <div class="min-w-0">
           <p id="modal-title" class="text-sm md:text-base text-white/95 font-medium truncate"></p>
@@ -247,21 +241,13 @@ const pageList =
         </button>
       </div>
 
-      <!-- Body -->
-      <!-- ✅ 영상 영역 확대: lg:grid-cols-6에서 video=4, info=2 -->
       <div class="grid grid-cols-1 lg:grid-cols-6">
-        <!-- Video -->
         <div class="lg:col-span-4 bg-black">
-          <div class="relative w-full bg-black">
-            <!-- ✅ 높이를 키워서 더 시원하게: 16:9 유지 + 화면 높이 대응 -->
-            <div class="relative w-full" style="padding-top:56.25%;">
-              <div id="modal-player" class="absolute inset-0"></div>
-            </div>
+          <div class="relative w-full" style="padding-top:56.25%;">
+            <div id="modal-player" class="absolute inset-0"></div>
           </div>
         </div>
 
-        <!-- Info -->
-        <!-- ✅ 우측 폭 축소: col-span-2 -->
         <div class="lg:col-span-2 bg-black/60 border-t lg:border-t-0 lg:border-l border-white/10 overflow-auto max-h-[92vh]">
           <div class="p-4 md:p-5">
             <h4 class="text-white/90 text-sm md:text-base font-medium mb-2">작업 설명</h4>
@@ -291,11 +277,12 @@ const pageList =
     </div>
   </div>
 
+  <!-- ✅ summary 2줄 라인클램프 (글자수 제어 X) -->
   <style is:inline>
     .work-summary{
       font-size:0.85em;
       display:-webkit-box;
-      -webkit-line-clamp:3;
+      -webkit-line-clamp:2;
       -webkit-box-orient:vertical;
       overflow:hidden;
     }
@@ -356,8 +343,7 @@ const pageList =
 
         list.forEach((tag) => {
           const chip = document.createElement("span");
-          chip.className =
-            "px-3 py-1 text-xs font-mono rounded-full bg-white/10 text-white/80 border border-white/10";
+          chip.className = "px-3 py-1 text-xs font-mono rounded-full bg-white/10 text-white/80 border border-white/10";
           chip.textContent = tag;
           tagsEl.appendChild(chip);
         });
@@ -399,16 +385,7 @@ const pageList =
       };
 
       const openModal = (payload) => {
-        const {
-          kind = "",
-          src = "",
-          title = "",
-          summary = "",
-          role = "",
-          year = "",
-          category = "",
-          tags = [],
-        } = payload || {};
+        const { kind="", src="", title="", summary="", role="", year="", category="", tags=[] } = payload || {};
 
         lastVideo = { kind, src, title };
 
@@ -418,10 +395,8 @@ const pageList =
         roleEl.textContent = `역할 · ${role || "-"}`;
         summaryEl.textContent = summary || "";
         renderTags(tags);
-
         mountVideo(kind, src, title);
 
-        // ✅ 중앙 정렬을 위해 flex 사용
         modal.classList.remove("hidden");
         modal.classList.add("flex");
         modal.setAttribute("aria-hidden", "false");
