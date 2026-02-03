@@ -11,11 +11,11 @@ html, body {
 }
 
 :root {
-  --color-primary-rgb: 93, 140, 127; /*  RGB values */
+  --color-primary-rgb: 93, 140, 127; /* Normal mode RGB */
 }
 
 .dark {
-  --color-primary-rgb: 124, 166, 154; /* RGB values for dark mode */
+  --color-primary-rgb: 124, 166, 154; /* Dark mode RGB */
 }
 
 @layer base {
