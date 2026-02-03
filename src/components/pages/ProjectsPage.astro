@@ -1,160 +1,93 @@
 ---
-import { works as allWorks } from "../../data/works.js";
-
 const {
   lang = "en",
   title = "Works",
-  subtitle = "흥미로운 연출, 명확한 정보 전달, 감각적인 모션으로 브랜드와 제품의 핵심 메시지를 설득력 있게 보여줍니다.",
-  topButtons,
-  projects,
-  category = "all",
-  pagination, // ✅ { basePath, currentPage, totalPages }
+  subtitle = "",
+  topButtons = [],
+  projects = [],
+  pagination = null,
 } = Astro.props;
 
 const isDe = lang === "de";
 const base = isDe ? "/de" : "";
 
-const hrefAll = `${base}/projects`;
-
-const defaultTopButtons = [
-  { text: "Agency Outsourcing", href: `${base}/projects/agency`, variant: "outline" },
-  { text: "Digital Signage Content", href: `${base}/projects/digital-signage`, variant: "outline" },
-];
-
-const buttons = topButtons ?? defaultTopButtons;
-
-// pages에서 잘라서 넘기므로 projects 우선
-const works =
-  projects ??
-  (category && category !== "all" ? allWorks.filter((w) => w.category === category) : allWorks);
-
-function getYoutubeId(url = "") {
-  const m =
-    url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
-    url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
-    url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
-  return m ? m[1] : "";
+/** ✅ 타이틀 끝의 2자리 숫자 제거: "메뉴보드 01" → "메뉴보드", "Full Banner 02" → "Full Banner" */
+function displayTitle(raw = "") {
+  return String(raw ?? "").replace(/\s*\d{2}\s*$/u, "").trim();
 }
 
-function getYoutubeThumb(url = "") {
-  const id = getYoutubeId(url);
-  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
+/** ✅ 영상 링크 추출: works.js의 media.src 우선, 없으면 info.youtubeUrl */
+function getVideoHref(work) {
+  return work?.media?.src || work?.info?.youtubeUrl || "";
 }
 
-function buttonClass(variant = "outline") {
-  const baseClass =
-    "inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-6 transition-colors";
-  if (variant === "primary") return `${baseClass} bg-primary text-white hover:bg-primary/90`;
-  return `${baseClass} border border-primary text-primary hover:bg-primary/10 bg-transparent`;
+/** ✅ 태그 안전 처리 */
+function getTags(work) {
+  return Array.isArray(work?.tags) ? work.tags : [];
 }
 
-// ✅ 페이지 링크 생성 (?page=2)
-function pageHref(basePath, pageNum) {
-  if (!basePath) return "#";
-  return pageNum <= 1 ? `${basePath}` : `${basePath}?page=${pageNum}`;
+/** ✅ 페이지네이션 숫자 생성(최대 7개) */
+function buildPageList(current, total, max = 7) {
+  const pages = [];
+  const half = Math.floor(max / 2);
+  let start = Math.max(1, current - half);
+  let end = Math.min(total, start + max - 1);
+  start = Math.max(1, end - max + 1);
+
+  for (let p = start; p <= end; p++) pages.push(p);
+  return pages;
 }
 
-// ✅ 페이지 버튼 범위(너무 길어지면 1 ... 5 6 7 ... 20 형태)
-function getPageItems(current, total) {
-  if (!total || total <= 1) return [1];
-
-  const items = [];
-  const push = (v) => items.push(v);
-
-  const window = 2; // current 주변 표시 폭
-  const left = Math.max(1, current - window);
-  const right = Math.min(total, current + window);
-
-  push(1);
-
-  if (left > 2) push("…");
-  for (let i = left; i <= right; i++) {
-    if (i !== 1 && i !== total) push(i);
-  }
-  if (right < total - 1) push("…");
-
-  if (total !== 1) push(total);
-
-  // 중복 제거(예: total 작을 때)
-  return items.filter((v, idx, arr) => idx === 0 || v !== arr[idx - 1]);
-}
+const pageList =
+  pagination?.totalPages && pagination?.currentPage
+    ? buildPageList(pagination.currentPage, pagination.totalPages, 7)
+    : [];
 ---
 
 <section class="pt-28 pb-16 md:pt-36 md:pb-24 bg-neutral-bg dark:bg-neutral-dark/60">
   <div class="max-w-container mx-auto px-6">
-
+    <!-- Title / Subtitle -->
     <div class="mb-10 text-center flex flex-col items-center" data-aos="fade-up">
-      <h1 class="font-heading text-h2 text-secondary dark:text-white mb-4">{title}</h1>
-      <p class="text-body text-secondary/70 dark:text-white/70 max-w-5xl mx-auto lg:whitespace-nowrap">
-        {subtitle}
-      </p>
+      <h1 class="font-heading text-h2 text-secondary dark:text-white mb-4">
+        {title}
+      </h1>
+      {subtitle ? (
+        <p class="text-body text-secondary/70 dark:text-white/70 max-w-5xl mx-auto lg:whitespace-nowrap">
+          {subtitle}
+        </p>
+      ) : null}
     </div>
 
-    <div class="flex flex-col sm:flex-row gap-3 justify-center mb-12" data-aos="fade-up">
-      {buttons.map((b) => (
-        <a href={b.href} class={buttonClass(b.variant)}>{b.text}</a>
-      ))}
-    </div>
+    <!-- Top Buttons -->
+    {topButtons?.length ? (
+      <div class="flex flex-col sm:flex-row gap-3 justify-center mb-12" data-aos="fade-up">
+        {topButtons.map((btn) => {
+          const isPrimary = btn.variant === "primary";
+          return (
+            <a
+              href={btn.href}
+              class={
+                isPrimary
+                  ? "inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-6 bg-primary text-white hover:bg-primary/90"
+                  : "inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-6 border border-primary text-primary hover:bg-primary/10 bg-transparent"
+              }
+            >
+              {btn.text}
+            </a>
+          );
+        })}
+      </div>
+    ) : null}
 
+    <!-- Works Grid -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
-      {works.map((work, index) => {
-        const kind = work.media?.kind || (work.info?.youtubeUrl ? "youtube" : "");
-        const src = work.media?.src || work.info?.youtubeUrl || "";
-        const playable = Boolean(kind && src);
+      {projects.map((work, index) => {
+        const href = getVideoHref(work);
+        const tags = getTags(work);
+        const t = displayTitle(work?.title);
 
-        const thumb =
-          work.media?.poster ||
-          (kind === "youtube" ? getYoutubeThumb(src) : "") ||
-          work.image ||
-          "/images/projects/card.jpg";
-
-        const MediaEl = playable ? (
-          <button
-            type="button"
-            class="relative w-full overflow-hidden aspect-video text-left"
-            data-open-video
-            data-video-kind={kind}
-            data-video-src={src}
-            data-video-title={work.title}
-          >
-            <img
-              src={thumb}
-              alt={work.title}
-              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              loading="lazy"
-            />
-            <div class="absolute top-4 left-4 flex flex-wrap gap-2">
-              {work.tags?.map((tag) => (
-                <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <div class="absolute inset-0 flex items-center justify-center">
-              <span class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-black/50 backdrop-blur-sm border border-white/20">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white">
-                  <path d="M8 5v14l11-7z"></path>
-                </svg>
-              </span>
-            </div>
-          </button>
-        ) : (
-          <div class="relative w-full overflow-hidden aspect-video text-left">
-            <img src={thumb} alt={work.title} class="w-full h-full object-cover" loading="lazy" />
-            <div class="absolute top-4 left-4 flex flex-wrap gap-2">
-              {work.tags?.map((tag) => (
-                <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <div class="absolute inset-0 flex items-center justify-center">
-              <span class="px-4 py-2 rounded-full bg-black/50 text-white/90 text-sm border border-white/20">
-                Coming soon
-              </span>
-            </div>
-          </div>
-        );
+        // 썸네일: media.poster > image > fallback
+        const thumb = work?.media?.poster || work?.image || "/images/projects/card.jpg";
 
         return (
           <article
@@ -162,123 +95,150 @@ function getPageItems(current, total) {
             data-aos="fade-up"
             data-aos-delay={index * 40}
           >
-            {MediaEl}
+            <!-- Thumbnail: 클릭 시 새 창으로 영상 오픈 -->
+            {href ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="block relative w-full overflow-hidden aspect-video"
+                aria-label={`${t} 영상 새 창에서 열기`}
+              >
+                <img
+                  src={thumb}
+                  alt={t}
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+
+                <!-- Play Icon Overlay -->
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <span class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-black/50 backdrop-blur-sm border border-white/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white">
+                      <path d="M8 5v14l11-7z"></path>
+                    </svg>
+                  </span>
+                </div>
+              </a>
+            ) : (
+              <div class="block relative w-full overflow-hidden aspect-video">
+                <img
+                  src={thumb}
+                  alt={t}
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+            )}
+
+            <!-- Content -->
             <div class="p-6">
               <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
-                {work.title}
+                {t}
               </h3>
-              <p class="text-secondary/70 dark:text-white/70 mb-4">{work.summary}</p>
 
-              <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1">
-                <li><span class="font-mono">작업연도</span> · {work.info?.year}</li>
+              <!-- ✅ summary: 3줄 이내 + 85% -->
+              <p class="work-summary text-secondary/70 dark:text-white/70 mb-4">
+                {work.summary}
+              </p>
+
+              <!-- ✅ 정보 순서: 작업연도 → 역할 -->
+              <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1 mb-3">
+                <li><span class="font-mono">작업 연도</span> · {work.info?.year}</li>
                 <li><span class="font-mono">역할</span> · {work.info?.role}</li>
               </ul>
+
+              <!-- ✅ 태그: 본문 영역에 배치 (작업연도/역할 다음) -->
+              {tags.length ? (
+                <div class="flex flex-wrap gap-2 mb-4">
+                  {tags.map((tag) => (
+                    <span class="px-3 py-1 text-xs font-mono bg-gray-100 dark:bg-white/10 text-secondary dark:text-white/80 rounded-full">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+
+              <!-- (선택) 링크 버튼도 제공: 이미지 클릭이 메인이지만 접근성/명확성 위해 유지 -->
+              {href ? (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center justify-center rounded-lg font-medium text-sm py-2 px-4 border border-primary text-primary hover:bg-primary/10 bg-transparent"
+                >
+                  영상 새 창에서 보기
+                </a>
+              ) : (
+                <span class="inline-flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-secondary/60 dark:text-white/50 px-4 py-2 text-sm">
+                  영상 링크 준비중
+                </span>
+              )}
             </div>
           </article>
         );
       })}
     </div>
 
-    <!-- ✅ 페이지네이션 UI -->
-    {pagination && pagination.totalPages > 1 ? (
-      <nav class="mt-14 flex flex-col items-center gap-4" aria-label="Pagination" data-aos="fade-up">
-        <div class="text-sm text-secondary/60 dark:text-white/60">
-          Page {pagination.currentPage} / {pagination.totalPages}
-        </div>
-
-        <div class="flex flex-wrap items-center justify-center gap-2">
-          {/* Prev */}
+    <!-- Pagination -->
+    {pagination?.totalPages && pagination?.totalPages > 1 ? (
+      <nav class="mt-12 flex items-center justify-center gap-2" aria-label="Pagination" data-aos="fade-up">
+        {pagination.currentPage > 1 ? (
           <a
-            href={pageHref(pagination.basePath, Math.max(1, pagination.currentPage - 1))}
-            class="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 text-secondary dark:text-white/80 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-            aria-label="Previous page"
+            href={`${pagination.basePath}?page=${pagination.currentPage - 1}`}
+            class="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-secondary/70 dark:text-white/70 hover:bg-gray-50 dark:hover:bg-white/5"
           >
             Prev
           </a>
+        ) : (
+          <span class="px-3 py-2 rounded-lg border border-gray-100 dark:border-gray-800 text-sm text-secondary/30 dark:text-white/30">
+            Prev
+          </span>
+        )}
 
-          {getPageItems(pagination.currentPage, pagination.totalPages).map((p) =>
-            p === "…" ? (
-              <span class="px-3 py-2 text-secondary/50 dark:text-white/40">…</span>
-            ) : (
-              <a
-                href={pageHref(pagination.basePath, p)}
-                class={
-                  p === pagination.currentPage
-                    ? "px-3 py-2 rounded-lg bg-primary text-white border border-primary"
-                    : "px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 text-secondary dark:text-white/80 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-                }
-                aria-current={p === pagination.currentPage ? "page" : undefined}
-              >
-                {p}
-              </a>
-            )
-          )}
+        {pageList.map((p) => {
+          const isActive = p === pagination.currentPage;
+          return (
+            <a
+              href={`${pagination.basePath}?page=${p}`}
+              class={
+                isActive
+                  ? "px-3 py-2 rounded-lg bg-primary text-white text-sm"
+                  : "px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-secondary/70 dark:text-white/70 hover:bg-gray-50 dark:hover:bg-white/5"
+              }
+              aria-current={isActive ? "page" : undefined}
+            >
+              {p}
+            </a>
+          );
+        })}
 
-          {/* Next */}
+        {pagination.currentPage < pagination.totalPages ? (
           <a
-            href={pageHref(pagination.basePath, Math.min(pagination.totalPages, pagination.currentPage + 1))}
-            class="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 text-secondary dark:text-white/80 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-            aria-label="Next page"
+            href={`${pagination.basePath}?page=${pagination.currentPage + 1}`}
+            class="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-secondary/70 dark:text-white/70 hover:bg-gray-50 dark:hover:bg-white/5"
           >
             Next
           </a>
-        </div>
+        ) : (
+          <span class="px-3 py-2 rounded-lg border border-gray-100 dark:border-gray-800 text-sm text-secondary/30 dark:text-white/30">
+            Next
+          </span>
+        )}
       </nav>
     ) : null}
-
-    {/* category page only: back to all */}
-    {category && category !== "all" ? (
-      <div class="mt-10 text-center" data-aos="fade-up">
-        <a href={hrefAll} class={buttonClass("outline")}>View all work</a>
-      </div>
-    ) : null}
   </div>
 
-  <!-- Video Modal -->
-  <div
-    id="work-video-modal"
-    class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 p-4"
-    aria-hidden="true"
-  >
-    <div class="w-full max-w-4xl bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-      <div class="flex items-center justify-between px-4 py-3 bg-black/60">
-        <p id="work-video-title" class="text-sm md:text-base text-white/90 truncate pr-3"></p>
-        <button
-          id="work-video-close"
-          type="button"
-          class="text-white/80 hover:text-white px-3 py-1 rounded-lg border border-white/10 hover:border-white/20"
-          aria-label="Close video modal"
-        >
-          Close
-        </button>
-      </div>
-
-      <div class="relative w-full bg-black" style="padding-top:56.25%;">
-        <div id="work-video-player" class="absolute inset-0"></div>
-      </div>
-    </div>
-  </div>
-
-  <script is:inline>
-    (() => {
-      const modal = document.getElementById("work-video-modal");
-      const closeBtn = document.getElementById("work-video-close");
-      const titleEl = document.getElementById("work-video-title");
-      const player = document.getElementById("work-video-player");
-
-      if (!modal || !closeBtn || !titleEl || !player) return;
-
-      const getYoutubeId = (url = "") => {
-        const m =
-          url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
-          url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
-          url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
-        return m ? m[1] : "";
-      };
-
-      const openModal = (kind, src, title) => {
-        titleEl.textContent = title || "";
-        player.innerHTML = "";
-
-        if (kind === "youtube") {
-          const id = getYoutubeId(src);
+  <!-- ✅ summary 3줄 제한 + 폰트 85% -->
+  <style is:inline>
+    {`
+      .work-summary{
+        font-size:0.85em;
+        display:-webkit-box;
+        -webkit-line-clamp:3;
+        -webkit-box-orient:vertical;
+        overflow:hidden;
+      }
+    `}
+  </style>
+</section>
