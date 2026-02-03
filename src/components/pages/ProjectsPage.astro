@@ -8,6 +8,7 @@ const {
   topButtons,
   projects,
   category = "all",
+  pagination, // ✅ { basePath, currentPage, totalPages }
 } = Astro.props;
 
 const isDe = lang === "de";
@@ -22,8 +23,7 @@ const defaultTopButtons = [
 
 const buttons = topButtons ?? defaultTopButtons;
 
-// ✅ pages에서 projects를 넘겼으면 그걸 우선 사용
-// ✅ 혹시 projects가 없더라도 category로 필터링하여 렌더 가능
+// pages에서 잘라서 넘기므로 projects 우선
 const works =
   projects ??
   (category && category !== "all" ? allWorks.filter((w) => w.category === category) : allWorks);
@@ -44,39 +44,60 @@ function getYoutubeThumb(url = "") {
 function buttonClass(variant = "outline") {
   const baseClass =
     "inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-6 transition-colors";
-  if (variant === "primary") {
-    return `${baseClass} bg-primary text-white hover:bg-primary/90`;
-  }
+  if (variant === "primary") return `${baseClass} bg-primary text-white hover:bg-primary/90`;
   return `${baseClass} border border-primary text-primary hover:bg-primary/10 bg-transparent`;
+}
+
+// ✅ 페이지 링크 생성 (?page=2)
+function pageHref(basePath, pageNum) {
+  if (!basePath) return "#";
+  return pageNum <= 1 ? `${basePath}` : `${basePath}?page=${pageNum}`;
+}
+
+// ✅ 페이지 버튼 범위(너무 길어지면 1 ... 5 6 7 ... 20 형태)
+function getPageItems(current, total) {
+  if (!total || total <= 1) return [1];
+
+  const items = [];
+  const push = (v) => items.push(v);
+
+  const window = 2; // current 주변 표시 폭
+  const left = Math.max(1, current - window);
+  const right = Math.min(total, current + window);
+
+  push(1);
+
+  if (left > 2) push("…");
+  for (let i = left; i <= right; i++) {
+    if (i !== 1 && i !== total) push(i);
+  }
+  if (right < total - 1) push("…");
+
+  if (total !== 1) push(total);
+
+  // 중복 제거(예: total 작을 때)
+  return items.filter((v, idx, arr) => idx === 0 || v !== arr[idx - 1]);
 }
 ---
 
 <section class="pt-28 pb-16 md:pt-36 md:pb-24 bg-neutral-bg dark:bg-neutral-dark/60">
   <div class="max-w-container mx-auto px-6">
 
-    <!-- Title / Subtitle -->
     <div class="mb-10 text-center flex flex-col items-center" data-aos="fade-up">
-      <h1 class="font-heading text-h2 text-secondary dark:text-white mb-4">
-        {title}
-      </h1>
+      <h1 class="font-heading text-h2 text-secondary dark:text-white mb-4">{title}</h1>
       <p class="text-body text-secondary/70 dark:text-white/70 max-w-5xl mx-auto lg:whitespace-nowrap">
         {subtitle}
       </p>
     </div>
 
-    <!-- Top Buttons -->
     <div class="flex flex-col sm:flex-row gap-3 justify-center mb-12" data-aos="fade-up">
       {buttons.map((b) => (
-        <a href={b.href} class={buttonClass(b.variant)}>
-          {b.text}
-        </a>
+        <a href={b.href} class={buttonClass(b.variant)}>{b.text}</a>
       ))}
     </div>
 
-    <!-- Works Grid -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
       {works.map((work, index) => {
-        // ✅ media 우선, 없으면 info.youtubeUrl을 youtube로 처리(하위호환)
         const kind = work.media?.kind || (work.info?.youtubeUrl ? "youtube" : "");
         const src = work.media?.src || work.info?.youtubeUrl || "";
         const playable = Boolean(kind && src);
@@ -102,8 +123,6 @@ function buttonClass(variant = "outline") {
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
             />
-
-            <!-- Tags -->
             <div class="absolute top-4 left-4 flex flex-wrap gap-2">
               {work.tags?.map((tag) => (
                 <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
@@ -111,8 +130,6 @@ function buttonClass(variant = "outline") {
                 </span>
               ))}
             </div>
-
-            <!-- Play Icon Overlay (playable only) -->
             <div class="absolute inset-0 flex items-center justify-center">
               <span class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-black/50 backdrop-blur-sm border border-white/20">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white">
@@ -123,14 +140,7 @@ function buttonClass(variant = "outline") {
           </button>
         ) : (
           <div class="relative w-full overflow-hidden aspect-video text-left">
-            <img
-              src={thumb}
-              alt={work.title}
-              class="w-full h-full object-cover"
-              loading="lazy"
-            />
-
-            <!-- Tags -->
+            <img src={thumb} alt={work.title} class="w-full h-full object-cover" loading="lazy" />
             <div class="absolute top-4 left-4 flex flex-wrap gap-2">
               {work.tags?.map((tag) => (
                 <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
@@ -138,8 +148,6 @@ function buttonClass(variant = "outline") {
                 </span>
               ))}
             </div>
-
-            <!-- Coming soon badge -->
             <div class="absolute inset-0 flex items-center justify-center">
               <span class="px-4 py-2 rounded-full bg-black/50 text-white/90 text-sm border border-white/20">
                 Coming soon
@@ -155,19 +163,14 @@ function buttonClass(variant = "outline") {
             data-aos-delay={index * 40}
           >
             {MediaEl}
-
             <div class="p-6">
               <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
                 {work.title}
               </h3>
-
-              <p class="text-secondary/70 dark:text-white/70 mb-4">
-                {work.summary}
-              </p>
+              <p class="text-secondary/70 dark:text-white/70 mb-4">{work.summary}</p>
 
               <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1">
                 <li><span class="font-mono">작업연도</span> · {work.info?.year}</li>
-                <li><span class="font-mono">러닝타임</span> · {work.info?.duration}</li>
                 <li><span class="font-mono">역할</span> · {work.info?.role}</li>
               </ul>
             </div>
@@ -176,12 +179,57 @@ function buttonClass(variant = "outline") {
       })}
     </div>
 
-    <!-- Back to all (category page only) -->
+    <!-- ✅ 페이지네이션 UI -->
+    {pagination && pagination.totalPages > 1 ? (
+      <nav class="mt-14 flex flex-col items-center gap-4" aria-label="Pagination" data-aos="fade-up">
+        <div class="text-sm text-secondary/60 dark:text-white/60">
+          Page {pagination.currentPage} / {pagination.totalPages}
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-2">
+          {/* Prev */}
+          <a
+            href={pageHref(pagination.basePath, Math.max(1, pagination.currentPage - 1))}
+            class="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 text-secondary dark:text-white/80 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            aria-label="Previous page"
+          >
+            Prev
+          </a>
+
+          {getPageItems(pagination.currentPage, pagination.totalPages).map((p) =>
+            p === "…" ? (
+              <span class="px-3 py-2 text-secondary/50 dark:text-white/40">…</span>
+            ) : (
+              <a
+                href={pageHref(pagination.basePath, p)}
+                class={
+                  p === pagination.currentPage
+                    ? "px-3 py-2 rounded-lg bg-primary text-white border border-primary"
+                    : "px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 text-secondary dark:text-white/80 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                }
+                aria-current={p === pagination.currentPage ? "page" : undefined}
+              >
+                {p}
+              </a>
+            )
+          )}
+
+          {/* Next */}
+          <a
+            href={pageHref(pagination.basePath, Math.min(pagination.totalPages, pagination.currentPage + 1))}
+            class="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 text-secondary dark:text-white/80 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            aria-label="Next page"
+          >
+            Next
+          </a>
+        </div>
+      </nav>
+    ) : null}
+
+    {/* category page only: back to all */}
     {category && category !== "all" ? (
-      <div class="mt-12 text-center" data-aos="fade-up">
-        <a href={hrefAll} class={buttonClass("outline")}>
-          View all work
-        </a>
+      <div class="mt-10 text-center" data-aos="fade-up">
+        <a href={hrefAll} class={buttonClass("outline")}>View all work</a>
       </div>
     ) : null}
   </div>
@@ -234,68 +282,3 @@ function buttonClass(variant = "outline") {
 
         if (kind === "youtube") {
           const id = getYoutubeId(src);
-          const embed = id
-            ? `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1`
-            : src;
-
-          const iframe = document.createElement("iframe");
-          iframe.className = "w-full h-full";
-          iframe.src = embed;
-          iframe.title = title || "YouTube video";
-          iframe.loading = "lazy";
-          iframe.setAttribute("frameborder", "0");
-          iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
-          iframe.setAttribute("allowfullscreen", "true");
-          player.appendChild(iframe);
-        }
-
-        if (kind === "file") {
-          const video = document.createElement("video");
-          video.className = "w-full h-full";
-          video.src = src;
-          video.controls = true;
-          video.autoplay = true;
-          video.playsInline = true;
-          player.appendChild(video);
-        }
-
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-        modal.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden";
-      };
-
-      const closeModal = () => {
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-        modal.setAttribute("aria-hidden", "true");
-        player.innerHTML = "";
-        document.body.style.overflow = "";
-      };
-
-      document.addEventListener("click", (e) => {
-        const btn = e.target?.closest?.("[data-open-video]");
-        if (!btn) return;
-
-        const kind = btn.getAttribute("data-video-kind");
-        const src = btn.getAttribute("data-video-src");
-        const title = btn.getAttribute("data-video-title");
-
-        if (!kind || !src) return;
-        openModal(kind, src, title);
-      });
-
-      closeBtn.addEventListener("click", closeModal);
-
-      // click outside modal content
-      modal.addEventListener("click", (e) => {
-        if (e.target === modal) closeModal();
-      });
-
-      // ESC close
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
-      });
-    })();
-  </script>
-</section>
