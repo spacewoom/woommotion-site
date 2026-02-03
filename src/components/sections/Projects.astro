@@ -370,216 +370,199 @@ function encJson(v: any) {
     }
   </style>
 
-  <script is:inline>
-  {`
-    (() => {
-      // init이 "언제 로드되든" 동작하게 만든 버전
-      function initHomeWorksModal() {
-        // 모달 DOM이 아직 없으면(스크립트가 너무 일찍 실행된 경우) 조용히 종료
-        const modal = document.getElementById("home-work-detail-modal");
-        if (!modal) return;
+  <script type="module">
+  // 중복 바인딩 방지 (Astro 페이지 전환 포함)
+  const KEY = "__HOME_WORKS_MODAL_V3__";
 
-        // 중복 바인딩 방지(이미 바인딩 되었으면 종료)
-        if (window.__HOME_WORKS_MODAL_READY__) return;
-        window.__HOME_WORKS_MODAL_READY__ = true;
+  function decode(s) {
+    try { return decodeURIComponent(s || ""); } catch { return String(s || ""); }
+  }
 
-        const closeBtn = document.getElementById("home-modal-close");
-        const replayBtn = document.getElementById("home-modal-replay");
-        const prevBtn = document.getElementById("home-modal-prev");
-        const nextBtn = document.getElementById("home-modal-next");
-        const counterEl = document.getElementById("home-modal-counter");
+  function safeJson(s) {
+    try { return JSON.parse(decode(s || "[]")); } catch { return []; }
+  }
 
-        const titleEl = document.getElementById("home-modal-title");
-        const categoryEl = document.getElementById("home-modal-category");
-        const yearEl = document.getElementById("home-modal-year");
-        const roleEl = document.getElementById("home-modal-role");
-        const summaryEl = document.getElementById("home-modal-summary");
-        const tagsEl = document.getElementById("home-modal-tags");
-        const playerHost = document.getElementById("home-modal-player");
+  function getYoutubeId(url = "") {
+    const m =
+      url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
+      url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
+      url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/) ||
+      url.match(/\/shorts\/([a-zA-Z0-9_-]{6,})/);
+    return m ? m[1] : "";
+  }
 
-        if (
-          !closeBtn || !replayBtn || !prevBtn || !nextBtn || !counterEl ||
-          !titleEl || !categoryEl || !yearEl || !roleEl || !summaryEl || !tagsEl || !playerHost
-        ) {
-          // 모달 마크업이 덜 렌더된 상태면 바인딩하지 않음
-          window.__HOME_WORKS_MODAL_READY__ = false;
-          return;
-        }
+  function categoryLabel(cat) {
+    const c = String(cat || "").toLowerCase();
+    if (c === "agency") return "Category · Agency";
+    if (c === "digital-signage") return "Category · Digital Signage";
+    return cat ? `Category · ${cat}` : "Category · -";
+  }
 
-        const decode = (s) => {
-          try { return decodeURIComponent(s || ""); } catch { return String(s || ""); }
-        };
+  function initHomeWorksModal() {
+    // 이미 바인딩되었으면 종료
+    if (window[KEY]) return;
 
-        const safeJson = (s) => {
-          try { return JSON.parse(decode(s || "[]")); } catch { return []; }
-        };
+    const modal = document.getElementById("home-work-detail-modal");
+    if (!modal) return; // DOM이 아직 없으면(전환 중) 다음 page-load에서 다시 시도
 
-        const getYoutubeId = (url = "") => {
-          const m =
-            url.match(/youtu\\.be\\/([a-zA-Z0-9_-]{6,})/) ||
-            url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
-            url.match(/\\/embed\\/([a-zA-Z0-9_-]{6,})/) ||
-            url.match(/\\/shorts\\/([a-zA-Z0-9_-]{6,})/);
-          return m ? m[1] : "";
-        };
+    const closeBtn = document.getElementById("home-modal-close");
+    const replayBtn = document.getElementById("home-modal-replay");
+    const prevBtn = document.getElementById("home-modal-prev");
+    const nextBtn = document.getElementById("home-modal-next");
+    const counterEl = document.getElementById("home-modal-counter");
 
-        const categoryLabel = (cat) => {
-          const c = String(cat || "").toLowerCase();
-          if (c === "agency") return "Category · Agency";
-          if (c === "digital-signage") return "Category · Digital Signage";
-          return cat ? \`Category · \${cat}\` : "Category · -";
-        };
+    const titleEl = document.getElementById("home-modal-title");
+    const categoryEl = document.getElementById("home-modal-category");
+    const yearEl = document.getElementById("home-modal-year");
+    const roleEl = document.getElementById("home-modal-role");
+    const summaryEl = document.getElementById("home-modal-summary");
+    const tagsEl = document.getElementById("home-modal-tags");
+    const playerHost = document.getElementById("home-modal-player");
 
-        const renderTags = (tags) => {
-          tagsEl.innerHTML = "";
-          const list = Array.isArray(tags) ? tags : [];
-          if (!list.length) {
-            const empty = document.createElement("span");
-            empty.className = "text-xs text-white/40";
-            empty.textContent = "태그 없음";
-            tagsEl.appendChild(empty);
-            return;
-          }
-          list.forEach((tag) => {
-            const chip = document.createElement("span");
-            chip.className =
-              "px-3 py-1 text-xs font-mono rounded-full bg-white/10 text-white/80 border border-white/10";
-            chip.textContent = tag;
-            tagsEl.appendChild(chip);
-          });
-        };
+    if (
+      !closeBtn || !replayBtn || !prevBtn || !nextBtn || !counterEl ||
+      !titleEl || !categoryEl || !yearEl || !roleEl || !summaryEl || !tagsEl || !playerHost
+    ) return;
 
-        const getButtons = () =>
-          Array.from(document.querySelectorAll("button[data-open-homework='true']"));
+    window[KEY] = true;
 
-        let currentIndex = 0;
+    const getButtons = () =>
+      Array.from(document.querySelectorAll("button[data-open-homework='true']"));
 
-        const mountVideo = (src, title) => {
-          playerHost.innerHTML = "";
-          const id = getYoutubeId(src);
-          if (!id) return;
+    let currentIndex = 0;
 
-          // vq=hd1080: "선호" 요청(유튜브가 강제 보장하진 않음)
-          const embed =
-            \`https://www.youtube.com/embed/\${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1&vq=hd1080\`;
-
-          const iframe = document.createElement("iframe");
-          iframe.className = "w-full h-full";
-          iframe.src = embed;
-          iframe.title = title || "YouTube video";
-          iframe.loading = "lazy";
-          iframe.setAttribute("frameborder", "0");
-          iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
-          iframe.setAttribute("allowfullscreen", "true");
-          playerHost.appendChild(iframe);
-        };
-
-        const updateNav = () => {
-          const buttons = getButtons();
-          const total = buttons.length || 0;
-          counterEl.textContent = \`\${currentIndex + 1} / \${total}\`;
-          prevBtn.disabled = currentIndex <= 0;
-          nextBtn.disabled = currentIndex >= total - 1;
-        };
-
-        const renderByIndex = (idx) => {
-          const buttons = getButtons();
-          const total = buttons.length || 0;
-          if (!total) return;
-
-          currentIndex = Math.max(0, Math.min(total - 1, idx));
-          const btn = buttons[currentIndex];
-
-          const src = decode(btn.dataset.src);
-          const title = decode(btn.dataset.title);
-          const summary = decode(btn.dataset.summary);
-          const year = decode(btn.dataset.year);
-          const role = decode(btn.dataset.role);
-          const category = decode(btn.dataset.category);
-          const tags = safeJson(btn.dataset.tags);
-
-          titleEl.textContent = title || "";
-          categoryEl.textContent = categoryLabel(category);
-          yearEl.textContent = \`작업 연도 · \${year || "-"}\`;
-          roleEl.textContent = \`역할 · \${role || "-"}\`;
-          summaryEl.textContent = summary || "";
-          renderTags(tags);
-
-          mountVideo(src, title);
-          updateNav();
-        };
-
-        const openModalAt = (idx) => {
-          renderByIndex(idx);
-          modal.classList.remove("hidden");
-          modal.classList.add("flex");
-          modal.setAttribute("aria-hidden", "false");
-          document.body.style.overflow = "hidden";
-        };
-
-        const closeModal = () => {
-          modal.classList.add("hidden");
-          modal.classList.remove("flex");
-          modal.setAttribute("aria-hidden", "true");
-          playerHost.innerHTML = "";
-          tagsEl.innerHTML = "";
-          summaryEl.textContent = "";
-          document.body.style.overflow = "";
-        };
-
-        // ✅ 가장 강력한 방식: 문서 전체 "캡처 단계" 이벤트 위임
-        // 다른 코드가 버블 단계에서 막아도, 이쪽이 먼저 잡음
-        document.addEventListener(
-          "click",
-          (e) => {
-            const t = e.target;
-            if (!(t instanceof Element)) return;
-
-            const btn = t.closest("button[data-open-homework='true']");
-            if (!btn) return;
-
-            e.preventDefault();
-            e.stopPropagation();
-            if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-
-            const idx = Number(btn.getAttribute("data-work-index") || "0");
-            openModalAt(Number.isFinite(idx) ? idx : 0);
-          },
-          true
-        );
-
-        prevBtn.addEventListener("click", () => renderByIndex(currentIndex - 1));
-        nextBtn.addEventListener("click", () => renderByIndex(currentIndex + 1));
-        replayBtn.addEventListener("click", () => renderByIndex(currentIndex));
-
-        closeBtn.addEventListener("click", closeModal);
-        modal.addEventListener("click", (e) => {
-          if (e.target === modal) closeModal();
-        });
-
-        document.addEventListener("keydown", (e) => {
-          if (modal.classList.contains("hidden")) return;
-          if (e.key === "Escape") closeModal();
-          if (e.key === "ArrowLeft") renderByIndex(currentIndex - 1);
-          if (e.key === "ArrowRight") renderByIndex(currentIndex + 1);
-        });
-
-        updateNav();
+    function renderTags(tags) {
+      tagsEl.innerHTML = "";
+      const list = Array.isArray(tags) ? tags : [];
+      if (!list.length) {
+        const empty = document.createElement("span");
+        empty.className = "text-xs text-white/40";
+        empty.textContent = "태그 없음";
+        tagsEl.appendChild(empty);
+        return;
       }
-
-      // ✅ DOMContentLoaded에만 의존하지 않도록 "즉시 실행 + 로딩 상태 체크"
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initHomeWorksModal);
-      }
-      initHomeWorksModal();
-
-      // ✅ Astro 페이지 전환(클라이언트 네비게이션) 대응
-      document.addEventListener("astro:page-load", () => {
-        // 전환 후에는 DOM이 다시 생기므로 재초기화 허용
-        window.__HOME_WORKS_MODAL_READY__ = false;
-        initHomeWorksModal();
+      list.forEach((tag) => {
+        const chip = document.createElement("span");
+        chip.className =
+          "px-3 py-1 text-xs font-mono rounded-full bg-white/10 text-white/80 border border-white/10";
+        chip.textContent = tag;
+        tagsEl.appendChild(chip);
       });
-    })();
-  `}
+    }
+
+    function mountVideo(src, title) {
+      playerHost.innerHTML = "";
+      const id = getYoutubeId(src);
+      if (!id) return;
+
+      // vq=hd1080은 "요청" 값 (유튜브가 강제로 고정 보장하진 않음)
+      const embed =
+        `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1&vq=hd1080`;
+
+      const iframe = document.createElement("iframe");
+      iframe.className = "w-full h-full";
+      iframe.src = embed;
+      iframe.title = title || "YouTube video";
+      iframe.loading = "lazy";
+      iframe.setAttribute("frameborder", "0");
+      iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+      iframe.setAttribute("allowfullscreen", "true");
+      playerHost.appendChild(iframe);
+    }
+
+    function updateNav() {
+      const total = getButtons().length || 0;
+      counterEl.textContent = `${currentIndex + 1} / ${total}`;
+      prevBtn.disabled = currentIndex <= 0;
+      nextBtn.disabled = currentIndex >= total - 1;
+    }
+
+    function renderByIndex(idx) {
+      const buttons = getButtons();
+      const total = buttons.length || 0;
+      if (!total) return;
+
+      currentIndex = Math.max(0, Math.min(total - 1, idx));
+      const btn = buttons[currentIndex];
+
+      const src = decode(btn.dataset.src);
+      const title = decode(btn.dataset.title); // 이미 숫자 제거된 타이틀이 들어가도록 구성됨
+      const summary = decode(btn.dataset.summary);
+      const year = decode(btn.dataset.year);
+      const role = decode(btn.dataset.role);
+      const category = decode(btn.dataset.category);
+      const tags = safeJson(btn.dataset.tags);
+
+      titleEl.textContent = title || "";
+      categoryEl.textContent = categoryLabel(category);
+      yearEl.textContent = `작업 연도 · ${year || "-"}`;
+      roleEl.textContent = `역할 · ${role || "-"}`;
+      summaryEl.textContent = summary || "";
+      renderTags(tags);
+
+      mountVideo(src, title);
+      updateNav();
+    }
+
+    function openModalAt(idx) {
+      renderByIndex(idx);
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      modal.setAttribute("aria-hidden", "true");
+      playerHost.innerHTML = "";
+      tagsEl.innerHTML = "";
+      summaryEl.textContent = "";
+      document.body.style.overflow = "";
+    }
+
+    // ✅ 문서 레벨 캡처 이벤트 위임
+    document.addEventListener("click", (ev) => {
+      const t = ev.target;
+      if (!(t instanceof Element)) return;
+
+      const btn = t.closest("button[data-open-homework='true']");
+      if (!btn) return;
+
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+
+      const idx = Number(btn.getAttribute("data-work-index") || "0");
+      openModalAt(Number.isFinite(idx) ? idx : 0);
+    }, true);
+
+    prevBtn.addEventListener("click", () => renderByIndex(currentIndex - 1));
+    nextBtn.addEventListener("click", () => renderByIndex(currentIndex + 1));
+    replayBtn.addEventListener("click", () => renderByIndex(currentIndex));
+    closeBtn.addEventListener("click", closeModal);
+
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (modal.classList.contains("hidden")) return;
+      if (e.key === "Escape") closeModal();
+      if (e.key === "ArrowLeft") renderByIndex(currentIndex - 1);
+      if (e.key === "ArrowRight") renderByIndex(currentIndex + 1);
+    });
+
+    updateNav();
+  }
+
+  // 즉시 시도 + Astro 전환 시 재시도
+  initHomeWorksModal();
+  document.addEventListener("astro:page-load", () => {
+    // 전환 후 DOM이 새로 생기면 재초기화해야 해서 key를 풀어줌
+    window[KEY] = false;
+    initHomeWorksModal();
+  });
 </script>
 </section>
