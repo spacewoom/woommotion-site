@@ -43,10 +43,9 @@ function roleIncludes(work: any, keyword: string) {
 }
 
 /**
- * ✅ 타이틀 끝 숫자 제거
+ * ✅ 타이틀 끝 숫자 제거 (01, 02 등)
  * - "메뉴보드01" -> "메뉴보드"
  * - "메뉴보드 02" -> "메뉴보드"
- * - "풀배너 01" -> "풀배너"
  */
 function displayTitle(raw: any) {
   return String(raw ?? "")
@@ -197,8 +196,6 @@ function encJson(v: any) {
         const youtubeUrl = getYoutubeUrl(project);
         const tags = Array.isArray(project?.tags) ? project.tags : [];
         const thumb = getThumb(project);
-
-        // ✅ 카드/모달 모두 이 타이틀 사용
         const cleanTitle = displayTitle(project.title);
 
         return (
@@ -225,7 +222,7 @@ function encJson(v: any) {
                   data-open-homework="true"
                   data-work-index={index}
                   data-src={enc(youtubeUrl)}
-                  data-title={enc(cleanTitle)}  /* ✅ 여기 중요 */
+                  data-title={enc(cleanTitle)}
                   data-summary={enc(project.summary)}
                   data-year={enc(project.info?.year)}
                   data-role={enc(project.info?.role)}
@@ -242,14 +239,17 @@ function encJson(v: any) {
             </div>
 
             <div class="p-6 pt-4">
-              <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
+              {/* ✅ 카드 타이틀: 강제 1줄 말줄임 */}
+              <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300 truncate">
                 {cleanTitle}
               </h3>
 
+              {/* ✅ summary: 2줄 clamp + … */}
               <p class="work-summary text-secondary/70 dark:text-white/70 mb-4">
                 {project.summary}
               </p>
 
+              {/* ✅ 정보 순서: 작업연도 → 역할 → 태그 */}
               <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1 mb-3">
                 <li><span class="font-mono">작업연도</span> · {project.info?.year}</li>
                 <li><span class="font-mono">역할</span> · {project.info?.role}</li>
@@ -282,45 +282,75 @@ function encJson(v: any) {
     aria-hidden="true"
   >
     <div class="w-full max-w-7xl max-h-[92vh] rounded-2xl overflow-hidden border border-white/10 bg-black shadow-2xl">
-      <div class="flex items-start justify-between gap-3 px-4 py-3 bg-black/70 border-b border-white/10">
+      {/* ✅ Header: 아이콘 Close(상단 우측) / 아이콘 Prev-Next(아래줄) */}
+      <div class="home-modal-header flex items-start justify-between gap-3 px-4 py-3 bg-black/70 border-b border-white/10">
         <div class="min-w-0">
-          <p id="home-modal-title" class="text-sm md:text-base text-white/95 font-medium truncate"></p>
+          {/* ✅ 모달 타이틀: 강제 1줄 말줄임 */}
+          <p id="home-modal-title" class="text-sm md:text-base text-white/95 font-medium truncate max-w-[74vw] md:max-w-none"></p>
 
-          <div class="mt-1 flex flex-wrap gap-2 items-center">
-            <span id="home-modal-category" class="text-[11px] md:text-xs font-mono px-2 py-1 rounded-full bg-white/10 text-white/80 border border-white/10"></span>
-            <span id="home-modal-year" class="text-[11px] md:text-xs font-mono px-2 py-1 rounded-full bg-white/10 text-white/80 border border-white/10"></span>
-            <span id="home-modal-role" class="text-[11px] md:text-xs font-mono px-2 py-1 rounded-full bg-white/10 text-white/80 border border-white/10"></span>
+          {/* ✅ 작업 정보(가로 1행), 너무 좁으면 모바일에서 숨김(CSS) */}
+          <div class="home-modal-chips mt-1 flex flex-wrap gap-2 items-center">
+            <span
+              id="home-modal-category"
+              class="home-modal-chip text-[11px] md:text-xs font-mono px-2 py-1 rounded-full bg-white/10 text-white/80 border border-white/10"
+            ></span>
+            <span
+              id="home-modal-year"
+              class="home-modal-chip text-[11px] md:text-xs font-mono px-2 py-1 rounded-full bg-white/10 text-white/80 border border-white/10"
+            ></span>
+            <span
+              id="home-modal-role"
+              class="home-modal-chip text-[11px] md:text-xs font-mono px-2 py-1 rounded-full bg-white/10 text-white/80 border border-white/10"
+            ></span>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <button
-            id="home-modal-prev"
-            type="button"
-            class="px-3 py-1 rounded-lg border border-white/10 text-white/80 hover:text-white hover:border-white/20 disabled:opacity-30"
-          >
-            Prev
-          </button>
+        <div class="home-modal-actions flex items-center gap-2">
+          {/* ✅ Close: 아이콘 버튼 */}
+          <div class="home-modal-closewrap">
+            <button
+              id="home-modal-close"
+              type="button"
+              class="icon-btn"
+              aria-label="Close"
+              title="Close"
+            >
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
 
-          <span id="home-modal-counter" class="text-[11px] md:text-xs font-mono text-white/60 px-2">
-            1 / 3
-          </span>
+          {/* ✅ Prev/Next: 아이콘 버튼 + 카운터 */}
+          <div class="home-modal-nav flex items-center gap-2">
+            <button
+              id="home-modal-prev"
+              type="button"
+              class="icon-btn"
+              aria-label="Previous"
+              title="Previous"
+            >
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M15 18L9 12L15 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
 
-          <button
-            id="home-modal-next"
-            type="button"
-            class="px-3 py-1 rounded-lg border border-white/10 text-white/80 hover:text-white hover:border-white/20 disabled:opacity-30"
-          >
-            Next
-          </button>
+            <span id="home-modal-counter" class="text-[11px] md:text-xs font-mono text-white/60 px-1">
+              1 / 3
+            </span>
 
-          <button
-            id="home-modal-close"
-            type="button"
-            class="ml-1 text-white/80 hover:text-white px-3 py-1 rounded-lg border border-white/10 hover:border-white/20"
-          >
-            Close
-          </button>
+            <button
+              id="home-modal-next"
+              type="button"
+              class="icon-btn"
+              aria-label="Next"
+              title="Next"
+            >
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M9 18L15 12L9 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -361,63 +391,7 @@ function encJson(v: any) {
   </div>
 
   <style is:inline>
-    @media (max-width: 640px) {
-  /* 헤더: 상단 타이틀+정보 / 우측 Close / 아래 Nav */
-  .home-modal-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  /* ✅ 작업정보(칩) 1행 가로 정렬 */
-  .home-modal-chips {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;          /* 줄바꿈 없이 1행 유지 */
-    gap: 8px;
-    align-items: center;
-    overflow: hidden;           /* 넘치면 숨김 */
-  }
-
-  /* 칩이 너무 길면 내부 텍스트를 말줄임 */
-  .home-modal-chip {
-    max-width: 33%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  /* ✅ 공간이 부족하면(아주 작은 화면) 작업정보 통째로 숨김 */
-  @media (max-width: 380px) {
-    .home-modal-chips { display: none; }
-  }
-
-  /* 액션 영역: Close는 상단 우측, Nav는 아래줄 */
-  .home-modal-actions {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .home-modal-closewrap {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .home-modal-nav {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  /* 터치 영역 살짝 키우기(선택) */
-  #home-modal-prev,
-  #home-modal-next,
-  #home-modal-close {
-    padding: 10px 12px;
-  }
-}
+    /* summary 2줄 말줄임 */
     .work-summary{
       font-size:0.8em;
       display:-webkit-box;
@@ -425,201 +399,280 @@ function encJson(v: any) {
       -webkit-box-orient:vertical;
       overflow:hidden;
     }
+
+    /* 모달 아이콘 버튼(심플) */
+    .icon-btn{
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.9);
+      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .icon-btn:hover{
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(255,255,255,0.18);
+      color: rgba(255,255,255,1);
+    }
+    .icon-btn:active{ transform: scale(0.98); }
+    .icon-btn:disabled{ opacity: 0.35; }
+    .icon-svg{ width: 20px; height: 20px; display:block; }
+
+    /* ✅ 모바일 모달 헤더 UI 정리 */
+    @media (max-width: 640px) {
+      /* 헤더를 세로 흐름으로 */
+      .home-modal-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      /* ✅ 작업정보(칩) 1행 가로 정렬 */
+      .home-modal-chips {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;      /* 줄바꿈 없이 1행 유지 */
+        gap: 8px;
+        align-items: center;
+        overflow: hidden;       /* 넘치면 숨김 */
+      }
+
+      /* 칩 내부 텍스트 말줄임 */
+      .home-modal-chip {
+        max-width: 33%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* ✅ 공간이 부족하면(아주 작은 화면) 작업정보 통째로 숨김 */
+      @media (max-width: 380px) {
+        .home-modal-chips { display: none; }
+      }
+
+      /* 액션 영역: Close(상단) + Nav(하단) 2단 구성 */
+      .home-modal-actions {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .home-modal-closewrap {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .home-modal-nav {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
   </style>
 
-  <script type="module">
-  // 중복 바인딩 방지 (Astro 페이지 전환 포함)
-  const KEY = "__HOME_WORKS_MODAL_V3__";
+  <script is:inline>
+    (() => {
+      const KEY = "__HOME_WORKS_MODAL_BOUND__";
 
-  function decode(s) {
-    try { return decodeURIComponent(s || ""); } catch { return String(s || ""); }
-  }
+      const decode = (s) => {
+        try { return decodeURIComponent(s || ""); } catch { return String(s || ""); }
+      };
 
-  function safeJson(s) {
-    try { return JSON.parse(decode(s || "[]")); } catch { return []; }
-  }
+      const safeJson = (s) => {
+        try { return JSON.parse(decode(s || "[]")); } catch { return []; }
+      };
 
-  function getYoutubeId(url = "") {
-    const m =
-      url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
-      url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
-      url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/) ||
-      url.match(/\/shorts\/([a-zA-Z0-9_-]{6,})/);
-    return m ? m[1] : "";
-  }
+      const getYoutubeId = (url = "") => {
+        const m =
+          url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/\/shorts\/([a-zA-Z0-9_-]{6,})/);
+        return m ? m[1] : "";
+      };
 
-  function categoryLabel(cat) {
-    const c = String(cat || "").toLowerCase();
-    if (c === "agency") return "Category · Agency";
-    if (c === "digital-signage") return "Category · Digital Signage";
-    return cat ? `Category · ${cat}` : "Category · -";
-  }
+      const categoryLabel = (cat) => {
+        const c = String(cat || "").toLowerCase();
+        if (c === "agency") return "Category · Agency";
+        if (c === "digital-signage") return "Category · Digital Signage";
+        return cat ? `Category · ${cat}` : "Category · -";
+      };
 
-  function initHomeWorksModal() {
-    // 이미 바인딩되었으면 종료
-    if (window[KEY]) return;
+      function bindModalOnce() {
+        if (window[KEY]) return true;
 
-    const modal = document.getElementById("home-work-detail-modal");
-    if (!modal) return; // DOM이 아직 없으면(전환 중) 다음 page-load에서 다시 시도
+        const modal = document.getElementById("home-work-detail-modal");
+        const closeBtn = document.getElementById("home-modal-close");
+        const replayBtn = document.getElementById("home-modal-replay");
+        const prevBtn = document.getElementById("home-modal-prev");
+        const nextBtn = document.getElementById("home-modal-next");
+        const counterEl = document.getElementById("home-modal-counter");
 
-    const closeBtn = document.getElementById("home-modal-close");
-    const replayBtn = document.getElementById("home-modal-replay");
-    const prevBtn = document.getElementById("home-modal-prev");
-    const nextBtn = document.getElementById("home-modal-next");
-    const counterEl = document.getElementById("home-modal-counter");
+        const titleEl = document.getElementById("home-modal-title");
+        const categoryEl = document.getElementById("home-modal-category");
+        const yearEl = document.getElementById("home-modal-year");
+        const roleEl = document.getElementById("home-modal-role");
+        const summaryEl = document.getElementById("home-modal-summary");
+        const tagsEl = document.getElementById("home-modal-tags");
+        const playerHost = document.getElementById("home-modal-player");
 
-    const titleEl = document.getElementById("home-modal-title");
-    const categoryEl = document.getElementById("home-modal-category");
-    const yearEl = document.getElementById("home-modal-year");
-    const roleEl = document.getElementById("home-modal-role");
-    const summaryEl = document.getElementById("home-modal-summary");
-    const tagsEl = document.getElementById("home-modal-tags");
-    const playerHost = document.getElementById("home-modal-player");
+        if (!modal || !closeBtn || !replayBtn || !prevBtn || !nextBtn || !counterEl ||
+            !titleEl || !categoryEl || !yearEl || !roleEl || !summaryEl || !tagsEl || !playerHost) {
+          return false;
+        }
 
-    if (
-      !closeBtn || !replayBtn || !prevBtn || !nextBtn || !counterEl ||
-      !titleEl || !categoryEl || !yearEl || !roleEl || !summaryEl || !tagsEl || !playerHost
-    ) return;
+        window[KEY] = true;
 
-    window[KEY] = true;
+        const getButtons = () =>
+          Array.from(document.querySelectorAll("button[data-open-homework='true']"));
 
-    const getButtons = () =>
-      Array.from(document.querySelectorAll("button[data-open-homework='true']"));
+        let currentIndex = 0;
 
-    let currentIndex = 0;
+        const renderTags = (tags) => {
+          tagsEl.innerHTML = "";
+          const list = Array.isArray(tags) ? tags : [];
+          if (!list.length) {
+            const empty = document.createElement("span");
+            empty.className = "text-xs text-white/40";
+            empty.textContent = "태그 없음";
+            tagsEl.appendChild(empty);
+            return;
+          }
+          list.forEach((tag) => {
+            const chip = document.createElement("span");
+            chip.className =
+              "px-3 py-1 text-xs font-mono rounded-full bg-white/10 text-white/80 border border-white/10";
+            chip.textContent = tag;
+            tagsEl.appendChild(chip);
+          });
+        };
 
-    function renderTags(tags) {
-      tagsEl.innerHTML = "";
-      const list = Array.isArray(tags) ? tags : [];
-      if (!list.length) {
-        const empty = document.createElement("span");
-        empty.className = "text-xs text-white/40";
-        empty.textContent = "태그 없음";
-        tagsEl.appendChild(empty);
-        return;
+        const mountVideo = (src, title) => {
+          playerHost.innerHTML = "";
+          const id = getYoutubeId(src);
+          if (!id) return;
+
+          const embed =
+            `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1&vq=hd1080`;
+
+          const iframe = document.createElement("iframe");
+          iframe.className = "w-full h-full";
+          iframe.src = embed;
+          iframe.title = title || "YouTube video";
+          iframe.loading = "lazy";
+          iframe.setAttribute("frameborder", "0");
+          iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+          iframe.setAttribute("allowfullscreen", "true");
+          playerHost.appendChild(iframe);
+        };
+
+        const updateNav = () => {
+          const total = getButtons().length || 0;
+          counterEl.textContent = `${currentIndex + 1} / ${total}`;
+          prevBtn.disabled = currentIndex <= 0;
+          nextBtn.disabled = currentIndex >= total - 1;
+        };
+
+        const renderByIndex = (idx) => {
+          const buttons = getButtons();
+          const total = buttons.length || 0;
+          if (!total) return;
+
+          currentIndex = Math.max(0, Math.min(total - 1, idx));
+          const btn = buttons[currentIndex];
+
+          const src = decode(btn.dataset.src);
+          const title = decode(btn.dataset.title);
+          const summary = decode(btn.dataset.summary);
+          const year = decode(btn.dataset.year);
+          const role = decode(btn.dataset.role);
+          const category = decode(btn.dataset.category);
+          const tags = safeJson(btn.dataset.tags);
+
+          titleEl.textContent = title || "";
+          categoryEl.textContent = categoryLabel(category);
+          yearEl.textContent = `작업 연도 · ${year || "-"}`;
+          roleEl.textContent = `역할 · ${role || "-"}`;
+          summaryEl.textContent = summary || "";
+          renderTags(tags);
+
+          mountVideo(src, title);
+          updateNav();
+        };
+
+        const openModalAt = (idx) => {
+          renderByIndex(idx);
+          modal.classList.remove("hidden");
+          modal.classList.add("flex");
+          modal.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+        };
+
+        const closeModal = () => {
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+          modal.setAttribute("aria-hidden", "true");
+          playerHost.innerHTML = "";
+          tagsEl.innerHTML = "";
+          summaryEl.textContent = "";
+          document.body.style.overflow = "";
+        };
+
+        // ✅ 캡처 단계 이벤트 위임
+        document.addEventListener("click", (e) => {
+          const t = e.target;
+          if (!(t instanceof Element)) return;
+
+          const btn = t.closest("button[data-open-homework='true']");
+          if (!btn) return;
+
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+          const idx = Number(btn.getAttribute("data-work-index") || "0");
+          openModalAt(Number.isFinite(idx) ? idx : 0);
+        }, true);
+
+        prevBtn.addEventListener("click", () => renderByIndex(currentIndex - 1));
+        nextBtn.addEventListener("click", () => renderByIndex(currentIndex + 1));
+        replayBtn.addEventListener("click", () => renderByIndex(currentIndex));
+
+        closeBtn.addEventListener("click", closeModal);
+        modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+        document.addEventListener("keydown", (e) => {
+          if (modal.classList.contains("hidden")) return;
+          if (e.key === "Escape") closeModal();
+          if (e.key === "ArrowLeft") renderByIndex(currentIndex - 1);
+          if (e.key === "ArrowRight") renderByIndex(currentIndex + 1);
+        });
+
+        updateNav();
+        return true;
       }
-      list.forEach((tag) => {
-        const chip = document.createElement("span");
-        chip.className =
-          "px-3 py-1 text-xs font-mono rounded-full bg-white/10 text-white/80 border border-white/10";
-        chip.textContent = tag;
-        tagsEl.appendChild(chip);
+
+      // ✅ DOM 준비될 때까지 재시도
+      let tries = 0;
+      const tryBind = () => {
+        if (bindModalOnce()) return;
+        tries += 1;
+        if (tries < 60) requestAnimationFrame(tryBind);
+      };
+      tryBind();
+
+      // ✅ Astro 페이지 전환 대응
+      document.addEventListener("astro:page-load", () => {
+        window[KEY] = false;
+        tries = 0;
+        tryBind();
       });
-    }
-
-    function mountVideo(src, title) {
-      playerHost.innerHTML = "";
-      const id = getYoutubeId(src);
-      if (!id) return;
-
-      // vq=hd1080은 "요청" 값 (유튜브가 강제로 고정 보장하진 않음)
-      const embed =
-        `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1&vq=hd1080`;
-
-      const iframe = document.createElement("iframe");
-      iframe.className = "w-full h-full";
-      iframe.src = embed;
-      iframe.title = title || "YouTube video";
-      iframe.loading = "lazy";
-      iframe.setAttribute("frameborder", "0");
-      iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
-      iframe.setAttribute("allowfullscreen", "true");
-      playerHost.appendChild(iframe);
-    }
-
-    function updateNav() {
-      const total = getButtons().length || 0;
-      counterEl.textContent = `${currentIndex + 1} / ${total}`;
-      prevBtn.disabled = currentIndex <= 0;
-      nextBtn.disabled = currentIndex >= total - 1;
-    }
-
-    function renderByIndex(idx) {
-      const buttons = getButtons();
-      const total = buttons.length || 0;
-      if (!total) return;
-
-      currentIndex = Math.max(0, Math.min(total - 1, idx));
-      const btn = buttons[currentIndex];
-
-      const src = decode(btn.dataset.src);
-      const title = decode(btn.dataset.title); // 이미 숫자 제거된 타이틀이 들어가도록 구성됨
-      const summary = decode(btn.dataset.summary);
-      const year = decode(btn.dataset.year);
-      const role = decode(btn.dataset.role);
-      const category = decode(btn.dataset.category);
-      const tags = safeJson(btn.dataset.tags);
-
-      titleEl.textContent = title || "";
-      categoryEl.textContent = categoryLabel(category);
-      yearEl.textContent = `작업 연도 · ${year || "-"}`;
-      roleEl.textContent = `역할 · ${role || "-"}`;
-      summaryEl.textContent = summary || "";
-      renderTags(tags);
-
-      mountVideo(src, title);
-      updateNav();
-    }
-
-    function openModalAt(idx) {
-      renderByIndex(idx);
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
-      modal.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeModal() {
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
-      modal.setAttribute("aria-hidden", "true");
-      playerHost.innerHTML = "";
-      tagsEl.innerHTML = "";
-      summaryEl.textContent = "";
-      document.body.style.overflow = "";
-    }
-
-    // ✅ 문서 레벨 캡처 이벤트 위임
-    document.addEventListener("click", (ev) => {
-      const t = ev.target;
-      if (!(t instanceof Element)) return;
-
-      const btn = t.closest("button[data-open-homework='true']");
-      if (!btn) return;
-
-      ev.preventDefault();
-      ev.stopPropagation();
-      if (ev.stopImmediatePropagation) ev.stopImmediatePropagation();
-
-      const idx = Number(btn.getAttribute("data-work-index") || "0");
-      openModalAt(Number.isFinite(idx) ? idx : 0);
-    }, true);
-
-    prevBtn.addEventListener("click", () => renderByIndex(currentIndex - 1));
-    nextBtn.addEventListener("click", () => renderByIndex(currentIndex + 1));
-    replayBtn.addEventListener("click", () => renderByIndex(currentIndex));
-    closeBtn.addEventListener("click", closeModal);
-
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) closeModal();
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (modal.classList.contains("hidden")) return;
-      if (e.key === "Escape") closeModal();
-      if (e.key === "ArrowLeft") renderByIndex(currentIndex - 1);
-      if (e.key === "ArrowRight") renderByIndex(currentIndex + 1);
-    });
-
-    updateNav();
-  }
-
-  // 즉시 시도 + Astro 전환 시 재시도
-  initHomeWorksModal();
-  document.addEventListener("astro:page-load", () => {
-    // 전환 후 DOM이 새로 생기면 재초기화해야 해서 key를 풀어줌
-    window[KEY] = false;
-    initHomeWorksModal();
-  });
-</script>
+    })();
+  </script>
 </section>
