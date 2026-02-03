@@ -87,7 +87,7 @@ const skillClusters: Cluster[] = [
       },
       { name: 'Veo', icon: VideoIcon, iconSrc: '/tools/veo.svg' },
       // Kling은 준비한 공용 비디오 아이콘(video.svg)로 처리
-      { name: 'Kling', icon: VideoIcon},
+      { name: 'Kling', icon: VideoIcon },
       { name: 'ChatGPT', icon: BracesIcon },
     ],
   },
@@ -151,14 +151,11 @@ const skillClusters: Cluster[] = [
               <div class="tool-item flex flex-col items-center text-center">
                 <div class="tool-icon text-primary bg-primary/5 p-3 rounded-lg mb-2">
                   {tool.iconSrc ? (
-                    <img
-                      src={tool.iconSrc}
-                      alt={`${tool.name} icon`}
-                      width="20"
-                      height="20"
-                      loading="lazy"
-                      class="w-5 h-5 object-contain invert-0"
-                    />
+                    <span
+                      class="tool-svg w-5 h-5"
+                      aria-label={`${tool.name} icon`}
+                      style={`--icon-url: url('${tool.iconSrc}')`}
+                    ></span>
                   ) : (
                     <tool.icon size={20} stroke-width={1.75} />
                   )}
@@ -176,3 +173,21 @@ const skillClusters: Cluster[] = [
 <script>
   // Skills section will be animated via the animations.js file
 </script>
+
+<style>
+  /* Monochrome SVG icons from /tools/ follow currentColor (e.g., text-primary) */
+  .tool-svg {
+    display: inline-block;
+    background-color: currentColor;
+
+    -webkit-mask-image: var(--icon-url);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+
+    mask-image: var(--icon-url);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+</style>
