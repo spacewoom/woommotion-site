@@ -42,12 +42,7 @@ function roleIncludes(work: any, keyword: string) {
   return safeLower(work?.info?.role).includes(keyword.toLowerCase());
 }
 
-// ✅ 타이틀 끝의 2자리 숫자 제거
-function displayTitle(raw: any) {
-  return String(raw ?? "").replace(/\s*\d{2}\s*$/u, "").trim();
-}
-
-// 업로드 최신(works 배열 뒤쪽일수록 최신 업로드 가정)
+// "업로드 최신" 기준: works 배열에서 뒤쪽일수록 최신 업로드라고 가정
 const indexBySlug = new Map(
   (Array.isArray(allWorks) ? allWorks : []).map((w: any, i: number) => [
     w?.slug ?? `__idx_${i}`,
@@ -59,9 +54,6 @@ function getUploadIndex(work: any) {
   return indexBySlug.get(work?.slug) ?? -1;
 }
 
-// -----------------------------
-// Weighted scoring (NO random)
-// -----------------------------
 function computeScore(work: any) {
   const year = parseYear(work?.info?.year);
   const upload = getUploadIndex(work);
@@ -73,7 +65,6 @@ function computeScore(work: any) {
 
   const hasPlanning = roleIncludes(work, "기획");
   const hasDesign = roleIncludes(work, "디자인");
-
   if (hasPlanning) score += 2500;
   if (hasDesign) score += 2000;
   if (hasPlanning && hasDesign) score += 1500;
@@ -169,19 +160,13 @@ function getThumb(project: any) {
   return project?.media?.poster || project?.image || "/images/projects/card.jpg";
 }
 
-function toInlineJson(value: any) {
-  return JSON.stringify(value).replace(/<\/script/gi, "<\\/script");
+// ✅ inline dataset 안전 인코딩
+function enc(v: any) {
+  return encodeURIComponent(String(v ?? ""));
 }
-
-const HOME_MODAL_ITEMS = homeProjects.map((p: any) => ({
-  title: displayTitle(p?.title),
-  src: getYoutubeUrl(p),
-  summary: String(p?.summary ?? ""),
-  year: String(p?.info?.year ?? ""),
-  role: String(p?.info?.role ?? ""),
-  category: String(p?.category ?? ""),
-  tags: Array.isArray(p?.tags) ? p.tags : [],
-}));
+function encJson(v: any) {
+  return encodeURIComponent(JSON.stringify(v ?? []));
+}
 ---
 
 <section id="works" class="py-16 md:py-24 bg-neutral-bg dark:bg-neutral-dark/60">
@@ -199,7 +184,6 @@ const HOME_MODAL_ITEMS = homeProjects.map((p: any) => ({
       {homeProjects.map((project, index) => {
         const youtubeUrl = getYoutubeUrl(project);
         const tags = Array.isArray(project?.tags) ? project.tags : [];
-        const title = displayTitle(project?.title);
         const thumb = getThumb(project);
 
         return (
@@ -211,13 +195,13 @@ const HOME_MODAL_ITEMS = homeProjects.map((p: any) => ({
             <div class="relative overflow-hidden aspect-video">
               <img
                 src={thumb}
-                alt={title}
+                alt={project.title}
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
             </div>
 
-            {/* ✅ 영상 보기 버튼: 이미지 바로 아래로 이동 */}
+            {/* ✅ 영상 보기 버튼: 이미지 바로 아래 */}
             <div class="px-6 pt-5">
               {youtubeUrl ? (
                 <button
@@ -225,7 +209,13 @@ const HOME_MODAL_ITEMS = homeProjects.map((p: any) => ({
                   class="w-full inline-flex items-center justify-center rounded-lg font-medium text-sm py-2.5 border border-primary text-primary hover:bg-primary/10 bg-transparent"
                   data-open-homework="true"
                   data-work-index={index}
-                  aria-label={`${title} 영상 보기`}
+                  data-src={enc(youtubeUrl)}
+                  data-title={enc(project.title)}
+                  data-summary={enc(project.summary)}
+                  data-year={enc(project.info?.year)}
+                  data-role={enc(project.info?.role)}
+                  data-category={enc(project.category)}
+                  data-tags={encJson(tags)}
                 >
                   영상 보기
                 </button>
@@ -238,10 +228,10 @@ const HOME_MODAL_ITEMS = homeProjects.map((p: any) => ({
 
             <div class="p-6 pt-4">
               <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
-                {title}
+                {project.title}
               </h3>
 
-              {/* ✅ summary: 글자수 제어 X / 2줄까지만 노출 + … */}
+              {/* ✅ summary: 2줄 clamp + … */}
               <p class="work-summary text-secondary/70 dark:text-white/70 mb-4">
                 {project.summary}
               </p>
@@ -272,7 +262,7 @@ const HOME_MODAL_ITEMS = homeProjects.map((p: any) => ({
     </div>
   </div>
 
-  <!-- ✅ 상세 모달 -->
+  {/* ✅ 모달 */}
   <div
     id="home-work-detail-modal"
     class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 p-3 md:p-6"
@@ -294,8 +284,7 @@ const HOME_MODAL_ITEMS = homeProjects.map((p: any) => ({
           <button
             id="home-modal-prev"
             type="button"
-            class="px-3 py-1 rounded-lg border border-white/10 text-white/80 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:hover:border-white/10"
-            aria-label="이전 작업"
+            class="px-3 py-1 rounded-lg border border-white/10 text-white/80 hover:text-white hover:border-white/20 disabled:opacity-30"
           >
             Prev
           </button>
@@ -307,8 +296,7 @@ const HOME_MODAL_ITEMS = homeProjects.map((p: any) => ({
           <button
             id="home-modal-next"
             type="button"
-            class="px-3 py-1 rounded-lg border border-white/10 text-white/80 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:hover:border-white/10"
-            aria-label="다음 작업"
+            class="px-3 py-1 rounded-lg border border-white/10 text-white/80 hover:text-white hover:border-white/20 disabled:opacity-30"
           >
             Next
           </button>
@@ -317,7 +305,6 @@ const HOME_MODAL_ITEMS = homeProjects.map((p: any) => ({
             id="home-modal-close"
             type="button"
             class="ml-1 text-white/80 hover:text-white px-3 py-1 rounded-lg border border-white/10 hover:border-white/20"
-            aria-label="Close modal"
           >
             Close
           </button>
@@ -361,238 +348,193 @@ const HOME_MODAL_ITEMS = homeProjects.map((p: any) => ({
   </div>
 
   <style is:inline>
-    {`
-      /* ✅ summary: 80% + 2줄 제한 + 말줄임표 */
-      .work-summary{
-        font-size:0.8em;
-        display:-webkit-box;
-        -webkit-line-clamp:2;
-        -webkit-box-orient:vertical;
-        overflow:hidden;
-      }
-    `}
+    .work-summary{
+      font-size:0.8em;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
   </style>
 
   <script is:inline>
-    {`
-      document.addEventListener("DOMContentLoaded", () => {
-        const HOME_WORKS = ${toInlineJson(HOME_MODAL_ITEMS)};
+    document.addEventListener("DOMContentLoaded", () => {
+      const modal = document.getElementById("home-work-detail-modal");
+      const closeBtn = document.getElementById("home-modal-close");
+      const replayBtn = document.getElementById("home-modal-replay");
+      const prevBtn = document.getElementById("home-modal-prev");
+      const nextBtn = document.getElementById("home-modal-next");
+      const counterEl = document.getElementById("home-modal-counter");
 
-        const modal = document.getElementById("home-work-detail-modal");
-        const closeBtn = document.getElementById("home-modal-close");
-        const replayBtn = document.getElementById("home-modal-replay");
-        const prevBtn = document.getElementById("home-modal-prev");
-        const nextBtn = document.getElementById("home-modal-next");
-        const counterEl = document.getElementById("home-modal-counter");
+      const titleEl = document.getElementById("home-modal-title");
+      const categoryEl = document.getElementById("home-modal-category");
+      const yearEl = document.getElementById("home-modal-year");
+      const roleEl = document.getElementById("home-modal-role");
+      const summaryEl = document.getElementById("home-modal-summary");
+      const tagsEl = document.getElementById("home-modal-tags");
+      const playerHost = document.getElementById("home-modal-player");
 
-        const titleEl = document.getElementById("home-modal-title");
-        const categoryEl = document.getElementById("home-modal-category");
-        const yearEl = document.getElementById("home-modal-year");
-        const roleEl = document.getElementById("home-modal-role");
-        const summaryEl = document.getElementById("home-modal-summary");
-        const tagsEl = document.getElementById("home-modal-tags");
-        const playerEl = document.getElementById("home-modal-player");
+      if (!modal || !closeBtn || !replayBtn || !prevBtn || !nextBtn || !counterEl ||
+          !titleEl || !categoryEl || !yearEl || !roleEl || !summaryEl || !tagsEl || !playerHost) return;
 
-        if (!modal || !closeBtn || !replayBtn || !prevBtn || !nextBtn || !counterEl ||
-            !titleEl || !categoryEl || !yearEl || !roleEl || !summaryEl || !tagsEl || !playerEl) return;
+      const decode = (s) => {
+        try { return decodeURIComponent(s || ""); } catch { return String(s || ""); }
+      };
 
-        let currentIndex = 0;
-        let ytPlayer = null;
-        let ytApiReady = false;
-        let ytApiLoading = false;
+      const safeJson = (s) => {
+        try { return JSON.parse(decode(s || "[]")); } catch { return []; }
+      };
 
-        const getYoutubeId = (url = "") => {
-          const m =
-            url.match(/youtu\\.be\\/([a-zA-Z0-9_-]{6,})/) ||
-            url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
-            url.match(/\\/embed\\/([a-zA-Z0-9_-]{6,})/) ||
-            url.match(/\\/shorts\\/([a-zA-Z0-9_-]{6,})/);
-          return m ? m[1] : "";
-        };
+      const getYoutubeId = (url = "") => {
+        const m =
+          url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/\/shorts\/([a-zA-Z0-9_-]{6,})/);
+        return m ? m[1] : "";
+      };
 
-        const categoryLabel = (cat) => {
-          const c = String(cat || "").toLowerCase();
-          if (c === "agency") return "Category · Agency";
-          if (c === "digital-signage") return "Category · Digital Signage";
-          return cat ? \`Category · \${cat}\` : "Category · -";
-        };
+      const categoryLabel = (cat) => {
+        const c = String(cat || "").toLowerCase();
+        if (c === "agency") return "Category · Agency";
+        if (c === "digital-signage") return "Category · Digital Signage";
+        return cat ? `Category · ${cat}` : "Category · -";
+      };
 
-        const renderTags = (tags) => {
-          tagsEl.innerHTML = "";
-          const list = Array.isArray(tags) ? tags : [];
-          if (!list.length) {
-            const empty = document.createElement("span");
-            empty.className = "text-xs text-white/40";
-            empty.textContent = "태그 없음";
-            tagsEl.appendChild(empty);
-            return;
-          }
-          list.forEach((tag) => {
-            const chip = document.createElement("span");
-            chip.className = "px-3 py-1 text-xs font-mono rounded-full bg-white/10 text-white/80 border border-white/10";
-            chip.textContent = tag;
-            tagsEl.appendChild(chip);
-          });
-        };
-
-        const updateNavUI = () => {
-          const total = HOME_WORKS.length || 0;
-          counterEl.textContent = \`\${currentIndex + 1} / \${total}\`;
-          prevBtn.disabled = currentIndex <= 0;
-          nextBtn.disabled = currentIndex >= total - 1;
-        };
-
-        // ✅ YouTube IFrame API 로드
-        const ensureYouTubeApi = () => {
-          return new Promise((resolve) => {
-            if (ytApiReady && window.YT && window.YT.Player) return resolve(true);
-            if (ytApiLoading) {
-              const t = setInterval(() => {
-                if (ytApiReady && window.YT && window.YT.Player) {
-                  clearInterval(t);
-                  resolve(true);
-                }
-              }, 50);
-              return;
-            }
-
-            ytApiLoading = true;
-            window.onYouTubeIframeAPIReady = () => {
-              ytApiReady = true;
-              resolve(true);
-            };
-
-            const s = document.createElement("script");
-            s.src = "https://www.youtube.com/iframe_api";
-            document.head.appendChild(s);
-          });
-        };
-
-        // ✅ 영상 마운트 (바로 재생 + HD 강제 시도)
-        const mountVideo = async (src, title) => {
-          playerEl.innerHTML = "";
-          ytPlayer = null;
-
-          if (!src) return;
-
-          const videoId = getYoutubeId(src);
-          if (!videoId) {
-            // fallback: 그냥 iframe
-            const iframe = document.createElement("iframe");
-            iframe.className = "w-full h-full";
-            iframe.src = src;
-            iframe.title = title || "Video";
-            iframe.loading = "lazy";
-            iframe.setAttribute("frameborder", "0");
-            iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
-            iframe.setAttribute("allowfullscreen", "true");
-            playerEl.appendChild(iframe);
-            return;
-          }
-
-          // YouTube API 방식
-          await ensureYouTubeApi();
-
-          // 컨테이너 div 생성
-          const holder = document.createElement("div");
-          holder.id = "home-yt-player";
-          holder.style.width = "100%";
-          holder.style.height = "100%";
-          playerEl.appendChild(holder);
-
-          ytPlayer = new window.YT.Player("home-yt-player", {
-            videoId,
-            playerVars: {
-              autoplay: 1,
-              controls: 1,
-              rel: 0,
-              playsinline: 1,
-              modestbranding: 1
-            },
-            events: {
-              onReady: (e) => {
-                try {
-                  // ✅ HD 강제 "시도" (환경에 따라 무시될 수 있음)
-                  e.target.setPlaybackQuality("hd1080");
-                  e.target.playVideo();
-                } catch (_) {}
-              }
-            }
-          });
-        };
-
-        const renderByIndex = async (idx) => {
-          const total = HOME_WORKS.length || 0;
-          if (!total) return;
-
-          currentIndex = Math.max(0, Math.min(total - 1, idx));
-          const item = HOME_WORKS[currentIndex];
-
-          titleEl.textContent = item?.title || "";
-          categoryEl.textContent = categoryLabel(item?.category);
-          yearEl.textContent = \`작업 연도 · \${item?.year || "-"}\`;
-          roleEl.textContent = \`역할 · \${item?.role || "-"}\`;
-          summaryEl.textContent = item?.summary || "";
-          renderTags(item?.tags || []);
-
-          updateNavUI();
-
-          // ✅ 모달 열릴 때 바로 재생
-          await mountVideo(item?.src || "", item?.title || "");
-        };
-
-        const openModalAt = async (idx) => {
-          await renderByIndex(idx);
-          modal.classList.remove("hidden");
-          modal.classList.add("flex");
-          modal.setAttribute("aria-hidden", "false");
-          document.body.style.overflow = "hidden";
-        };
-
-        const closeModal = () => {
-          modal.classList.add("hidden");
-          modal.classList.remove("flex");
-          modal.setAttribute("aria-hidden", "true");
-
-          // stop
-          try { if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo(); } catch(_) {}
-          ytPlayer = null;
-
-          playerEl.innerHTML = "";
-          tagsEl.innerHTML = "";
-          summaryEl.textContent = "";
-          document.body.style.overflow = "";
-        };
-
-        // ✅ 카드 "영상 보기" 버튼 → 모달 오픈(index 기반)
-        const buttons = document.querySelectorAll("button[data-open-homework='true']");
-        buttons.forEach((btn) => {
-          btn.addEventListener("click", () => {
-            const idxStr = btn.getAttribute("data-work-index");
-            const idx = Number(idxStr);
-            openModalAt(Number.isFinite(idx) ? idx : 0);
-          });
+      const renderTags = (tags) => {
+        tagsEl.innerHTML = "";
+        const list = Array.isArray(tags) ? tags : [];
+        if (!list.length) {
+          const empty = document.createElement("span");
+          empty.className = "text-xs text-white/40";
+          empty.textContent = "태그 없음";
+          tagsEl.appendChild(empty);
+          return;
+        }
+        list.forEach((tag) => {
+          const chip = document.createElement("span");
+          chip.className = "px-3 py-1 text-xs font-mono rounded-full bg-white/10 text-white/80 border border-white/10";
+          chip.textContent = tag;
+          tagsEl.appendChild(chip);
         });
+      };
 
-        prevBtn.addEventListener("click", () => renderByIndex(currentIndex - 1));
-        nextBtn.addEventListener("click", () => renderByIndex(currentIndex + 1));
-        replayBtn.addEventListener("click", () => renderByIndex(currentIndex));
+      // ✅ 버튼 목록을 기준으로 Prev/Next 구성 (JSON 주입 없이 가장 안전)
+      const buttons = Array.from(document.querySelectorAll("button[data-open-homework='true']"));
+      let currentIndex = 0;
 
-        closeBtn.addEventListener("click", closeModal);
-        modal.addEventListener("click", (e) => {
-          if (e.target === modal) closeModal();
-        });
+      const mountVideo = (src, title) => {
+        playerHost.innerHTML = "";
+        const id = getYoutubeId(src);
+        if (!id) return;
 
-        document.addEventListener("keydown", (e) => {
-          if (modal.classList.contains("hidden")) return;
+        // ✅ vq=hd1080 로 "HD 선호" 요청 + autoplay
+        const embed = `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1&vq=hd1080`;
 
-          if (e.key === "Escape") closeModal();
-          if (e.key === "ArrowLeft") renderByIndex(currentIndex - 1);
-          if (e.key === "ArrowRight") renderByIndex(currentIndex + 1);
-        });
+        const iframe = document.createElement("iframe");
+        iframe.className = "w-full h-full";
+        iframe.src = embed;
+        iframe.title = title || "YouTube video";
+        iframe.loading = "lazy";
+        iframe.setAttribute("frameborder", "0");
+        iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+        iframe.setAttribute("allowfullscreen", "true");
+        playerHost.appendChild(iframe);
 
-        updateNavUI();
+        // ✅ (가능하면) IFrame API로 hd1080 고정 시도
+        // - 유튜브가 무시할 수 있음. 그래도 시도는 함.
+        const tryLoadApi = () => {
+          if (window.__YT_API_LOADING__) return;
+          if (window.YT && window.YT.Player) return;
+
+          window.__YT_API_LOADING__ = true;
+          const s = document.createElement("script");
+          s.src = "https://www.youtube.com/iframe_api";
+          document.head.appendChild(s);
+        };
+        tryLoadApi();
+      };
+
+      const updateNav = () => {
+        const total = buttons.length || 0;
+        counterEl.textContent = `${currentIndex + 1} / ${total}`;
+        prevBtn.disabled = currentIndex <= 0;
+        nextBtn.disabled = currentIndex >= total - 1;
+      };
+
+      const renderByIndex = (idx) => {
+        const total = buttons.length || 0;
+        if (!total) return;
+
+        currentIndex = Math.max(0, Math.min(total - 1, idx));
+        const btn = buttons[currentIndex];
+
+        const src = decode(btn.dataset.src);
+        const title = decode(btn.dataset.title);
+        const summary = decode(btn.dataset.summary);
+        const year = decode(btn.dataset.year);
+        const role = decode(btn.dataset.role);
+        const category = decode(btn.dataset.category);
+        const tags = safeJson(btn.dataset.tags);
+
+        titleEl.textContent = title || "";
+        categoryEl.textContent = categoryLabel(category);
+        yearEl.textContent = `작업 연도 · ${year || "-"}`;
+        roleEl.textContent = `역할 · ${role || "-"}`;
+        summaryEl.textContent = summary || "";
+        renderTags(tags);
+
+        mountVideo(src, title);
+        updateNav();
+      };
+
+      const openModalAt = (idx) => {
+        renderByIndex(idx);
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      };
+
+      const closeModal = () => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        modal.setAttribute("aria-hidden", "true");
+        playerHost.innerHTML = "";
+        tagsEl.innerHTML = "";
+        summaryEl.textContent = "";
+        document.body.style.overflow = "";
+      };
+
+      // ✅ 이벤트 위임으로 “모달 안 뜸” 문제 방지
+      document.addEventListener("click", (e) => {
+        const t = e.target;
+        if (!(t instanceof Element)) return;
+
+        const btn = t.closest("button[data-open-homework='true']");
+        if (btn) {
+          e.preventDefault();
+          const idx = Number(btn.getAttribute("data-work-index") || "0");
+          openModalAt(Number.isFinite(idx) ? idx : 0);
+          return;
+        }
       });
-    `}
+
+      prevBtn.addEventListener("click", () => renderByIndex(currentIndex - 1));
+      nextBtn.addEventListener("click", () => renderByIndex(currentIndex + 1));
+      replayBtn.addEventListener("click", () => renderByIndex(currentIndex));
+
+      closeBtn.addEventListener("click", closeModal);
+      modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+      document.addEventListener("keydown", (e) => {
+        if (modal.classList.contains("hidden")) return;
+        if (e.key === "Escape") closeModal();
+        if (e.key === "ArrowLeft") renderByIndex(currentIndex - 1);
+        if (e.key === "ArrowRight") renderByIndex(currentIndex + 1);
+      });
+
+      updateNav();
+    });
   </script>
 </section>
