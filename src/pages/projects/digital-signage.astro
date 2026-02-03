@@ -1,17 +1,17 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import ProjectsPage from '../../components/pages/ProjectsPage.astro';
-import { buildGrid } from '../../data/works.js';
+import Layout from "../../layouts/Layout.astro";
+import ProjectsPage from "../../components/pages/ProjectsPage.astro";
+import { buildGrid } from "../../data/works.js";
 
-const lang = Astro.currentLocale ?? 'en';
-const prefix = lang === 'de' ? '/de' : '';
+const lang = Astro.currentLocale ?? "en";
+const prefix = lang === "de" ? "/de" : "";
 
 const topButtons = [
-  { text: 'Agency Outsourcing', href: `${prefix}/projects/agency`, variant: 'outline' },
-  { text: 'View all work', href: `${prefix}/projects`, variant: 'primary' },
+  { text: "Agency Outsourcing", href: `${prefix}/projects/agency`, variant: "outline" },
+  { text: "Digital Signage Content", href: `${prefix}/projects/digital-signage`, variant: "primary" },
 ];
 
-const projects = buildGrid({ category: 'digital-signage', targetCount: 30 });
+const projects = buildGrid({ category: "digital-signage", targetCount: 30 });
 ---
 
 <Layout title="Digital Signage Content" description="Digital signage works" lang={lang}>
@@ -21,5 +21,6 @@ const projects = buildGrid({ category: 'digital-signage', targetCount: 30 });
     subtitle="DID/매장 사이니지 환경에 최적화된 콘텐츠 작업들을 모아볼 수 있습니다."
     topButtons={topButtons}
     projects={projects}
+    category="digital-signage"
   />
 </Layout>
