@@ -1,7 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import ProjectsPage from "../../components/pages/ProjectsPage.astro";
-import { buildGrid } from "../../data/works.js";
+import { buildGrid, paginateWorks } from "../../data/works.js";
 
 const lang = Astro.currentLocale ?? "en";
 const prefix = lang === "de" ? "/de" : "";
@@ -11,8 +11,15 @@ const topButtons = [
   { text: "Digital Signage Content", href: `${prefix}/projects/digital-signage`, variant: "outline" },
 ];
 
-// ✅ agency 작업 개수만큼 자동 반환
-const projects = buildGrid({ category: "agency" });
+const pageParam = Astro.url.searchParams.get("page");
+const page = pageParam ? Number(pageParam) : 1;
+
+const perPage = 30;
+
+const allProjects = buildGrid({ category: "agency" });
+const { items, totalPages, currentPage } = paginateWorks(allProjects, page, perPage);
+
+const basePath = `${prefix}/projects/agency`;
 ---
 
 <Layout title="Agency Outsourcing" description="Agency Outsourcing works" lang={lang}>
@@ -21,7 +28,8 @@ const projects = buildGrid({ category: "agency" });
     title="Agency Outsourcing"
     subtitle="에이전시/스튜디오 협업용 작업들을 모아볼 수 있습니다."
     topButtons={topButtons}
-    projects={projects}
+    projects={items}
     category="agency"
+    pagination={{ basePath, currentPage, totalPages }}
   />
 </Layout>
