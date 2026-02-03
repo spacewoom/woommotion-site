@@ -19,29 +19,35 @@ const {
   rel,
 } = Astro.props;
 
-const computedRel = target === '_blank'
-  ? (rel ?? 'noopener noreferrer')
-  : rel;
+const computedRel =
+  target === '_blank' ? (rel ?? 'noopener noreferrer') : rel;
 
 const variants = {
-  // 기본 채움 버튼(필요 시 사용)
+  /**
+   * ✅ Light: 기존 유지(채움+흰 글씨)
+   * ✅ Dark : 밝은 채움 + 어두운 글씨 + luxurious border/shine
+   */
   primary:
+    // Light
     'bg-highlightBlue text-white hover:bg-highlightBlue/90 ' +
-    'dark:bg-primary dark:text-neutral-dark dark:hover:bg-primary/90',
+    // Dark (inverted filled)
+    'dark:bg-primary dark:text-neutral-dark dark:hover:bg-primary/95 ' +
+    // Dark border & shine (lux)
+    'dark:border dark:border-white/15 ' +
+    'dark:ring-1 dark:ring-white/10 ' +
+    'dark:shadow-[0_10px_30px_-18px_rgba(0,0,0,0.65)] ' +
+    'dark:hover:border-white/22 dark:hover:ring-white/14',
 
   secondary:
     'bg-secondary text-white hover:bg-secondary/90 ' +
     'dark:bg-secondary dark:text-white dark:hover:bg-secondary/90',
 
   /**
-   * ✅ 요구사항 핵심
-   * - Normal(라이트): 기존 유지 = 투명 + 테두리 + primary 텍스트
-   * - Night(다크): 밝은 채움(primary) + 어두운 텍스트(neutral-dark)
-   *   (배경과 확실히 분리되게)
+   * Outline는 라이트/다크 모두 선명하게
    */
   outline:
     'bg-transparent border border-primary text-primary hover:bg-primary/10 ' +
-    'dark:bg-primary dark:text-neutral-dark dark:border-transparent dark:hover:bg-primary/90',
+    'dark:border-primary dark:text-primary dark:hover:bg-primary/20',
 };
 
 const sizes = {
@@ -56,22 +62,29 @@ const sizes = {
   target={target}
   rel={computedRel}
   class:list={[
-    // base (공통)
-    'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-300 transform hover:scale-104 hover:shadow-button focus:outline-none focus:ring-2 focus:ring-primary/50 focus-visible:ring-2 focus-visible:ring-primary/50',
+    // base
+    'relative overflow-hidden inline-flex items-center justify-center rounded-lg font-medium transition-all duration-300 transform hover:scale-104 hover:shadow-button focus:outline-none focus:ring-2 focus:ring-primary/50 focus-visible:ring-2 focus-visible:ring-primary/50',
 
     // size
     sizes[size],
 
-    // ✅ className을 먼저 적용 (사용처에서 준 값이 있더라도)
+    // caller class first
     className,
 
-    // ✅ variant를 마지막에 적용해서 "최종 승리"하도록
+    // ✅ variant last (wins)
     variants[variant],
   ]}
   data-aos="fade-up"
 >
   {text}
   <slot />
+
+  <!-- ✅ Dark-mode only subtle top shine (lux) -->
+  <span
+    class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300
+           dark:opacity-100"
+    style="background: linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 28%, rgba(255,255,255,0) 60%);"
+  ></span>
 </a>
 
 <style>
