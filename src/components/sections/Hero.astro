@@ -48,14 +48,16 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
             </p>
           </div>
 
-          <div class="mt-7 w-full flex flex-col sm:flex-row gap-3 justify-center">
+          <!-- ✅ 모바일에서 버튼 2개가 좌/우 한 줄로 나오도록 수정 -->
+          <div class="mt-7 w-full flex flex-row sm:flex-row gap-2 sm:gap-3 justify-center">
             <a
               href="/projects"
-              class="inline-flex w-full sm:w-[220px] items-center justify-center rounded-lg font-medium text-base py-2 px-8
+              class="inline-flex w-1/2 sm:w-[220px] items-center justify-center rounded-lg font-medium
+                     text-sm sm:text-base py-2 px-3 sm:px-8
                      border border-[#003124] text-[#003124]
                      hover:bg-[#003124]/10 bg-transparent
                      dark:border-[#e4f5f0] dark:text-[#e4f5f0]
-                     dark:hover:bg-[#e4f5f0]/10"
+                     dark:hover:bg-[#e4f5f0]/10 whitespace-nowrap"
             >
               Works 보기
             </a>
@@ -64,11 +66,12 @@ const YT_EMBED = `https://www.youtube.com/embed/${BRAND_VIDEO_ID}?autoplay=1&mut
               href={KAKAO_DIRECT_CHAT}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex w-full sm:w-[220px] items-center justify-center rounded-lg font-medium text-base py-2 px-8
+              class="inline-flex w-1/2 sm:w-[220px] items-center justify-center rounded-lg font-medium
+                     text-sm sm:text-base py-2 px-3 sm:px-8
                      border border-[#003124] text-[#003124]
                      hover:bg-[#003124]/10 bg-transparent
                      dark:border-[#e4f5f0] dark:text-[#e4f5f0]
-                     dark:hover:bg-[#e4f5f0]/10"
+                     dark:hover:bg-[#e4f5f0]/10 whitespace-nowrap"
               aria-label="KakaoTalk 문의 (새 탭)"
             >
               KakaoTalk 문의
