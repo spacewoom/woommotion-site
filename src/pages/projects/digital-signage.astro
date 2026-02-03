@@ -11,7 +11,8 @@ const topButtons = [
   { text: "Digital Signage Content", href: `${prefix}/projects/digital-signage`, variant: "primary" },
 ];
 
-const projects = buildGrid({ category: "digital-signage", targetCount: 30 });
+// ✅ digital-signage 작업 개수만큼 자동 반환
+const projects = buildGrid({ category: "digital-signage" });
 ---
 
 <Layout title="Digital Signage Content" description="Digital signage works" lang={lang}>
