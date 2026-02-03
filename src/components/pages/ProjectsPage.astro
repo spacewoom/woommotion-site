@@ -13,11 +13,11 @@ function displayTitle(raw = "") {
   return String(raw ?? "").replace(/\s*\d{2}\s*$/u, "").trim();
 }
 
-/** ✅ 카드 summary: 공백 포함 90자 이내(말줄임표 포함) */
-function summary90(raw = "") {
-  const s = String(raw ?? "").replace(/\s+/g, " ").trim(); // 공백 정리(가독성)
-  if (s.length <= 90) return s;
-  return s.slice(0, 89) + "…"; // 총 90자
+/** ✅ 카드 summary: 공백 포함 65자 이내(말줄임표 포함) */
+function summary65(raw = "") {
+  const s = String(raw ?? "").replace(/\s+/g, " ").trim();
+  if (s.length <= 65) return s;
+  return s.slice(0, 64) + "…"; // 총 65자
 }
 
 /** ✅ 영상 링크/종류 추출 (works.js: media 우선, 없으면 info.youtubeUrl) */
@@ -96,6 +96,7 @@ const pageList =
           "/images/projects/card.jpg";
 
         const hasVideo = Boolean(src);
+        // ✅ 모달에 원문 summary를 안전하게 넘기기 위해 인코딩
         const summaryEncoded = encodeURIComponent(String(work?.summary ?? ""));
 
         return (
@@ -123,9 +124,8 @@ const pageList =
                 loading="lazy"
               />
 
-              <!-- Play Icon Overlay -->
               {hasVideo ? (
-                <div class="absolute inset-0 flex items-center justify-center">
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <span class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-black/50 backdrop-blur-sm border border-white/20">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white">
                       <path d="M8 5v14l11-7z"></path>
@@ -133,7 +133,7 @@ const pageList =
                   </span>
                 </div>
               ) : (
-                <div class="absolute inset-0 flex items-center justify-center">
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <span class="px-3 py-1 text-xs font-mono bg-black/55 text-white/90 rounded-full border border-white/10">
                     영상 링크 없음
                   </span>
@@ -147,9 +147,9 @@ const pageList =
                 {t}
               </h3>
 
-              <!-- ✅ 카드 summary: 90자 이내 + 폰트 85% + 3줄 클램프(보험) -->
+              <!-- ✅ 카드 summary: 65자 이내 + 폰트 85% + 3줄 클램프 -->
               <p class="work-summary text-secondary/70 dark:text-white/70 mb-4">
-                {summary90(work.summary)}
+                {summary65(work.summary)}
               </p>
 
               <!-- ✅ 정보 순서: 작업 연도 → 역할 -->
@@ -158,7 +158,7 @@ const pageList =
                 <li><span class="font-mono">역할</span> · {work.info?.role}</li>
               </ul>
 
-              <!-- ✅ 태그: 본문 영역에 배치 -->
+              <!-- ✅ 태그: 본문 영역 -->
               {tags.length ? (
                 <div class="flex flex-wrap gap-2">
                   {tags.map((tag) => (
@@ -258,56 +258,74 @@ const pageList =
 
   <!-- ✅ 카드 summary 스타일(85% + 3줄 클램프) -->
   <style is:inline>
-    {`
-      .work-summary{
-        font-size:0.85em;
-        display:-webkit-box;
-        -webkit-line-clamp:3;
-        -webkit-box-orient:vertical;
-        overflow:hidden;
-      }
-    `}
+    .work-summary{
+      font-size:0.85em;
+      display:-webkit-box;
+      -webkit-line-clamp:3;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
   </style>
 
-  <!-- ✅ Modal Script -->
+  <!-- ✅ Modal Script: 버튼에 직접 바인딩 + DOMContentLoaded로 확실히 실행 -->
   <script is:inline>
-    {`
-      (() => {
-        const modal = document.getElementById("work-video-modal");
-        const closeBtn = document.getElementById("work-video-close");
-        const titleEl = document.getElementById("work-video-title");
-        const summaryEl = document.getElementById("work-video-summary");
-        const player = document.getElementById("work-video-player");
+    document.addEventListener("DOMContentLoaded", () => {
+      const modal = document.getElementById("work-video-modal");
+      const closeBtn = document.getElementById("work-video-close");
+      const titleEl = document.getElementById("work-video-title");
+      const summaryEl = document.getElementById("work-video-summary");
+      const player = document.getElementById("work-video-player");
 
-        if (!modal || !closeBtn || !titleEl || !summaryEl || !player) return;
+      if (!modal || !closeBtn || !titleEl || !summaryEl || !player) return;
 
-        const getYoutubeId = (url = "") => {
-          const m =
-            url.match(/youtu\\.be\\/([a-zA-Z0-9_-]{6,})/) ||
-            url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
-            url.match(/\\/embed\\/([a-zA-Z0-9_-]{6,})/) ||
-            url.match(/\\/shorts\\/([a-zA-Z0-9_-]{6,})/);
-          return m ? m[1] : "";
-        };
+      const safeDecode = (s = "") => {
+        try { return decodeURIComponent(s); } catch { return String(s || ""); }
+      };
 
-        const safeDecode = (s = "") => {
-          try { return decodeURIComponent(s); } catch { return String(s || ""); }
-        };
+      const getYoutubeId = (url = "") => {
+        const m =
+          url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/\/shorts\/([a-zA-Z0-9_-]{6,})/);
+        return m ? m[1] : "";
+      };
 
-        const openModal = (kind, src, title, summaryEncoded) => {
-          titleEl.textContent = title || "";
-          summaryEl.textContent = safeDecode(summaryEncoded || "");
-          player.innerHTML = "";
+      const openModal = (kind, src, title, summaryEncoded) => {
+        titleEl.textContent = title || "";
+        summaryEl.textContent = safeDecode(summaryEncoded || "");
+        player.innerHTML = "";
 
-          if (kind === "youtube") {
-            const id = getYoutubeId(src);
-            const embed = id
-              ? \`https://www.youtube.com/embed/\${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1\`
-              : src;
+        if (kind === "youtube") {
+          const id = getYoutubeId(src);
+          const embed = id
+            ? `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1`
+            : src;
 
+          const iframe = document.createElement("iframe");
+          iframe.className = "w-full h-full";
+          iframe.src = embed;
+          iframe.title = title || "YouTube video";
+          iframe.loading = "lazy";
+          iframe.setAttribute("frameborder", "0");
+          iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+          iframe.setAttribute("allowfullscreen", "true");
+          player.appendChild(iframe);
+        } else if (kind === "file") {
+          const video = document.createElement("video");
+          video.className = "w-full h-full";
+          video.src = src;
+          video.controls = true;
+          video.autoplay = true;
+          video.playsInline = true;
+          player.appendChild(video);
+        } else {
+          // kind가 비어있어도 src가 유튜브면 유튜브로 취급
+          const id = getYoutubeId(src);
+          if (id) {
             const iframe = document.createElement("iframe");
             iframe.className = "w-full h-full";
-            iframe.src = embed;
+            iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1`;
             iframe.title = title || "YouTube video";
             iframe.loading = "lazy";
             iframe.setAttribute("frameborder", "0");
@@ -315,58 +333,47 @@ const pageList =
             iframe.setAttribute("allowfullscreen", "true");
             player.appendChild(iframe);
           }
+        }
 
-          if (kind === "file") {
-            const video = document.createElement("video");
-            video.className = "w-full h-full";
-            video.src = src;
-            video.controls = true;
-            video.autoplay = true;
-            video.playsInline = true;
-            player.appendChild(video);
-          }
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      };
 
-          modal.classList.remove("hidden");
-          modal.classList.add("flex");
-          modal.setAttribute("aria-hidden", "false");
-          document.body.style.overflow = "hidden";
-        };
+      const closeModal = () => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        modal.setAttribute("aria-hidden", "true");
+        player.innerHTML = "";
+        summaryEl.textContent = "";
+        document.body.style.overflow = "";
+      };
 
-        const closeModal = () => {
-          modal.classList.add("hidden");
-          modal.classList.remove("flex");
-          modal.setAttribute("aria-hidden", "true");
-          player.innerHTML = "";
-          summaryEl.textContent = "";
-          document.body.style.overflow = "";
-        };
-
-        // 썸네일 버튼 클릭 → 모달 오픈
-        document.addEventListener("click", (e) => {
-          const btn = e.target?.closest?.("[data-open-video='true']");
-          if (!btn) return;
-
+      // ✅ 버튼에 직접 바인딩(closest 의존 제거)
+      const buttons = document.querySelectorAll("button[data-open-video='true']");
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
           const kind = btn.getAttribute("data-video-kind") || "";
           const src = btn.getAttribute("data-video-src") || "";
           const title = btn.getAttribute("data-video-title") || "";
           const summaryEncoded = btn.getAttribute("data-video-summary") || "";
-
-          if (!kind || !src) return;
+          if (!src) return;
           openModal(kind, src, title, summaryEncoded);
         });
+      });
 
-        closeBtn.addEventListener("click", closeModal);
+      closeBtn.addEventListener("click", closeModal);
 
-        // 모달 바깥 클릭 닫기
-        modal.addEventListener("click", (e) => {
-          if (e.target === modal) closeModal();
-        });
+      // 모달 바깥 클릭 닫기
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
 
-        // ESC 닫기
-        document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
-        });
-      })();
-    `}
+      // ESC 닫기
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
+      });
+    });
   </script>
 </section>
