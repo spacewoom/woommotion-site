@@ -25,27 +25,28 @@ const computedRel = target === '_blank'
 
 const variants = {
   /**
-   * ✅ 항상 배경과 구분되게:
-   * - Light: highlightBlue(진한 톤)로 채움 + white 텍스트
-   * - Dark : primary(밝은 톤)로 채움 + dark 배경에 대비되는 텍스트
+   * ✅ Filled button (반전 전략)
+   * - Light: 진한 채움 + 흰 텍스트
+   * - Dark : 밝은 채움(primary) + 어두운 텍스트(배경과 확실히 분리)
    */
   primary:
     'bg-highlightBlue text-white hover:bg-highlightBlue/90 ' +
-    'dark:bg-primary dark:text-neutral-dark dark:hover:bg-primary/90',
+    'dark:bg-primary dark:text-neutral-dark dark:hover:bg-primary/90 ' +
+    'dark:shadow-[0_0_0_1px_rgba(255,255,255,0.12)]',
 
   /**
-   * secondary는 기존 의도를 최대한 유지하되, dark에서는 highlightBlue로 확실히 분리
+   * secondary: 라이트/다크 모두 무난하게 유지
    */
   secondary:
     'bg-secondary text-white hover:bg-secondary/90 ' +
-    'dark:bg-highlightBlue dark:text-white dark:hover:bg-highlightBlue/90',
+    'dark:bg-secondary dark:text-white dark:hover:bg-secondary/90',
 
   /**
-   * outline은 그대로 (배경과의 대비는 border/text로 확보)
+   * outline: 다크에서 hover 배경을 살짝 올려서 눌림감 확보
    */
   outline:
     'bg-transparent border border-primary text-primary hover:bg-primary/10 ' +
-    'dark:hover:bg-primary/15',
+    'dark:border-primary dark:text-primary dark:hover:bg-primary/20',
 };
 
 const sizes = {
