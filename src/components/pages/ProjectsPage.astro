@@ -1,210 +1,301 @@
 ---
-/** src/components/pages/ProjectsPage.astro */
-import Button from '../ui/Buttons.astro';
+import { works as allWorks } from "../../data/works.js";
 
 const {
-  title = 'Works',
-  subtitle = '',
-  topButtons = [],
-  projects = [],
+  lang = "en",
+  title = "Works",
+  subtitle = "흥미로운 연출, 명확한 정보 전달, 감각적인 모션으로 브랜드와 제품의 핵심 메시지를 설득력 있게 보여줍니다.",
+  topButtons,
+  projects,
+  category = "all",
 } = Astro.props;
+
+const isDe = lang === "de";
+const base = isDe ? "/de" : "";
+
+const hrefAll = `${base}/projects`;
+
+const defaultTopButtons = [
+  { text: "Agency Outsourcing", href: `${base}/projects/agency`, variant: "outline" },
+  { text: "Digital Signage Content", href: `${base}/projects/digital-signage`, variant: "outline" },
+];
+
+const buttons = topButtons ?? defaultTopButtons;
+
+// ✅ pages에서 projects를 넘겼으면 그걸 우선 사용
+// ✅ 혹시 projects가 없더라도 category로 필터링하여 렌더 가능
+const works =
+  projects ??
+  (category && category !== "all" ? allWorks.filter((w) => w.category === category) : allWorks);
+
+function getYoutubeId(url = "") {
+  const m =
+    url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
+    url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
+    url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
+  return m ? m[1] : "";
+}
+
+function getYoutubeThumb(url = "") {
+  const id = getYoutubeId(url);
+  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
+}
+
+function buttonClass(variant = "outline") {
+  const baseClass =
+    "inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-6 transition-colors";
+  if (variant === "primary") {
+    return `${baseClass} bg-primary text-white hover:bg-primary/90`;
+  }
+  return `${baseClass} border border-primary text-primary hover:bg-primary/10 bg-transparent`;
+}
 ---
 
-<section class="py-16 md:py-24 bg-neutral-bg dark:bg-neutral-dark/60">
+<section class="pt-28 pb-16 md:pt-36 md:pb-24 bg-neutral-bg dark:bg-neutral-dark/60">
   <div class="max-w-container mx-auto px-6">
 
-    <!-- 타이틀/서브타이틀 중앙 정렬 -->
-    <div class="mb-10 text-center flex flex-col items-center">
+    <!-- Title / Subtitle -->
+    <div class="mb-10 text-center flex flex-col items-center" data-aos="fade-up">
       <h1 class="font-heading text-h2 text-secondary dark:text-white mb-4">
         {title}
       </h1>
-
-      <!-- subtitle 영역: 반갈림 방지 + 한 줄 유지 옵션 -->
-      <p class="text-body text-secondary/70 dark:text-white/70 max-w-6xl mx-auto lg:whitespace-nowrap">
+      <p class="text-body text-secondary/70 dark:text-white/70 max-w-5xl mx-auto lg:whitespace-nowrap">
         {subtitle}
       </p>
     </div>
 
-    <!-- 상단 2개 버튼 -->
-    {topButtons?.length ? (
-      <div class="mb-10 flex flex-wrap justify-center gap-3">
-        {topButtons.map((b) => (
-          <Button text={b.text} href={b.href} variant={b.variant} />
-        ))}
-      </div>
-    ) : null}
+    <!-- Top Buttons -->
+    <div class="flex flex-col sm:flex-row gap-3 justify-center mb-12" data-aos="fade-up">
+      {buttons.map((b) => (
+        <a href={b.href} class={buttonClass(b.variant)}>
+          {b.text}
+        </a>
+      ))}
+    </div>
 
-    <!-- 카드 그리드 -->
+    <!-- Works Grid -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
-      {projects.map((project) => {
-        const safeTitle = project?.title ?? 'Work';
-        const tags = Array.isArray(project?.tags) ? project.tags : [];
-        const info = project?.info ?? {};
+      {works.map((work, index) => {
+        // ✅ media 우선, 없으면 info.youtubeUrl을 youtube로 처리(하위호환)
+        const kind = work.media?.kind || (work.info?.youtubeUrl ? "youtube" : "");
+        const src = work.media?.src || work.info?.youtubeUrl || "";
+        const playable = Boolean(kind && src);
 
-        const youtubeUrl = info?.youtubeUrl ?? '';
-        const canOpen = Boolean(youtubeUrl);
+        const thumb =
+          work.media?.poster ||
+          (kind === "youtube" ? getYoutubeThumb(src) : "") ||
+          work.image ||
+          "/images/projects/card.jpg";
 
-        return (
-          <div class="md:col-span-4 group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-            <div class="relative overflow-hidden aspect-video">
-              <button
-                type="button"
-                class={`w-full h-full text-left ${canOpen ? 'cursor-pointer' : 'cursor-default'}`}
-                data-work-open={canOpen ? '' : undefined}
-                data-youtube={youtubeUrl}
-                data-title={safeTitle}
-                aria-label={canOpen ? `${safeTitle} 재생` : safeTitle}
-              >
-                <img
-                  src={project?.image ?? '/images/projects/card.jpg'}
-                  alt={safeTitle}
-                  class={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${canOpen ? '' : 'opacity-70'}`}
-                  loading="lazy"
-                />
-              </button>
+        const MediaEl = playable ? (
+          <button
+            type="button"
+            class="relative w-full overflow-hidden aspect-video text-left"
+            data-open-video
+            data-video-kind={kind}
+            data-video-src={src}
+            data-video-title={work.title}
+          >
+            <img
+              src={thumb}
+              alt={work.title}
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
 
-              <div class="absolute top-4 left-4 flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+            <!-- Tags -->
+            <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+              {work.tags?.map((tag) => (
+                <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
+                  {tag}
+                </span>
+              ))}
             </div>
 
-            <div class="p-6">
-              <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
-                {safeTitle}
-              </h3>
+            <!-- Play Icon Overlay (playable only) -->
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-black/50 backdrop-blur-sm border border-white/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white">
+                  <path d="M8 5v14l11-7z"></path>
+                </svg>
+              </span>
+            </div>
+          </button>
+        ) : (
+          <div class="relative w-full overflow-hidden aspect-video text-left">
+            <img
+              src={thumb}
+              alt={work.title}
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
 
-              <p class="text-secondary/70 dark:text-white/70 mb-4">
-                {project?.summary ?? ''}
-              </p>
+            <!-- Tags -->
+            <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+              {work.tags?.map((tag) => (
+                <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
+                  {tag}
+                </span>
+              ))}
+            </div>
 
-              <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1 mb-6">
-                <li><span class="font-mono">작업연도</span> · {info?.year ?? '-'}</li>
-                <li><span class="font-mono">러닝타임</span> · {info?.duration ?? '-'}</li>
-                <li><span class="font-mono">역할</span> · {info?.role ?? '-'}</li>
-              </ul>
-
-              {youtubeUrl ? (
-                <Button
-                  text="YouTube에서 보기"
-                  href={youtubeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  variant="outline"
-                  size="sm"
-                />
-              ) : (
-                <span class="text-sm text-secondary/50 dark:text-white/50">영상 링크 준비중</span>
-              )}
+            <!-- Coming soon badge -->
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="px-4 py-2 rounded-full bg-black/50 text-white/90 text-sm border border-white/20">
+                Coming soon
+              </span>
             </div>
           </div>
         );
+
+        return (
+          <article
+            class="md:col-span-4 group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+            data-aos="fade-up"
+            data-aos-delay={index * 40}
+          >
+            {MediaEl}
+
+            <div class="p-6">
+              <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
+                {work.title}
+              </h3>
+
+              <p class="text-secondary/70 dark:text-white/70 mb-4">
+                {work.summary}
+              </p>
+
+              <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1">
+                <li><span class="font-mono">작업연도</span> · {work.info?.year}</li>
+                <li><span class="font-mono">러닝타임</span> · {work.info?.duration}</li>
+                <li><span class="font-mono">역할</span> · {work.info?.role}</li>
+              </ul>
+            </div>
+          </article>
+        );
       })}
     </div>
+
+    <!-- Back to all (category page only) -->
+    {category && category !== "all" ? (
+      <div class="mt-12 text-center" data-aos="fade-up">
+        <a href={hrefAll} class={buttonClass("outline")}>
+          View all work
+        </a>
+      </div>
+    ) : null}
   </div>
 
-  <!-- Modal -->
+  <!-- Video Modal -->
   <div
-    id="workModal"
-    class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/70 p-4"
+    id="work-video-modal"
+    class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 p-4"
     aria-hidden="true"
   >
-    <div class="w-full max-w-5xl bg-white dark:bg-neutral-dark rounded-2xl overflow-hidden shadow-2xl">
-      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-        <p id="workModalTitle" class="font-heading text-secondary dark:text-white">
-          Work
-        </p>
+    <div class="w-full max-w-4xl bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+      <div class="flex items-center justify-between px-4 py-3 bg-black/60">
+        <p id="work-video-title" class="text-sm md:text-base text-white/90 truncate pr-3"></p>
         <button
-          id="workModalClose"
+          id="work-video-close"
           type="button"
-          class="px-3 py-1 rounded-lg text-secondary/70 dark:text-white/70 hover:text-primary"
-          aria-label="닫기"
+          class="text-white/80 hover:text-white px-3 py-1 rounded-lg border border-white/10 hover:border-white/20"
+          aria-label="Close video modal"
         >
-          ✕
+          Close
         </button>
       </div>
 
-      <div class="bg-black">
-        <div class="aspect-video w-full">
-          <iframe
-            id="workModalFrame"
-            class="w-full h-full"
-            src=""
-            title="Work video"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          />
-        </div>
+      <div class="relative w-full bg-black" style="padding-top:56.25%;">
+        <div id="work-video-player" class="absolute inset-0"></div>
       </div>
     </div>
   </div>
 
   <script is:inline>
-    function toYouTubeEmbed(url) {
-      if (!url) return '';
-      try {
-        const u = new URL(url);
-        if (u.hostname.includes('youtu.be')) {
-          const id = u.pathname.replace('/', '');
-          return id ? `https://www.youtube.com/embed/${id}?autoplay=1&rel=0` : '';
+    (() => {
+      const modal = document.getElementById("work-video-modal");
+      const closeBtn = document.getElementById("work-video-close");
+      const titleEl = document.getElementById("work-video-title");
+      const player = document.getElementById("work-video-player");
+
+      if (!modal || !closeBtn || !titleEl || !player) return;
+
+      const getYoutubeId = (url = "") => {
+        const m =
+          url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
+          url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/);
+        return m ? m[1] : "";
+      };
+
+      const openModal = (kind, src, title) => {
+        titleEl.textContent = title || "";
+        player.innerHTML = "";
+
+        if (kind === "youtube") {
+          const id = getYoutubeId(src);
+          const embed = id
+            ? `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1`
+            : src;
+
+          const iframe = document.createElement("iframe");
+          iframe.className = "w-full h-full";
+          iframe.src = embed;
+          iframe.title = title || "YouTube video";
+          iframe.loading = "lazy";
+          iframe.setAttribute("frameborder", "0");
+          iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+          iframe.setAttribute("allowfullscreen", "true");
+          player.appendChild(iframe);
         }
-        const v = u.searchParams.get('v');
-        if (v) return `https://www.youtube.com/embed/${v}?autoplay=1&rel=0`;
-        if (u.pathname.includes('/embed/')) {
-          return `${u.origin}${u.pathname}?autoplay=1&rel=0`;
+
+        if (kind === "file") {
+          const video = document.createElement("video");
+          video.className = "w-full h-full";
+          video.src = src;
+          video.controls = true;
+          video.autoplay = true;
+          video.playsInline = true;
+          player.appendChild(video);
         }
-      } catch (e) {}
-      return '';
-    }
 
-    function initWorkModal() {
-      const modal = document.getElementById('workModal');
-      const frame = document.getElementById('workModalFrame');
-      const titleEl = document.getElementById('workModalTitle');
-      const closeBtn = document.getElementById('workModalClose');
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      };
 
-      if (!modal || !frame || !titleEl || !closeBtn) return;
+      const closeModal = () => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        modal.setAttribute("aria-hidden", "true");
+        player.innerHTML = "";
+        document.body.style.overflow = "";
+      };
 
-      function openModal(youtubeUrl, title) {
-        const embed = toYouTubeEmbed(youtubeUrl);
-        if (!embed) return;
-        titleEl.textContent = title || 'Work';
-        frame.src = embed;
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        modal.setAttribute('aria-hidden', 'false');
-      }
+      document.addEventListener("click", (e) => {
+        const btn = e.target?.closest?.("[data-open-video]");
+        if (!btn) return;
 
-      function closeModal() {
-        frame.src = '';
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-        modal.setAttribute('aria-hidden', 'true');
-      }
+        const kind = btn.getAttribute("data-video-kind");
+        const src = btn.getAttribute("data-video-src");
+        const title = btn.getAttribute("data-video-title");
 
-      document.querySelectorAll('[data-work-open]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const youtubeUrl = btn.getAttribute('data-youtube');
-          const title = btn.getAttribute('data-title');
-          openModal(youtubeUrl, title);
-        });
+        if (!kind || !src) return;
+        openModal(kind, src, title);
       });
 
-      closeBtn.addEventListener('click', closeModal);
+      closeBtn.addEventListener("click", closeModal);
 
-      modal.addEventListener('click', (e) => {
+      // click outside modal content
+      modal.addEventListener("click", (e) => {
         if (e.target === modal) closeModal();
       });
 
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeModal();
+      // ESC close
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
       });
-    }
-
-    document.addEventListener('DOMContentLoaded', initWorkModal);
-    document.addEventListener('astro:page-load', initWorkModal);
+    })();
   </script>
 </section>
