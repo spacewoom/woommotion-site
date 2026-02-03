@@ -42,12 +42,12 @@ function roleIncludes(work: any, keyword: string) {
   return safeLower(work?.info?.role).includes(keyword.toLowerCase());
 }
 
-// ✅ 타이틀 끝의 2자리 숫자 제거 (예: 메뉴보드 01 → 메뉴보드)
+// ✅ 타이틀 끝의 2자리 숫자 제거
 function displayTitle(raw: any) {
   return String(raw ?? "").replace(/\s*\d{2}\s*$/u, "").trim();
 }
 
-// "업로드 최신" 기준: works 배열에서 뒤쪽일수록 최신 업로드라고 가정
+// 업로드 최신(works 배열 뒤쪽일수록 최신 업로드 가정)
 const indexBySlug = new Map(
   (Array.isArray(allWorks) ? allWorks : []).map((w: any, i: number) => [
     w?.slug ?? `__idx_${i}`,
@@ -62,25 +62,15 @@ function getUploadIndex(work: any) {
 // -----------------------------
 // Weighted scoring (NO random)
 // -----------------------------
-/**
- * 점수 설계 원칙:
- * 1) 최신 연도는 기본적으로 유리하게
- * 2) 선호 타입(제품홍보/인포그래픽/POP)은 가점
- * 3) role에 "기획", "디자인"이 포함되면 추가 가점
- * 4) 같은 점수면 업로드 최신이 우선
- */
 function computeScore(work: any) {
   const year = parseYear(work?.info?.year);
   const upload = getUploadIndex(work);
 
-  // 기본 점수: 최신 연도에 크게 가중, 업로드 최신으로 미세 정렬
   let score = year * 10000 + upload;
 
-  // 카테고리 기본 가점
   if (work?.category === "agency") score += 2000;
   if (work?.category === "digital-signage") score += 1500;
 
-  // role 기반 가점
   const hasPlanning = roleIncludes(work, "기획");
   const hasDesign = roleIncludes(work, "디자인");
 
@@ -88,11 +78,9 @@ function computeScore(work: any) {
   if (hasDesign) score += 2000;
   if (hasPlanning && hasDesign) score += 1500;
 
-  // 핵심 선호 타입 가점
   const isAgency = work?.category === "agency";
   const isSignage = work?.category === "digital-signage";
 
-  // agency 제품홍보
   const isProductPromo =
     isAgency &&
     (hasTag(work, "Product Promo") ||
@@ -100,23 +88,19 @@ function computeScore(work: any) {
       titleIncludes(work, "제품홍보"));
   if (isProductPromo) score += 7000;
 
-  // agency 인포그래픽
   const isInfographic =
     isAgency && (hasTag(work, "Infographic") || titleIncludes(work, "인포그래픽"));
   if (isInfographic) score += 6500;
 
-  // digital-signage POP
   const isPop =
     isSignage && (titleIncludes(work, "pop") || hasTag(work, "POP"));
   if (isPop) score += 6000;
 
-  // 대표성이 큰 포맷 약 가점
   if (hasTag(work, "Full Banner") || titleIncludes(work, "full banner")) score += 1200;
   if (hasTag(work, "Menu Board") || titleIncludes(work, "메뉴보드")) score += 900;
   if (hasTag(work, "Campaign") || titleIncludes(work, "캠페인")) score += 700;
   if (hasTag(work, "Event") || titleIncludes(work, "행사")) score += 600;
 
-  // 유튜브 링크 존재 가점(홈 버튼 UX 안정)
   const hasYoutube =
     (work?.media?.kind === "youtube" && !!work?.media?.src) || !!work?.info?.youtubeUrl;
   if (hasYoutube) score += 300;
@@ -124,11 +108,6 @@ function computeScore(work: any) {
   return score;
 }
 
-/**
- * ✅ 상위 N개 선택
- * - score desc → year desc → uploadIndex desc
- * - 다양성: 같은 category 최대 2개까지 허용
- */
 function pickTopWorksWeighted(count = 3) {
   const list = Array.isArray(allWorks) ? allWorks : [];
 
@@ -157,8 +136,6 @@ function pickTopWorksWeighted(count = 3) {
 
     const cat = String(w.category || "unknown");
     const current = categoryCount.get(cat) ?? 0;
-
-    // category 최대 2개 제한
     if (current >= 2) continue;
 
     usedSlug.add(w.slug);
@@ -166,7 +143,6 @@ function pickTopWorksWeighted(count = 3) {
     picked.push(w);
   }
 
-  // 제한 때문에 못 채우면 제한 없이 추가
   if (picked.length < count) {
     for (const item of ranked) {
       if (picked.length >= count) break;
@@ -181,20 +157,31 @@ function pickTopWorksWeighted(count = 3) {
   return picked.slice(0, count);
 }
 
-// ✅ 홈 노출 3개
 const homeProjects = pickTopWorksWeighted(3);
 
-// ✅ YouTube 링크 추출(works.js 구조: media.src 우선, info.youtubeUrl 호환)
 function getYoutubeUrl(project: any) {
   if (project?.media?.kind === "youtube" && project?.media?.src) return project.media.src;
   if (project?.info?.youtubeUrl) return project.info.youtubeUrl;
   return "";
 }
 
-// ✅ 썸네일 이미지 추출(works.js 구조 호환)
 function getThumb(project: any) {
   return project?.media?.poster || project?.image || "/images/projects/card.jpg";
 }
+
+function toInlineJson(value: any) {
+  return JSON.stringify(value).replace(/<\/script/gi, "<\\/script");
+}
+
+const HOME_MODAL_ITEMS = homeProjects.map((p: any) => ({
+  title: displayTitle(p?.title),
+  src: getYoutubeUrl(p),
+  summary: String(p?.summary ?? ""),
+  year: String(p?.info?.year ?? ""),
+  role: String(p?.info?.role ?? ""),
+  category: String(p?.category ?? ""),
+  tags: Array.isArray(p?.tags) ? p.tags : [],
+}));
 ---
 
 <section id="works" class="py-16 md:py-24 bg-neutral-bg dark:bg-neutral-dark/60">
@@ -215,13 +202,6 @@ function getThumb(project: any) {
         const title = displayTitle(project?.title);
         const thumb = getThumb(project);
 
-        // ✅ 모달 전달용(안전하게 인코딩)
-        const summaryEncoded = encodeURIComponent(String(project?.summary ?? ""));
-        const roleEncoded = encodeURIComponent(String(project?.info?.role ?? ""));
-        const yearEncoded = encodeURIComponent(String(project?.info?.year ?? ""));
-        const categoryEncoded = encodeURIComponent(String(project?.category ?? ""));
-        const tagsEncoded = encodeURIComponent(JSON.stringify(tags));
-
         return (
           <article
             class="md:col-span-4 group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
@@ -235,15 +215,33 @@ function getThumb(project: any) {
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
-              {/* ✅ 태그 오버레이 제거 */}
             </div>
 
-            <div class="p-6">
+            {/* ✅ 영상 보기 버튼: 이미지 바로 아래로 이동 */}
+            <div class="px-6 pt-5">
+              {youtubeUrl ? (
+                <button
+                  type="button"
+                  class="w-full inline-flex items-center justify-center rounded-lg font-medium text-sm py-2.5 border border-primary text-primary hover:bg-primary/10 bg-transparent"
+                  data-open-homework="true"
+                  data-work-index={index}
+                  aria-label={`${title} 영상 보기`}
+                >
+                  영상 보기
+                </button>
+              ) : (
+                <span class="w-full inline-flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-secondary/60 dark:text-white/50 py-2.5 text-sm">
+                  영상 링크 준비중
+                </span>
+              )}
+            </div>
+
+            <div class="p-6 pt-4">
               <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
                 {title}
               </h3>
 
-              {/* ✅ summary: 80% */}
+              {/* ✅ summary: 글자수 제어 X / 2줄까지만 노출 + … */}
               <p class="work-summary text-secondary/70 dark:text-white/70 mb-4">
                 {project.summary}
               </p>
@@ -255,40 +253,14 @@ function getThumb(project: any) {
               </ul>
 
               {tags.length > 0 ? (
-                <div class="flex flex-wrap gap-2 mb-6">
+                <div class="flex flex-wrap gap-2">
                   {tags.map((tag) => (
                     <span class="px-3 py-1 text-xs font-mono bg-gray-100 dark:bg-white/10 text-secondary dark:text-white/80 rounded-full">
                       {tag}
                     </span>
                   ))}
                 </div>
-              ) : (
-                <div class="mb-6" />
-              )}
-
-              {youtubeUrl ? (
-                // ✅ 버튼: "영상 보기" → 페이지 내 모달 오픈
-                <button
-                  type="button"
-                  class="inline-flex items-center justify-center rounded-lg font-medium text-sm py-2 px-4 border border-primary text-primary hover:bg-primary/10 bg-transparent"
-                  data-open-homework="true"
-                  data-video-kind="youtube"
-                  data-video-src={youtubeUrl}
-                  data-video-title={title}
-                  data-video-summary={summaryEncoded}
-                  data-video-role={roleEncoded}
-                  data-video-year={yearEncoded}
-                  data-video-category={categoryEncoded}
-                  data-video-tags={tagsEncoded}
-                  aria-label={`${title} 영상 보기`}
-                >
-                  영상 보기
-                </button>
-              ) : (
-                <span class="inline-flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-secondary/60 dark:text-white/50 px-4 py-2 text-sm">
-                  영상 링크 준비중
-                </span>
-              )}
+              ) : null}
             </div>
           </article>
         );
@@ -300,7 +272,7 @@ function getThumb(project: any) {
     </div>
   </div>
 
-  <!-- ✅ 상세 모달(ProjectsPage.astro 레이아웃 동일 컨셉: 좌 영상 크게 / 우 상세정보) -->
+  <!-- ✅ 상세 모달 -->
   <div
     id="home-work-detail-modal"
     class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 p-3 md:p-6"
@@ -310,6 +282,7 @@ function getThumb(project: any) {
       <div class="flex items-start justify-between gap-3 px-4 py-3 bg-black/70 border-b border-white/10">
         <div class="min-w-0">
           <p id="home-modal-title" class="text-sm md:text-base text-white/95 font-medium truncate"></p>
+
           <div class="mt-1 flex flex-wrap gap-2 items-center">
             <span id="home-modal-category" class="text-[11px] md:text-xs font-mono px-2 py-1 rounded-full bg-white/10 text-white/80 border border-white/10"></span>
             <span id="home-modal-year" class="text-[11px] md:text-xs font-mono px-2 py-1 rounded-full bg-white/10 text-white/80 border border-white/10"></span>
@@ -317,25 +290,47 @@ function getThumb(project: any) {
           </div>
         </div>
 
-        <button
-          id="home-modal-close"
-          type="button"
-          class="shrink-0 text-white/80 hover:text-white px-3 py-1 rounded-lg border border-white/10 hover:border-white/20"
-          aria-label="Close modal"
-        >
-          Close
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            id="home-modal-prev"
+            type="button"
+            class="px-3 py-1 rounded-lg border border-white/10 text-white/80 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:hover:border-white/10"
+            aria-label="이전 작업"
+          >
+            Prev
+          </button>
+
+          <span id="home-modal-counter" class="text-[11px] md:text-xs font-mono text-white/60 px-2">
+            1 / 3
+          </span>
+
+          <button
+            id="home-modal-next"
+            type="button"
+            class="px-3 py-1 rounded-lg border border-white/10 text-white/80 hover:text-white hover:border-white/20 disabled:opacity-30 disabled:hover:border-white/10"
+            aria-label="다음 작업"
+          >
+            Next
+          </button>
+
+          <button
+            id="home-modal-close"
+            type="button"
+            class="ml-1 text-white/80 hover:text-white px-3 py-1 rounded-lg border border-white/10 hover:border-white/20"
+            aria-label="Close modal"
+          >
+            Close
+          </button>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-6">
-        <!-- ✅ 영상 영역(크게) -->
         <div class="lg:col-span-4 bg-black">
           <div class="relative w-full" style="padding-top:56.25%;">
             <div id="home-modal-player" class="absolute inset-0"></div>
           </div>
         </div>
 
-        <!-- ✅ 우측 상세 -->
         <div class="lg:col-span-2 bg-black/60 border-t lg:border-t-0 lg:border-l border-white/10 overflow-auto max-h-[92vh]">
           <div class="p-4 md:p-5">
             <h4 class="text-white/90 text-sm md:text-base font-medium mb-2">작업 설명</h4>
@@ -357,7 +352,7 @@ function getThumb(project: any) {
             </div>
 
             <p class="mt-3 text-[11px] text-white/40">
-              * ESC로 닫기 / 바깥 영역 클릭으로 닫기
+              * ESC로 닫기 / 바깥 영역 클릭으로 닫기 / ← → 로 이전·다음
             </p>
           </div>
         </div>
@@ -367,17 +362,28 @@ function getThumb(project: any) {
 
   <style is:inline>
     {`
-      /* ✅ summary: 80% */
-      .work-summary{ font-size: 0.8em; }
+      /* ✅ summary: 80% + 2줄 제한 + 말줄임표 */
+      .work-summary{
+        font-size:0.8em;
+        display:-webkit-box;
+        -webkit-line-clamp:2;
+        -webkit-box-orient:vertical;
+        overflow:hidden;
+      }
     `}
   </style>
 
   <script is:inline>
     {`
       document.addEventListener("DOMContentLoaded", () => {
+        const HOME_WORKS = ${toInlineJson(HOME_MODAL_ITEMS)};
+
         const modal = document.getElementById("home-work-detail-modal");
         const closeBtn = document.getElementById("home-modal-close");
         const replayBtn = document.getElementById("home-modal-replay");
+        const prevBtn = document.getElementById("home-modal-prev");
+        const nextBtn = document.getElementById("home-modal-next");
+        const counterEl = document.getElementById("home-modal-counter");
 
         const titleEl = document.getElementById("home-modal-title");
         const categoryEl = document.getElementById("home-modal-category");
@@ -385,19 +391,15 @@ function getThumb(project: any) {
         const roleEl = document.getElementById("home-modal-role");
         const summaryEl = document.getElementById("home-modal-summary");
         const tagsEl = document.getElementById("home-modal-tags");
-        const player = document.getElementById("home-modal-player");
+        const playerEl = document.getElementById("home-modal-player");
 
-        if (!modal || !closeBtn || !replayBtn || !titleEl || !categoryEl || !yearEl || !roleEl || !summaryEl || !tagsEl || !player) return;
+        if (!modal || !closeBtn || !replayBtn || !prevBtn || !nextBtn || !counterEl ||
+            !titleEl || !categoryEl || !yearEl || !roleEl || !summaryEl || !tagsEl || !playerEl) return;
 
-        let lastVideo = { src: "", title: "" };
-
-        const safeDecode = (s = "") => {
-          try { return decodeURIComponent(s); } catch { return String(s || ""); }
-        };
-
-        const safeJson = (s = "[]") => {
-          try { return JSON.parse(s); } catch { return []; }
-        };
+        let currentIndex = 0;
+        let ytPlayer = null;
+        let ytApiReady = false;
+        let ytApiLoading = false;
 
         const getYoutubeId = (url = "") => {
           const m =
@@ -433,38 +435,114 @@ function getThumb(project: any) {
           });
         };
 
-        const mountVideo = (src, title) => {
-          player.innerHTML = "";
-          if (!src) return;
-
-          const id = getYoutubeId(src);
-          const embed = id
-            ? \`https://www.youtube.com/embed/\${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1\`
-            : src;
-
-          const iframe = document.createElement("iframe");
-          iframe.className = "w-full h-full";
-          iframe.src = embed;
-          iframe.title = title || "YouTube video";
-          iframe.loading = "lazy";
-          iframe.setAttribute("frameborder", "0");
-          iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
-          iframe.setAttribute("allowfullscreen", "true");
-          player.appendChild(iframe);
+        const updateNavUI = () => {
+          const total = HOME_WORKS.length || 0;
+          counterEl.textContent = \`\${currentIndex + 1} / \${total}\`;
+          prevBtn.disabled = currentIndex <= 0;
+          nextBtn.disabled = currentIndex >= total - 1;
         };
 
-        const openModal = ({ src, title, summary, year, role, category, tags }) => {
-          lastVideo = { src, title };
+        // ✅ YouTube IFrame API 로드
+        const ensureYouTubeApi = () => {
+          return new Promise((resolve) => {
+            if (ytApiReady && window.YT && window.YT.Player) return resolve(true);
+            if (ytApiLoading) {
+              const t = setInterval(() => {
+                if (ytApiReady && window.YT && window.YT.Player) {
+                  clearInterval(t);
+                  resolve(true);
+                }
+              }, 50);
+              return;
+            }
 
-          titleEl.textContent = title || "";
-          categoryEl.textContent = categoryLabel(category);
-          yearEl.textContent = \`작업 연도 · \${year || "-"}\`;
-          roleEl.textContent = \`역할 · \${role || "-"}\`;
-          summaryEl.textContent = summary || "";
-          renderTags(tags);
+            ytApiLoading = true;
+            window.onYouTubeIframeAPIReady = () => {
+              ytApiReady = true;
+              resolve(true);
+            };
 
-          mountVideo(src, title);
+            const s = document.createElement("script");
+            s.src = "https://www.youtube.com/iframe_api";
+            document.head.appendChild(s);
+          });
+        };
 
+        // ✅ 영상 마운트 (바로 재생 + HD 강제 시도)
+        const mountVideo = async (src, title) => {
+          playerEl.innerHTML = "";
+          ytPlayer = null;
+
+          if (!src) return;
+
+          const videoId = getYoutubeId(src);
+          if (!videoId) {
+            // fallback: 그냥 iframe
+            const iframe = document.createElement("iframe");
+            iframe.className = "w-full h-full";
+            iframe.src = src;
+            iframe.title = title || "Video";
+            iframe.loading = "lazy";
+            iframe.setAttribute("frameborder", "0");
+            iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+            iframe.setAttribute("allowfullscreen", "true");
+            playerEl.appendChild(iframe);
+            return;
+          }
+
+          // YouTube API 방식
+          await ensureYouTubeApi();
+
+          // 컨테이너 div 생성
+          const holder = document.createElement("div");
+          holder.id = "home-yt-player";
+          holder.style.width = "100%";
+          holder.style.height = "100%";
+          playerEl.appendChild(holder);
+
+          ytPlayer = new window.YT.Player("home-yt-player", {
+            videoId,
+            playerVars: {
+              autoplay: 1,
+              controls: 1,
+              rel: 0,
+              playsinline: 1,
+              modestbranding: 1
+            },
+            events: {
+              onReady: (e) => {
+                try {
+                  // ✅ HD 강제 "시도" (환경에 따라 무시될 수 있음)
+                  e.target.setPlaybackQuality("hd1080");
+                  e.target.playVideo();
+                } catch (_) {}
+              }
+            }
+          });
+        };
+
+        const renderByIndex = async (idx) => {
+          const total = HOME_WORKS.length || 0;
+          if (!total) return;
+
+          currentIndex = Math.max(0, Math.min(total - 1, idx));
+          const item = HOME_WORKS[currentIndex];
+
+          titleEl.textContent = item?.title || "";
+          categoryEl.textContent = categoryLabel(item?.category);
+          yearEl.textContent = \`작업 연도 · \${item?.year || "-"}\`;
+          roleEl.textContent = \`역할 · \${item?.role || "-"}\`;
+          summaryEl.textContent = item?.summary || "";
+          renderTags(item?.tags || []);
+
+          updateNavUI();
+
+          // ✅ 모달 열릴 때 바로 재생
+          await mountVideo(item?.src || "", item?.title || "");
+        };
+
+        const openModalAt = async (idx) => {
+          await renderByIndex(idx);
           modal.classList.remove("hidden");
           modal.classList.add("flex");
           modal.setAttribute("aria-hidden", "false");
@@ -475,46 +553,45 @@ function getThumb(project: any) {
           modal.classList.add("hidden");
           modal.classList.remove("flex");
           modal.setAttribute("aria-hidden", "true");
-          player.innerHTML = "";
+
+          // stop
+          try { if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo(); } catch(_) {}
+          ytPlayer = null;
+
+          playerEl.innerHTML = "";
           tagsEl.innerHTML = "";
           summaryEl.textContent = "";
           document.body.style.overflow = "";
         };
 
-        // ✅ "영상 보기" 버튼 클릭 → 모달
+        // ✅ 카드 "영상 보기" 버튼 → 모달 오픈(index 기반)
         const buttons = document.querySelectorAll("button[data-open-homework='true']");
         buttons.forEach((btn) => {
           btn.addEventListener("click", () => {
-            const src = btn.getAttribute("data-video-src") || "";
-            const title = btn.getAttribute("data-video-title") || "";
-
-            const summary = safeDecode(btn.getAttribute("data-video-summary") || "");
-            const year = safeDecode(btn.getAttribute("data-video-year") || "");
-            const role = safeDecode(btn.getAttribute("data-video-role") || "");
-            const category = safeDecode(btn.getAttribute("data-video-category") || "");
-
-            const tagsRaw = safeDecode(btn.getAttribute("data-video-tags") || "[]");
-            const tags = safeJson(tagsRaw);
-
-            if (!src) return;
-            openModal({ src, title, summary, year, role, category, tags });
+            const idxStr = btn.getAttribute("data-work-index");
+            const idx = Number(idxStr);
+            openModalAt(Number.isFinite(idx) ? idx : 0);
           });
         });
 
+        prevBtn.addEventListener("click", () => renderByIndex(currentIndex - 1));
+        nextBtn.addEventListener("click", () => renderByIndex(currentIndex + 1));
+        replayBtn.addEventListener("click", () => renderByIndex(currentIndex));
+
         closeBtn.addEventListener("click", closeModal);
-
-        replayBtn.addEventListener("click", () => {
-          if (!lastVideo?.src) return;
-          mountVideo(lastVideo.src, lastVideo.title);
-        });
-
         modal.addEventListener("click", (e) => {
           if (e.target === modal) closeModal();
         });
 
         document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
+          if (modal.classList.contains("hidden")) return;
+
+          if (e.key === "Escape") closeModal();
+          if (e.key === "ArrowLeft") renderByIndex(currentIndex - 1);
+          if (e.key === "ArrowRight") renderByIndex(currentIndex + 1);
         });
+
+        updateNavUI();
       });
     `}
   </script>
