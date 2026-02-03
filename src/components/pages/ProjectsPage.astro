@@ -8,19 +8,16 @@ const {
   pagination = null,
 } = Astro.props;
 
-/** ✅ 타이틀 끝의 2자리 숫자 제거: "메뉴보드 01" → "메뉴보드" */
 function displayTitle(raw = "") {
   return String(raw ?? "").replace(/\s*\d{2}\s*$/u, "").trim();
 }
 
-/** ✅ 카드 summary: 공백 포함 65자 이내(말줄임표 포함) */
 function summary65(raw = "") {
   const s = String(raw ?? "").replace(/\s+/g, " ").trim();
   if (s.length <= 65) return s;
-  return s.slice(0, 64) + "…"; // 총 65자
+  return s.slice(0, 64) + "…";
 }
 
-/** ✅ 영상 링크/종류 추출 (works.js: media 우선, 없으면 info.youtubeUrl) */
 function getVideo(work) {
   const src = work?.media?.src || work?.info?.youtubeUrl || "";
   const kind = work?.media?.kind || (src ? "youtube" : "");
@@ -31,7 +28,6 @@ function getTags(work) {
   return Array.isArray(work?.tags) ? work.tags : [];
 }
 
-/** ✅ 페이지네이션 숫자 생성(최대 7개) */
 function buildPageList(current, total, max = 7) {
   const pages = [];
   const half = Math.floor(max / 2);
@@ -50,7 +46,6 @@ const pageList =
 
 <section class="pt-28 pb-16 md:pt-36 md:pb-24 bg-neutral-bg dark:bg-neutral-dark/60">
   <div class="max-w-container mx-auto px-6">
-    <!-- Title / Subtitle -->
     <div class="mb-10 text-center flex flex-col items-center" data-aos="fade-up">
       <h1 class="font-heading text-h2 text-secondary dark:text-white mb-4">
         {title}
@@ -62,7 +57,6 @@ const pageList =
       ) : null}
     </div>
 
-    <!-- Top Buttons -->
     {topButtons?.length ? (
       <div class="flex flex-col sm:flex-row gap-3 justify-center mb-12" data-aos="fade-up">
         {topButtons.map((btn) => {
@@ -83,7 +77,6 @@ const pageList =
       </div>
     ) : null}
 
-    <!-- Works Grid -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
       {projects.map((work, index) => {
         const t = displayTitle(work?.title);
@@ -97,7 +90,6 @@ const pageList =
 
         const hasVideo = Boolean(src);
 
-        // ✅ 모달에 넘길 데이터(안전하게 인코딩)
         const summaryEncoded = encodeURIComponent(String(work?.summary ?? ""));
         const roleEncoded = encodeURIComponent(String(work?.info?.role ?? ""));
         const yearEncoded = encodeURIComponent(String(work?.info?.year ?? ""));
@@ -110,7 +102,6 @@ const pageList =
             data-aos="fade-up"
             data-aos-delay={index * 40}
           >
-            <!-- Thumbnail: 클릭 시 상세 모달 오픈 -->
             <button
               type="button"
               class={"block relative w-full overflow-hidden aspect-video text-left " + (hasVideo ? "cursor-pointer" : "cursor-not-allowed")}
@@ -150,24 +141,20 @@ const pageList =
               )}
             </button>
 
-            <!-- Content -->
             <div class="p-6">
               <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
                 {t}
               </h3>
 
-              <!-- ✅ 카드 summary: 65자 이내 + 폰트 85% + 3줄 클램프 -->
               <p class="work-summary text-secondary/70 dark:text-white/70 mb-4">
                 {summary65(work.summary)}
               </p>
 
-              <!-- ✅ 정보 순서: 작업 연도 → 역할 -->
               <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1 mb-3">
                 <li><span class="font-mono">작업 연도</span> · {work.info?.year}</li>
                 <li><span class="font-mono">역할</span> · {work.info?.role}</li>
               </ul>
 
-              <!-- ✅ 태그: 본문 영역 -->
               {tags.length ? (
                 <div class="flex flex-wrap gap-2">
                   {tags.map((tag) => (
@@ -183,7 +170,6 @@ const pageList =
       })}
     </div>
 
-    <!-- Pagination -->
     {pagination?.totalPages && pagination?.totalPages > 1 ? (
       <nav class="mt-12 flex items-center justify-center gap-2" aria-label="Pagination" data-aos="fade-up">
         {pagination.currentPage > 1 ? (
@@ -232,13 +218,14 @@ const pageList =
     ) : null}
   </div>
 
-  <!-- ✅ Work Detail Modal (영상 + 정보 + 태그) -->
+  <!-- ✅ Work Detail Modal (센터 정렬 + 더 큰 사이즈 + 영상 영역 확대) -->
   <div
     id="work-detail-modal"
-    class="fixed inset-0 z-[9999] hidden bg-black/70 p-4"
+    class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 p-3 md:p-6"
     aria-hidden="true"
   >
-    <div class="mx-auto w-full max-w-5xl rounded-2xl overflow-hidden border border-white/10 bg-black shadow-2xl">
+    <!-- ✅ 모달 자체 크기 확대: max-w-7xl + 화면 높이 기반 -->
+    <div class="w-full max-w-7xl max-h-[92vh] rounded-2xl overflow-hidden border border-white/10 bg-black shadow-2xl">
       <!-- Header -->
       <div class="flex items-start justify-between gap-3 px-4 py-3 bg-black/70 border-b border-white/10">
         <div class="min-w-0">
@@ -260,20 +247,25 @@ const pageList =
         </button>
       </div>
 
-      <!-- Body: Desktop = left(video) + right(info) / Mobile = stacked -->
-      <div class="grid grid-cols-1 lg:grid-cols-5 gap-0">
+      <!-- Body -->
+      <!-- ✅ 영상 영역 확대: lg:grid-cols-6에서 video=4, info=2 -->
+      <div class="grid grid-cols-1 lg:grid-cols-6">
         <!-- Video -->
-        <div class="lg:col-span-3 bg-black">
-          <div class="relative w-full" style="padding-top:56.25%;">
-            <div id="modal-player" class="absolute inset-0"></div>
+        <div class="lg:col-span-4 bg-black">
+          <div class="relative w-full bg-black">
+            <!-- ✅ 높이를 키워서 더 시원하게: 16:9 유지 + 화면 높이 대응 -->
+            <div class="relative w-full" style="padding-top:56.25%;">
+              <div id="modal-player" class="absolute inset-0"></div>
+            </div>
           </div>
         </div>
 
         <!-- Info -->
-        <div class="lg:col-span-2 bg-black/60 border-t lg:border-t-0 lg:border-l border-white/10">
+        <!-- ✅ 우측 폭 축소: col-span-2 -->
+        <div class="lg:col-span-2 bg-black/60 border-t lg:border-t-0 lg:border-l border-white/10 overflow-auto max-h-[92vh]">
           <div class="p-4 md:p-5">
             <h4 class="text-white/90 text-sm md:text-base font-medium mb-2">작업 설명</h4>
-            <p id="modal-summary" class="text-white/75 text-xs md:text-sm leading-relaxed whitespace-pre-line max-h-40 overflow-auto pr-1"></p>
+            <p id="modal-summary" class="text-white/75 text-xs md:text-sm leading-relaxed whitespace-pre-line max-h-44 overflow-auto pr-1"></p>
 
             <div class="mt-5">
               <h4 class="text-white/90 text-sm md:text-base font-medium mb-2">태그</h4>
@@ -299,7 +291,6 @@ const pageList =
     </div>
   </div>
 
-  <!-- ✅ 카드 summary 스타일(85% + 3줄 클램프) -->
   <style is:inline>
     .work-summary{
       font-size:0.85em;
@@ -310,7 +301,6 @@ const pageList =
     }
   </style>
 
-  <!-- ✅ Modal Script -->
   <script is:inline>
     document.addEventListener("DOMContentLoaded", () => {
       const modal = document.getElementById("work-detail-modal");
@@ -377,7 +367,6 @@ const pageList =
         player.innerHTML = "";
         if (!src) return;
 
-        // kind가 비어있어도 유튜브 URL이면 유튜브로 처리
         const ytId = getYoutubeId(src);
         if (kind === "youtube" || ytId) {
           const id = ytId || getYoutubeId(src);
@@ -432,15 +421,16 @@ const pageList =
 
         mountVideo(kind, src, title);
 
+        // ✅ 중앙 정렬을 위해 flex 사용
         modal.classList.remove("hidden");
-        modal.classList.add("block");
+        modal.classList.add("flex");
         modal.setAttribute("aria-hidden", "false");
         document.body.style.overflow = "hidden";
       };
 
       const closeModal = () => {
         modal.classList.add("hidden");
-        modal.classList.remove("block");
+        modal.classList.remove("flex");
         modal.setAttribute("aria-hidden", "true");
         player.innerHTML = "";
         tagsEl.innerHTML = "";
@@ -448,7 +438,6 @@ const pageList =
         document.body.style.overflow = "";
       };
 
-      // ✅ 카드 버튼에 직접 바인딩
       const buttons = document.querySelectorAll("button[data-open-video='true']");
       buttons.forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -465,24 +454,20 @@ const pageList =
           const tags = safeJson(tagsRaw);
 
           if (!src) return;
-
           openModal({ kind, src, title, summary, role, year, category, tags });
         });
       });
 
-      // 닫기 / 재생
       closeBtn.addEventListener("click", closeModal);
       replayBtn.addEventListener("click", () => {
         if (!lastVideo?.src) return;
         mountVideo(lastVideo.kind, lastVideo.src, lastVideo.title);
       });
 
-      // 모달 바깥 클릭 닫기
       modal.addEventListener("click", (e) => {
         if (e.target === modal) closeModal();
       });
 
-      // ESC 닫기
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
       });
