@@ -553,7 +553,7 @@ const rawWorks = [
     title: "인포그래픽 | 방배유스센터",
     slug: "campaign-02",
     category: "agency",
-    image: "/images/projects/campaign_02.png",
+    image: "/images/projects/campaign_02.jpg",
     tags: ["Infographic", "Agency"],
     summary:
       "고객사로부터 전달받은 콘티와 로고 이미지를 기반으로, 친환경 사업의 메시지에 어울리도록 그린과 블루 톤을 활용하여 제작하였습니다. 전반적으로 따뜻하고 친근한 인상을 줄 수 있도록 디자인했습니다.",
