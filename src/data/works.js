@@ -22,7 +22,6 @@ export const works = [
       "텍스트를 최소화하고 직관적인 이미지 중심으로 구성해, 짧은 시간 안에 핵심 정보가 이해되도록 디자인했습니다.",
     info: {
       year: "2024",
-      duration: "35s",
       role: "기획 · 디자인 · 애니메이션",
       // (선택) 기존 데이터 호환용
       youtubeUrl: "https://youtu.be/LLY3FR1Sb3I?si=1O3wcJZANL766oDf",
@@ -54,7 +53,7 @@ export function makePlaceholders({ count = 30, category = "all" } = {}) {
     image: "/images/projects/card.jpg",
     tags: ["Coming soon"],
     summary: "업로드 준비 중입니다.",
-    info: { year: "-", duration: "-", role: "-" },
+    info: { year: "-", role: "-" },
     media: { kind: "", src: "" },
   }));
 }
