@@ -24,9 +24,28 @@ const computedRel = target === '_blank'
   : rel;
 
 const variants = {
-  primary: 'bg-primary text-white hover:bg-primary/90',
-  secondary: 'bg-secondary text-white hover:bg-secondary/90',
-  outline: 'bg-transparent border border-primary text-primary hover:bg-primary/10',
+  /**
+   * ✅ 항상 배경과 구분되게:
+   * - Light: highlightBlue(진한 톤)로 채움 + white 텍스트
+   * - Dark : primary(밝은 톤)로 채움 + dark 배경에 대비되는 텍스트
+   */
+  primary:
+    'bg-highlightBlue text-white hover:bg-highlightBlue/90 ' +
+    'dark:bg-primary dark:text-neutral-dark dark:hover:bg-primary/90',
+
+  /**
+   * secondary는 기존 의도를 최대한 유지하되, dark에서는 highlightBlue로 확실히 분리
+   */
+  secondary:
+    'bg-secondary text-white hover:bg-secondary/90 ' +
+    'dark:bg-highlightBlue dark:text-white dark:hover:bg-highlightBlue/90',
+
+  /**
+   * outline은 그대로 (배경과의 대비는 border/text로 확보)
+   */
+  outline:
+    'bg-transparent border border-primary text-primary hover:bg-primary/10 ' +
+    'dark:hover:bg-primary/15',
 };
 
 const sizes = {
