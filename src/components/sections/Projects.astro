@@ -1,65 +1,203 @@
 ---
-import Button from '../ui/Buttons.astro';
+import Button from "../ui/Buttons.astro";
+import { works as allWorks } from "../../data/works.js";
 
 interface Props {
   lang: string | undefined;
 }
 
-const { lang } = Astro.props; // (지금은 i18n 안 쓰지만, index.astro에서 내려주니 남겨둬도 OK)
+const { lang } = Astro.props;
+const prefix = lang === "de" ? "/de" : "";
 
-const sectionTitle = 'Works';
+const sectionTitle = "Works";
 const sectionSubtitle =
-  '흥미로운 연출, 명확한 정보 전달, 감각적인 모션으로 브랜드와 제품의 핵심 메시지를 설득력 있게 보여줍니다.';
+  "흥미로운 연출, 명확한 정보 전달, 감각적인 모션으로 브랜드와 제품의 핵심 메시지를 설득력 있게 보여줍니다.";
 
-const projects = [
-  {
-    title: '인포그래픽 | 기후동행카드 (35s)',
-    slug: 'infographics-01',
-    image: '/images/projects/card.jpg',
-    tags: ['인포그래픽', '모션그래픽'],
-    summary:
-      '텍스트를 최소화하고 직관적인 이미지 중심으로 구성해, 짧은 시간 안에 핵심 정보가 이해되도록 디자인했습니다.',
-    info: {
-      year: '2024',
-      duration: '35s',
-      role: '기획 · 디자인 · 애니메이션',
-      youtubeUrl: 'https://youtu.be/LLY3FR1Sb3I?si=1O3wcJZANL766oDf'
-    },
-  },
-  {
-    title: '프로모션 | Prmr 크루 모집',
-    slug: 'promotion-01',
-    image: '/images/projects/prmr.jpg',
-    tags: ['타이포그래픽', '프로모션'],
-    summary:
-      '리드미컬한 타이포 키네틱과 화면 템포를 중심으로, 메시지가 빠르고 선명하게 전달되도록 제작했습니다.',
-    info: {
-      year: '2024',
-      duration: '15s',
-      role: '기획 · 디자인 · 애니메이션',
-      youtubeUrl: 'https://youtu.be/K_o555Ywq28?si=hvlUgRNbGhntTqAI'
-    },
-  },
-  {
-    title: '제품 홍보 | Grida pencil',
-    slug: 'product-01',
-    image: '/images/projects/grida.jpg',
-    tags: ['제품 홍보', '모션그래픽'],
-    summary:
-      '“아이디어는 끄적이는 순간부터 시작된다”는 메시지를 중심으로 드로잉 요소와 모션을 결합해 생동감 있게 표현했습니다.',
-    info: {
-      year: '2022',
-      duration: '30s 내외',
-      role: '기획 · 디자인· 애니메이션 · 3D 모델링',
-      youtubeUrl: 'https://youtu.be/dcmq0tn98So?si=jOl7SytoZ3DJiQWZ'
-    },
-  },
-];
+// -----------------------------
+// Utils
+// -----------------------------
+function parseYear(value: any) {
+  const s = String(value ?? "").trim();
+  const m = s.match(/\d{4}/);
+  if (!m) return 0;
+  const y = Number(m[0]);
+  return Number.isFinite(y) ? y : 0;
+}
+
+function safeLower(v: any) {
+  return String(v ?? "").toLowerCase();
+}
+
+function hasTag(work: any, tagName: string) {
+  const tags = Array.isArray(work?.tags) ? work.tags : [];
+  const target = tagName.toLowerCase();
+  return tags.some((t: any) => String(t).toLowerCase() === target);
+}
+
+function titleIncludes(work: any, keyword: string) {
+  return safeLower(work?.title).includes(keyword.toLowerCase());
+}
+
+function roleIncludes(work: any, keyword: string) {
+  return safeLower(work?.info?.role).includes(keyword.toLowerCase());
+}
+
+// "업로드 최신" 기준: works 배열에서 뒤쪽일수록 최신 업로드라고 가정
+const indexBySlug = new Map(
+  (Array.isArray(allWorks) ? allWorks : []).map((w: any, i: number) => [
+    w?.slug ?? `__idx_${i}`,
+    i,
+  ])
+);
+
+function getUploadIndex(work: any) {
+  return indexBySlug.get(work?.slug) ?? -1;
+}
+
+// -----------------------------
+// Weighted scoring (NO random)
+// -----------------------------
+/**
+ * 점수 설계 원칙:
+ * 1) 최신 연도는 기본적으로 유리하게
+ * 2) 선호 타입(제품홍보/인포그래픽/POP)은 가점
+ * 3) role에 "기획", "디자인"이 포함되면 추가 가점
+ * 4) 같은 점수면 업로드 최신이 우선
+ */
+function computeScore(work: any) {
+  const year = parseYear(work?.info?.year);
+  const upload = getUploadIndex(work);
+
+  // 기본 점수: 최신 연도에 크게 가중, 업로드 최신으로 미세 정렬
+  let score = year * 10000 + upload;
+
+  // 카테고리 기본 가점
+  if (work?.category === "agency") score += 2000;
+  if (work?.category === "digital-signage") score += 1500;
+
+  // -------------------------
+  // ✅ role 기반 가점 (요청 반영)
+  // -------------------------
+  // role 문자열 예: "기획, 디자인, 애니메이션"
+  // - "기획" 포함: +2500
+  // - "디자인" 포함: +2000
+  // - 둘 다 포함(시너지): +1500 추가
+  const hasPlanning = roleIncludes(work, "기획");
+  const hasDesign = roleIncludes(work, "디자인");
+
+  if (hasPlanning) score += 2500;
+  if (hasDesign) score += 2000;
+  if (hasPlanning && hasDesign) score += 1500;
+
+  // -------------------------
+  // 핵심 선호 타입 가점
+  // -------------------------
+  const isAgency = work?.category === "agency";
+  const isSignage = work?.category === "digital-signage";
+
+  // agency 제품홍보
+  const isProductPromo =
+    isAgency &&
+    (hasTag(work, "Product Promo") ||
+      titleIncludes(work, "제품 홍보") ||
+      titleIncludes(work, "제품홍보"));
+  if (isProductPromo) score += 7000;
+
+  // agency 인포그래픽
+  const isInfographic =
+    isAgency && (hasTag(work, "Infographic") || titleIncludes(work, "인포그래픽"));
+  if (isInfographic) score += 6500;
+
+  // digital-signage POP
+  const isPop =
+    isSignage && (titleIncludes(work, "pop") || hasTag(work, "POP"));
+  if (isPop) score += 6000;
+
+  // 대표성이 큰 포맷 약 가점
+  if (hasTag(work, "Full Banner") || titleIncludes(work, "full banner")) score += 1200;
+  if (hasTag(work, "Menu Board") || titleIncludes(work, "메뉴보드")) score += 900;
+  if (hasTag(work, "Campaign") || titleIncludes(work, "캠페인")) score += 700;
+  if (hasTag(work, "Event") || titleIncludes(work, "행사")) score += 600;
+
+  // 유튜브 링크 존재 가점(홈 버튼 UX 안정)
+  const hasYoutube =
+    (work?.media?.kind === "youtube" && !!work?.media?.src) || !!work?.info?.youtubeUrl;
+  if (hasYoutube) score += 300;
+
+  return score;
+}
+
+/**
+ * ✅ 상위 N개 선택
+ * - score desc → year desc → uploadIndex desc
+ * - 다양성: 같은 category 최대 2개까지 허용
+ */
+function pickTopWorksWeighted(count = 3) {
+  const list = Array.isArray(allWorks) ? allWorks : [];
+
+  const ranked = list
+    .map((w: any) => ({
+      w,
+      score: computeScore(w),
+      year: parseYear(w?.info?.year),
+      upload: getUploadIndex(w),
+    }))
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (b.year !== a.year) return b.year - a.year;
+      return b.upload - a.upload;
+    });
+
+  const picked: any[] = [];
+  const usedSlug = new Set<string>();
+  const categoryCount = new Map<string, number>();
+
+  for (const item of ranked) {
+    if (picked.length >= count) break;
+    const w = item.w;
+    if (!w?.slug) continue;
+    if (usedSlug.has(w.slug)) continue;
+
+    const cat = String(w.category || "unknown");
+    const current = categoryCount.get(cat) ?? 0;
+
+    // category 최대 2개 제한
+    if (current >= 2) continue;
+
+    usedSlug.add(w.slug);
+    categoryCount.set(cat, current + 1);
+    picked.push(w);
+  }
+
+  // 제한 때문에 못 채우면 제한 없이 추가
+  if (picked.length < count) {
+    for (const item of ranked) {
+      if (picked.length >= count) break;
+      const w = item.w;
+      if (!w?.slug) continue;
+      if (usedSlug.has(w.slug)) continue;
+      usedSlug.add(w.slug);
+      picked.push(w);
+    }
+  }
+
+  return picked.slice(0, count);
+}
+
+// ✅ 홈 노출 3개
+const homeProjects = pickTopWorksWeighted(3);
+
+// ✅ YouTube 링크 추출(works.js 구조: media.src 우선, info.youtubeUrl 호환)
+function getYoutubeUrl(project: any) {
+  if (project?.media?.kind === "youtube" && project?.media?.src) return project.media.src;
+  if (project?.info?.youtubeUrl) return project.info.youtubeUrl;
+  return "";
+}
 ---
 
 <section id="works" class="py-16 md:py-24 bg-neutral-bg dark:bg-neutral-dark/60">
   <div class="max-w-container mx-auto px-6">
-   <div class="mb-12 text-center flex flex-col items-center" data-aos="fade-up">
+    <div class="mb-12 text-center flex flex-col items-center" data-aos="fade-up">
       <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">
         {sectionTitle}
       </h2>
@@ -69,63 +207,71 @@ const projects = [
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
-      {projects.map((project, index) => (
-        <div
-          class="md:col-span-4 group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
-          data-aos="fade-up"
-          data-aos-delay={index * 100}
-        >
-          <div class="relative overflow-hidden aspect-video">
-            <img
-              src={project.image}
-              alt={project.title}
-              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              loading="lazy"
-            />
-            <div class="absolute top-4 left-4 flex flex-wrap gap-2">
-              {project.tags.map((tag) => (
-                <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
-                  {tag}
-                </span>
-              ))}
+      {homeProjects.map((project, index) => {
+        const youtubeUrl = getYoutubeUrl(project);
+        const tags = Array.isArray(project?.tags) ? project.tags : [];
+
+        return (
+          <article
+            class="md:col-span-4 group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+            data-aos="fade-up"
+            data-aos-delay={index * 100}
+          >
+            <div class="relative overflow-hidden aspect-video">
+              <img
+                src={project.image}
+                alt={project.title}
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+
+              {tags.length > 0 ? (
+                <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+                  {tags.map((tag) => (
+                    <span class="px-3 py-1 text-xs font-mono bg-white/90 dark:bg-neutral-dark/90 backdrop-blur-sm text-primary rounded-full">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
             </div>
-          </div>
 
-          <div class="p-6">
-            <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
-              {project.title}
-            </h3>
+            <div class="p-6">
+              <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
+                {project.title}
+              </h3>
 
-            <p class="text-secondary/70 dark:text-white/70 mb-4">
-              {project.summary}
-            </p>
+              <p class="text-secondary/70 dark:text-white/70 mb-4">
+                {project.summary}
+              </p>
 
-            <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1 mb-6">
-              <li><span class="font-mono">작업연도</span> · {project.info.year}</li>
-              <li><span class="font-mono">러닝타임</span> · {project.info.duration}</li>
-              <li><span class="font-mono">역할</span> · {project.info.role}</li>
-            </ul>
+              <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1 mb-6">
+                <li><span class="font-mono">작업연도</span> · {project.info?.year}</li>
+                <li><span class="font-mono">역할</span> · {project.info?.role}</li>
+              </ul>
 
-            <Button
-              text="YouTube에서 보기"
-              href={project.youtubeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="outline"
-              size="sm"
-            />
-          </div>
-        </div>
-      ))}
+              {youtubeUrl ? (
+                <Button
+                  text="YouTube에서 보기"
+                  href={youtubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="outline"
+                  size="sm"
+                />
+              ) : (
+                <span class="inline-flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-secondary/60 dark:text-white/50 px-4 py-2 text-sm">
+                  영상 링크 준비중
+                </span>
+              )}
+            </div>
+          </article>
+        );
+      })}
     </div>
 
-    <!-- /projects 페이지를 아직 안 쓸 거면 이 블록은 삭제해도 됩니다 -->
     <div class="mt-12 text-center" data-aos="fade-up">
-      <Button
-        text="전체 작업 보기"
-        href="/projects"
-        variant="primary"
-      />
+      <Button text="전체 작업 보기" href={`${prefix}/projects`} variant="primary" />
     </div>
   </div>
 </section>
