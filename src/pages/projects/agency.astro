@@ -7,8 +7,8 @@ const lang = Astro.currentLocale ?? "en";
 const prefix = lang === "de" ? "/de" : "";
 
 const topButtons = [
-  { text: "Agency Outsourcing", href: `${prefix}/projects/agency`, variant: "primary" },
-  { text: "Digital Signage Content", href: `${prefix}/projects/digital-signage`, variant: "outline" },
+  { text: "전체 작업 보기", href: `${prefix}/projects`, variant: "outline" },
+  { text: "디지털 사이니지", href: `${prefix}/projects/digital-signage`, variant: "primary" },
 ];
 
 const pageParam = Astro.url.searchParams.get("page");
