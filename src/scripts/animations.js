@@ -33,12 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
     ScrollTrigger.create({
       start: 'top-=200',
       end: 99999,
-      toggleClass: { className: 'shadow-md', targets: navbar }
+      toggleClass: { className: 'shadow-md', targets: navbar },
     });
   }
 
   // Smooth scroll for anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', function (e) {
       e.preventDefault();
 
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         window.scrollTo({
           top: targetElement.offsetTop - navbarHeight - 20,
-          behavior: 'smooth'
+          behavior: 'smooth',
         });
 
         // Update URL hash without scrolling
@@ -107,14 +107,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (skillClusters.length > 0) {
     // We'll let AOS handle the scroll animations, and use GSAP for hover effects
 
-    skillClusters.forEach(cluster => {
+    skillClusters.forEach((cluster) => {
       const toolItems = cluster.querySelectorAll('.tool-item');
       const clusterHeader = cluster.querySelector('.cluster-header');
       const clusterDescription = cluster.querySelector('.cluster-description');
       const clusterIcon = cluster.querySelector('.icon-container svg');
 
       // Enhanced cluster hover effect with more dynamic animations
-      const primaryColorRGB = getComputedStyle(document.documentElement).getPropertyValue('--color-primary-rgb').trim() || '37, 99, 235';
+      const primaryColorRGB =
+        getComputedStyle(document.documentElement)
+          .getPropertyValue('--color-primary-rgb')
+          .trim() || '37, 99, 235';
       const initialBorderColor = getComputedStyle(cluster).borderColor;
       const initialBoxShadow = getComputedStyle(cluster).boxShadow;
 
@@ -130,36 +133,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Add various animations to the timeline
         hoverTimeline
-          .to(cluster, {
-            borderColor: `rgba(${primaryColorRGB}, 1)`,
-            boxShadow: `0 8px 16px -3px rgba(${primaryColorRGB}, 0.25), 0 5px 10px -4px rgba(${primaryColorRGB}, 0.15)`,
-            y: -5,
-            duration: 0.3,
-            ease: 'power2.out'
-          }, 0)
-          .to(clusterIcon, {
-            scale: 1.15,
-            rotate: 5,
-            duration: 0.4,
-            ease: 'back.out(1.7)'
-          }, 0)
-          .to(clusterHeader, {
-            x: 3,
-            duration: 0.3,
-            ease: 'power1.out'
-          }, 0)
-          .to(clusterDescription, {
-            opacity: 0.9,
-            x: 2,
-            duration: 0.3,
-            ease: 'power1.out'
-          }, 0)
-          .to(toolItems, {
-            y: -3,
-            stagger: 0.03,
-            duration: 0.4,
-            ease: 'power1.out'
-          }, 0.1);
+          .to(
+            cluster,
+            {
+              borderColor: `rgba(${primaryColorRGB}, 1)`,
+              boxShadow: `0 8px 16px -3px rgba(${primaryColorRGB}, 0.25), 0 5px 10px -4px rgba(${primaryColorRGB}, 0.15)`,
+              y: -5,
+              duration: 0.3,
+              ease: 'power2.out',
+            },
+            0
+          )
+          .to(
+            clusterIcon,
+            {
+              scale: 1.15,
+              rotate: 5,
+              duration: 0.4,
+              ease: 'back.out(1.7)',
+            },
+            0
+          )
+          .to(
+            clusterHeader,
+            {
+              x: 3,
+              duration: 0.3,
+              ease: 'power1.out',
+            },
+            0
+          )
+          .to(
+            clusterDescription,
+            {
+              opacity: 0.9,
+              x: 2,
+              duration: 0.3,
+              ease: 'power1.out',
+            },
+            0
+          )
+          .to(
+            toolItems,
+            {
+              y: -3,
+              stagger: 0.03,
+              duration: 0.4,
+              ease: 'power1.out',
+            },
+            0.1
+          );
       });
 
       cluster.addEventListener('mouseleave', () => {
@@ -171,44 +194,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Reset all animations
         hoverTimeline
-          .to(cluster, {
-            borderColor: initialBorderColor,
-            boxShadow: initialBoxShadow,
-            y: 0,
-            duration: 0.3,
-            ease: 'power2.out'
-          }, 0)
-          .to(clusterIcon, {
-            scale: 1,
-            rotate: 0,
-            duration: 0.3,
-            ease: 'power2.out'
-          }, 0)
-          .to(clusterHeader, {
-            x: 0,
-            duration: 0.3,
-            ease: 'power1.out'
-          }, 0)
-          .to(clusterDescription, {
-            opacity: 1,
-            x: 0,
-            duration: 0.3,
-            ease: 'power1.out'
-          }, 0)
-          .to(toolItems, {
-            y: 0,
-            stagger: 0.02,
-            duration: 0.3,
-            ease: 'power1.out'
-          }, 0);
+          .to(
+            cluster,
+            {
+              borderColor: initialBorderColor,
+              boxShadow: initialBoxShadow,
+              y: 0,
+              duration: 0.3,
+              ease: 'power2.out',
+            },
+            0
+          )
+          .to(
+            clusterIcon,
+            {
+              scale: 1,
+              rotate: 0,
+              duration: 0.3,
+              ease: 'power2.out',
+            },
+            0
+          )
+          .to(
+            clusterHeader,
+            {
+              x: 0,
+              duration: 0.3,
+              ease: 'power1.out',
+            },
+            0
+          )
+          .to(
+            clusterDescription,
+            {
+              opacity: 1,
+              x: 0,
+              duration: 0.3,
+              ease: 'power1.out',
+            },
+            0
+          )
+          .to(
+            toolItems,
+            {
+              y: 0,
+              stagger: 0.02,
+              duration: 0.3,
+              ease: 'power1.out',
+            },
+            0
+          );
       });
 
       // Enhanced tool item hover animations
-      toolItems.forEach(item => {
-        const icon = item.querySelector('.tool-icon svg, .tool-icon img');
+      toolItems.forEach((item) => {
+        // ✅ FIX: mask icon(span.tool-svg)도 애니메이션 대상에 포함
+        const icon = item.querySelector('.tool-icon svg, .tool-icon img, .tool-icon .tool-svg');
         const label = item.querySelector('p');
 
         if (icon && label) {
+          // ✅ 아이콘 회전/스케일 기준점 안정화 (svg/img/span 모두 적용)
+          gsap.set(icon, { transformOrigin: '50% 50%' });
+
           let itemHoverTimeline;
 
           item.addEventListener('mouseenter', () => {
@@ -220,19 +267,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Add coordinated animations for the tool item
             itemHoverTimeline
-              .to(icon, {
-                scale: 1.3,
-                rotate: 10,
-                duration: 0.25,
-                ease: 'back.out(1.7)'
-              }, 0)
-              .to(label, {
-                scale: 1.05,
-                y: -2,
-                color: `rgba(${primaryColorRGB}, 1)`,
-                duration: 0.2,
-                ease: 'power1.out'
-              }, 0);
+              .to(
+                icon,
+                {
+                  scale: 1.3,
+                  rotate: 10,
+                  duration: 0.25,
+                  ease: 'back.out(1.7)',
+                },
+                0
+              )
+              .to(
+                label,
+                {
+                  scale: 1.05,
+                  y: -2,
+                  color: `rgba(${primaryColorRGB}, 1)`,
+                  duration: 0.2,
+                  ease: 'power1.out',
+                },
+                0
+              );
           });
 
           item.addEventListener('mouseleave', () => {
@@ -244,19 +299,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Reset all animations
             itemHoverTimeline
-              .to(icon, {
-                scale: 1,
-                rotate: 0,
-                duration: 0.25,
-                ease: 'power1.out'
-              }, 0)
-              .to(label, {
-                scale: 1,
-                y: 0,
-                color: '',
-                duration: 0.2,
-                ease: 'power1.out'
-              }, 0);
+              .to(
+                icon,
+                {
+                  scale: 1,
+                  rotate: 0,
+                  duration: 0.25,
+                  ease: 'power1.out',
+                },
+                0
+              )
+              .to(
+                label,
+                {
+                  scale: 1,
+                  y: 0,
+                  color: '',
+                  duration: 0.2,
+                  ease: 'power1.out',
+                },
+                0
+              );
           });
         }
       });
@@ -266,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Project cards hover effect
   const projectCards = document.querySelectorAll('#projects .group');
 
-  projectCards.forEach(card => {
+  projectCards.forEach((card) => {
     const image = card.querySelector('img');
 
     if (image) {
@@ -274,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gsap.to(image, {
           scale: 1.05,
           duration: 0.5,
-          ease: 'power2.out'
+          ease: 'power2.out',
         });
       });
 
@@ -282,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gsap.to(image, {
           scale: 1,
           duration: 0.5,
-          ease: 'power2.out'
+          ease: 'power2.out',
         });
       });
     }
