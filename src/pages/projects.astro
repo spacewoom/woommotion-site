@@ -7,14 +7,13 @@ import { buildGrid } from "../data/works.js";
 const lang = Astro.currentLocale ?? "en";
 const prefix = lang === "de" ? "/de" : "";
 
-// 상단 2개 버튼
 const topButtons = [
   { text: "Agency Outsourcing", href: `${prefix}/projects/agency`, variant: "outline" },
   { text: "Digital Signage Content", href: `${prefix}/projects/digital-signage`, variant: "outline" },
 ];
 
-// 카드 30개 유지(부족하면 placeholder로 채움)
-const projects = buildGrid({ category: "all", targetCount: 30 });
+// ✅ 업로드된 작업 개수만큼 자동 반환
+const projects = buildGrid({ category: "all" });
 ---
 
 <Layout title="Works" description="View all work" lang={lang}>
