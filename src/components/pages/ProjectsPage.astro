@@ -8,20 +8,25 @@ const {
   pagination = null,
 } = Astro.props;
 
-const isDe = lang === "de";
-const base = isDe ? "/de" : "";
-
-/** ✅ 타이틀 끝의 2자리 숫자 제거: "메뉴보드 01" → "메뉴보드", "Full Banner 02" → "Full Banner" */
+/** ✅ 타이틀 끝의 2자리 숫자 제거: "메뉴보드 01" → "메뉴보드" */
 function displayTitle(raw = "") {
   return String(raw ?? "").replace(/\s*\d{2}\s*$/u, "").trim();
 }
 
-/** ✅ 영상 링크 추출: works.js의 media.src 우선, 없으면 info.youtubeUrl */
-function getVideoHref(work) {
-  return work?.media?.src || work?.info?.youtubeUrl || "";
+/** ✅ 카드 summary: 공백 포함 90자 이내(말줄임표 포함) */
+function summary90(raw = "") {
+  const s = String(raw ?? "").replace(/\s+/g, " ").trim(); // 공백 정리(가독성)
+  if (s.length <= 90) return s;
+  return s.slice(0, 89) + "…"; // 총 90자
 }
 
-/** ✅ 태그 안전 처리 */
+/** ✅ 영상 링크/종류 추출 (works.js: media 우선, 없으면 info.youtubeUrl) */
+function getVideo(work) {
+  const src = work?.media?.src || work?.info?.youtubeUrl || "";
+  const kind = work?.media?.kind || (src ? "youtube" : "");
+  return { kind, src };
+}
+
 function getTags(work) {
   return Array.isArray(work?.tags) ? work.tags : [];
 }
@@ -33,7 +38,6 @@ function buildPageList(current, total, max = 7) {
   let start = Math.max(1, current - half);
   let end = Math.min(total, start + max - 1);
   start = Math.max(1, end - max + 1);
-
   for (let p = start; p <= end; p++) pages.push(p);
   return pages;
 }
@@ -82,12 +86,17 @@ const pageList =
     <!-- Works Grid -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
       {projects.map((work, index) => {
-        const href = getVideoHref(work);
-        const tags = getTags(work);
         const t = displayTitle(work?.title);
+        const tags = getTags(work);
+        const { kind, src } = getVideo(work);
 
-        // 썸네일: media.poster > image > fallback
-        const thumb = work?.media?.poster || work?.image || "/images/projects/card.jpg";
+        const thumb =
+          work?.media?.poster ||
+          work?.image ||
+          "/images/projects/card.jpg";
+
+        const hasVideo = Boolean(src);
+        const summaryEncoded = encodeURIComponent(String(work?.summary ?? ""));
 
         return (
           <article
@@ -95,23 +104,27 @@ const pageList =
             data-aos="fade-up"
             data-aos-delay={index * 40}
           >
-            <!-- Thumbnail: 클릭 시 새 창으로 영상 오픈 -->
-            {href ? (
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="block relative w-full overflow-hidden aspect-video"
-                aria-label={`${t} 영상 새 창에서 열기`}
-              >
-                <img
-                  src={thumb}
-                  alt={t}
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
+            <!-- Thumbnail: 클릭 시 모달 오픈 -->
+            <button
+              type="button"
+              class={"block relative w-full overflow-hidden aspect-video text-left " + (hasVideo ? "cursor-pointer" : "cursor-not-allowed")}
+              data-open-video={hasVideo ? "true" : "false"}
+              data-video-kind={kind}
+              data-video-src={src}
+              data-video-title={t}
+              data-video-summary={summaryEncoded}
+              aria-label={hasVideo ? `${t} 영상 재생` : `${t} (영상 링크 없음)`}
+              disabled={!hasVideo}
+            >
+              <img
+                src={thumb}
+                alt={t}
+                class={"w-full h-full object-cover transition-transform duration-500 " + (hasVideo ? "group-hover:scale-105" : "")}
+                loading="lazy"
+              />
 
-                <!-- Play Icon Overlay -->
+              <!-- Play Icon Overlay -->
+              {hasVideo ? (
                 <div class="absolute inset-0 flex items-center justify-center">
                   <span class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-black/50 backdrop-blur-sm border border-white/20">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="white">
@@ -119,17 +132,14 @@ const pageList =
                     </svg>
                   </span>
                 </div>
-              </a>
-            ) : (
-              <div class="block relative w-full overflow-hidden aspect-video">
-                <img
-                  src={thumb}
-                  alt={t}
-                  class="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-            )}
+              ) : (
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <span class="px-3 py-1 text-xs font-mono bg-black/55 text-white/90 rounded-full border border-white/10">
+                    영상 링크 없음
+                  </span>
+                </div>
+              )}
+            </button>
 
             <!-- Content -->
             <div class="p-6">
@@ -137,20 +147,20 @@ const pageList =
                 {t}
               </h3>
 
-              <!-- ✅ summary: 3줄 이내 + 85% -->
+              <!-- ✅ 카드 summary: 90자 이내 + 폰트 85% + 3줄 클램프(보험) -->
               <p class="work-summary text-secondary/70 dark:text-white/70 mb-4">
-                {work.summary}
+                {summary90(work.summary)}
               </p>
 
-              <!-- ✅ 정보 순서: 작업연도 → 역할 -->
+              <!-- ✅ 정보 순서: 작업 연도 → 역할 -->
               <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1 mb-3">
                 <li><span class="font-mono">작업 연도</span> · {work.info?.year}</li>
                 <li><span class="font-mono">역할</span> · {work.info?.role}</li>
               </ul>
 
-              <!-- ✅ 태그: 본문 영역에 배치 (작업연도/역할 다음) -->
+              <!-- ✅ 태그: 본문 영역에 배치 -->
               {tags.length ? (
-                <div class="flex flex-wrap gap-2 mb-4">
+                <div class="flex flex-wrap gap-2">
                   {tags.map((tag) => (
                     <span class="px-3 py-1 text-xs font-mono bg-gray-100 dark:bg-white/10 text-secondary dark:text-white/80 rounded-full">
                       {tag}
@@ -158,22 +168,6 @@ const pageList =
                   ))}
                 </div>
               ) : null}
-
-              <!-- (선택) 링크 버튼도 제공: 이미지 클릭이 메인이지만 접근성/명확성 위해 유지 -->
-              {href ? (
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center justify-center rounded-lg font-medium text-sm py-2 px-4 border border-primary text-primary hover:bg-primary/10 bg-transparent"
-                >
-                  영상 새 창에서 보기
-                </a>
-              ) : (
-                <span class="inline-flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-secondary/60 dark:text-white/50 px-4 py-2 text-sm">
-                  영상 링크 준비중
-                </span>
-              )}
             </div>
           </article>
         );
@@ -229,7 +223,40 @@ const pageList =
     ) : null}
   </div>
 
-  <!-- ✅ summary 3줄 제한 + 폰트 85% -->
+  <!-- ✅ Video Modal -->
+  <div
+    id="work-video-modal"
+    class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 p-4"
+    aria-hidden="true"
+  >
+    <div class="w-full max-w-4xl bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+      <div class="flex items-center justify-between px-4 py-3 bg-black/60">
+        <p id="work-video-title" class="text-sm md:text-base text-white/90 truncate pr-3"></p>
+        <button
+          id="work-video-close"
+          type="button"
+          class="text-white/80 hover:text-white px-3 py-1 rounded-lg border border-white/10 hover:border-white/20"
+          aria-label="Close video modal"
+        >
+          Close
+        </button>
+      </div>
+
+      <!-- ✅ 모달에 summary 원문 전체 표시 -->
+      <div class="px-4 pb-3 bg-black/60">
+        <p
+          id="work-video-summary"
+          class="text-xs md:text-sm text-white/75 leading-relaxed max-h-36 overflow-auto pr-1"
+        ></p>
+      </div>
+
+      <div class="relative w-full bg-black" style="padding-top:56.25%;">
+        <div id="work-video-player" class="absolute inset-0"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ 카드 summary 스타일(85% + 3줄 클램프) -->
   <style is:inline>
     {`
       .work-summary{
@@ -241,4 +268,105 @@ const pageList =
       }
     `}
   </style>
+
+  <!-- ✅ Modal Script -->
+  <script is:inline>
+    {`
+      (() => {
+        const modal = document.getElementById("work-video-modal");
+        const closeBtn = document.getElementById("work-video-close");
+        const titleEl = document.getElementById("work-video-title");
+        const summaryEl = document.getElementById("work-video-summary");
+        const player = document.getElementById("work-video-player");
+
+        if (!modal || !closeBtn || !titleEl || !summaryEl || !player) return;
+
+        const getYoutubeId = (url = "") => {
+          const m =
+            url.match(/youtu\\.be\\/([a-zA-Z0-9_-]{6,})/) ||
+            url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
+            url.match(/\\/embed\\/([a-zA-Z0-9_-]{6,})/) ||
+            url.match(/\\/shorts\\/([a-zA-Z0-9_-]{6,})/);
+          return m ? m[1] : "";
+        };
+
+        const safeDecode = (s = "") => {
+          try { return decodeURIComponent(s); } catch { return String(s || ""); }
+        };
+
+        const openModal = (kind, src, title, summaryEncoded) => {
+          titleEl.textContent = title || "";
+          summaryEl.textContent = safeDecode(summaryEncoded || "");
+          player.innerHTML = "";
+
+          if (kind === "youtube") {
+            const id = getYoutubeId(src);
+            const embed = id
+              ? \`https://www.youtube.com/embed/\${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1\`
+              : src;
+
+            const iframe = document.createElement("iframe");
+            iframe.className = "w-full h-full";
+            iframe.src = embed;
+            iframe.title = title || "YouTube video";
+            iframe.loading = "lazy";
+            iframe.setAttribute("frameborder", "0");
+            iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+            iframe.setAttribute("allowfullscreen", "true");
+            player.appendChild(iframe);
+          }
+
+          if (kind === "file") {
+            const video = document.createElement("video");
+            video.className = "w-full h-full";
+            video.src = src;
+            video.controls = true;
+            video.autoplay = true;
+            video.playsInline = true;
+            player.appendChild(video);
+          }
+
+          modal.classList.remove("hidden");
+          modal.classList.add("flex");
+          modal.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+        };
+
+        const closeModal = () => {
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+          modal.setAttribute("aria-hidden", "true");
+          player.innerHTML = "";
+          summaryEl.textContent = "";
+          document.body.style.overflow = "";
+        };
+
+        // 썸네일 버튼 클릭 → 모달 오픈
+        document.addEventListener("click", (e) => {
+          const btn = e.target?.closest?.("[data-open-video='true']");
+          if (!btn) return;
+
+          const kind = btn.getAttribute("data-video-kind") || "";
+          const src = btn.getAttribute("data-video-src") || "";
+          const title = btn.getAttribute("data-video-title") || "";
+          const summaryEncoded = btn.getAttribute("data-video-summary") || "";
+
+          if (!kind || !src) return;
+          openModal(kind, src, title, summaryEncoded);
+        });
+
+        closeBtn.addEventListener("click", closeModal);
+
+        // 모달 바깥 클릭 닫기
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) closeModal();
+        });
+
+        // ESC 닫기
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal();
+        });
+      })();
+    `}
+  </script>
 </section>
