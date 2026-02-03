@@ -42,6 +42,18 @@ function roleIncludes(work: any, keyword: string) {
   return safeLower(work?.info?.role).includes(keyword.toLowerCase());
 }
 
+/**
+ * ✅ 타이틀 끝 숫자 제거
+ * - "메뉴보드01" -> "메뉴보드"
+ * - "메뉴보드 02" -> "메뉴보드"
+ * - "풀배너 01" -> "풀배너"
+ */
+function displayTitle(raw: any) {
+  return String(raw ?? "")
+    .replace(/\s*\d{1,2}\s*$/u, "")
+    .trim();
+}
+
 // "업로드 최신" 기준: works 배열에서 뒤쪽일수록 최신 업로드라고 가정
 const indexBySlug = new Map(
   (Array.isArray(allWorks) ? allWorks : []).map((w: any, i: number) => [
@@ -186,6 +198,9 @@ function encJson(v: any) {
         const tags = Array.isArray(project?.tags) ? project.tags : [];
         const thumb = getThumb(project);
 
+        // ✅ 카드/모달 모두 이 타이틀 사용
+        const cleanTitle = displayTitle(project.title);
+
         return (
           <article
             class="md:col-span-4 group bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
@@ -195,7 +210,7 @@ function encJson(v: any) {
             <div class="relative overflow-hidden aspect-video">
               <img
                 src={thumb}
-                alt={project.title}
+                alt={cleanTitle}
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
@@ -210,7 +225,7 @@ function encJson(v: any) {
                   data-open-homework="true"
                   data-work-index={index}
                   data-src={enc(youtubeUrl)}
-                  data-title={enc(project.title)}
+                  data-title={enc(cleanTitle)}  /* ✅ 여기 중요 */
                   data-summary={enc(project.summary)}
                   data-year={enc(project.info?.year)}
                   data-role={enc(project.info?.role)}
@@ -228,15 +243,13 @@ function encJson(v: any) {
 
             <div class="p-6 pt-4">
               <h3 class="font-heading text-xl text-secondary dark:text-white mb-3 group-hover:text-primary transition-colors duration-300">
-                {project.title}
+                {cleanTitle}
               </h3>
 
-              {/* ✅ summary: 2줄 clamp + … */}
               <p class="work-summary text-secondary/70 dark:text-white/70 mb-4">
                 {project.summary}
               </p>
 
-              {/* ✅ 정보 순서: 작업연도 → 역할 → 태그 */}
               <ul class="text-sm text-secondary/70 dark:text-white/70 space-y-1 mb-3">
                 <li><span class="font-mono">작업연도</span> · {project.info?.year}</li>
                 <li><span class="font-mono">역할</span> · {project.info?.role}</li>
@@ -358,183 +371,216 @@ function encJson(v: any) {
   </style>
 
   <script is:inline>
-    document.addEventListener("DOMContentLoaded", () => {
-      const modal = document.getElementById("home-work-detail-modal");
-      const closeBtn = document.getElementById("home-modal-close");
-      const replayBtn = document.getElementById("home-modal-replay");
-      const prevBtn = document.getElementById("home-modal-prev");
-      const nextBtn = document.getElementById("home-modal-next");
-      const counterEl = document.getElementById("home-modal-counter");
+    {`
+      (() => {
+        if (window.__HOME_WORKS_MODAL_BOUND__) return;
+        window.__HOME_WORKS_MODAL_BOUND__ = true;
 
-      const titleEl = document.getElementById("home-modal-title");
-      const categoryEl = document.getElementById("home-modal-category");
-      const yearEl = document.getElementById("home-modal-year");
-      const roleEl = document.getElementById("home-modal-role");
-      const summaryEl = document.getElementById("home-modal-summary");
-      const tagsEl = document.getElementById("home-modal-tags");
-      const playerHost = document.getElementById("home-modal-player");
-
-      if (!modal || !closeBtn || !replayBtn || !prevBtn || !nextBtn || !counterEl ||
-          !titleEl || !categoryEl || !yearEl || !roleEl || !summaryEl || !tagsEl || !playerHost) return;
-
-      const decode = (s) => {
-        try { return decodeURIComponent(s || ""); } catch { return String(s || ""); }
-      };
-
-      const safeJson = (s) => {
-        try { return JSON.parse(decode(s || "[]")); } catch { return []; }
-      };
-
-      const getYoutubeId = (url = "") => {
-        const m =
-          url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/) ||
-          url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
-          url.match(/\/embed\/([a-zA-Z0-9_-]{6,})/) ||
-          url.match(/\/shorts\/([a-zA-Z0-9_-]{6,})/);
-        return m ? m[1] : "";
-      };
-
-      const categoryLabel = (cat) => {
-        const c = String(cat || "").toLowerCase();
-        if (c === "agency") return "Category · Agency";
-        if (c === "digital-signage") return "Category · Digital Signage";
-        return cat ? `Category · ${cat}` : "Category · -";
-      };
-
-      const renderTags = (tags) => {
-        tagsEl.innerHTML = "";
-        const list = Array.isArray(tags) ? tags : [];
-        if (!list.length) {
-          const empty = document.createElement("span");
-          empty.className = "text-xs text-white/40";
-          empty.textContent = "태그 없음";
-          tagsEl.appendChild(empty);
-          return;
-        }
-        list.forEach((tag) => {
-          const chip = document.createElement("span");
-          chip.className = "px-3 py-1 text-xs font-mono rounded-full bg-white/10 text-white/80 border border-white/10";
-          chip.textContent = tag;
-          tagsEl.appendChild(chip);
-        });
-      };
-
-      // ✅ 버튼 목록을 기준으로 Prev/Next 구성 (JSON 주입 없이 가장 안전)
-      const buttons = Array.from(document.querySelectorAll("button[data-open-homework='true']"));
-      let currentIndex = 0;
-
-      const mountVideo = (src, title) => {
-        playerHost.innerHTML = "";
-        const id = getYoutubeId(src);
-        if (!id) return;
-
-        // ✅ vq=hd1080 로 "HD 선호" 요청 + autoplay
-        const embed = `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1&vq=hd1080`;
-
-        const iframe = document.createElement("iframe");
-        iframe.className = "w-full h-full";
-        iframe.src = embed;
-        iframe.title = title || "YouTube video";
-        iframe.loading = "lazy";
-        iframe.setAttribute("frameborder", "0");
-        iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
-        iframe.setAttribute("allowfullscreen", "true");
-        playerHost.appendChild(iframe);
-
-        // ✅ (가능하면) IFrame API로 hd1080 고정 시도
-        // - 유튜브가 무시할 수 있음. 그래도 시도는 함.
-        const tryLoadApi = () => {
-          if (window.__YT_API_LOADING__) return;
-          if (window.YT && window.YT.Player) return;
-
-          window.__YT_API_LOADING__ = true;
-          const s = document.createElement("script");
-          s.src = "https://www.youtube.com/iframe_api";
-          document.head.appendChild(s);
+        const decode = (s) => {
+          try { return decodeURIComponent(s || ""); } catch { return String(s || ""); }
         };
-        tryLoadApi();
-      };
 
-      const updateNav = () => {
-        const total = buttons.length || 0;
-        counterEl.textContent = `${currentIndex + 1} / ${total}`;
-        prevBtn.disabled = currentIndex <= 0;
-        nextBtn.disabled = currentIndex >= total - 1;
-      };
+        const safeJson = (s) => {
+          try { return JSON.parse(decode(s || "[]")); } catch { return []; }
+        };
 
-      const renderByIndex = (idx) => {
-        const total = buttons.length || 0;
-        if (!total) return;
+        const getYoutubeId = (url = "") => {
+          const m =
+            url.match(/youtu\\.be\\/([a-zA-Z0-9_-]{6,})/) ||
+            url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/) ||
+            url.match(/\\/embed\\/([a-zA-Z0-9_-]{6,})/) ||
+            url.match(/\\/shorts\\/([a-zA-Z0-9_-]{6,})/);
+          return m ? m[1] : "";
+        };
 
-        currentIndex = Math.max(0, Math.min(total - 1, idx));
-        const btn = buttons[currentIndex];
+        const categoryLabel = (cat) => {
+          const c = String(cat || "").toLowerCase();
+          if (c === "agency") return "Category · Agency";
+          if (c === "digital-signage") return "Category · Digital Signage";
+          return cat ? \`Category · \${cat}\` : "Category · -";
+        };
 
-        const src = decode(btn.dataset.src);
-        const title = decode(btn.dataset.title);
-        const summary = decode(btn.dataset.summary);
-        const year = decode(btn.dataset.year);
-        const role = decode(btn.dataset.role);
-        const category = decode(btn.dataset.category);
-        const tags = safeJson(btn.dataset.tags);
+        let els = null;
+        const getEls = () => {
+          if (els) return els;
 
-        titleEl.textContent = title || "";
-        categoryEl.textContent = categoryLabel(category);
-        yearEl.textContent = `작업 연도 · ${year || "-"}`;
-        roleEl.textContent = `역할 · ${role || "-"}`;
-        summaryEl.textContent = summary || "";
-        renderTags(tags);
+          const modal = document.getElementById("home-work-detail-modal");
+          const closeBtn = document.getElementById("home-modal-close");
+          const replayBtn = document.getElementById("home-modal-replay");
+          const prevBtn = document.getElementById("home-modal-prev");
+          const nextBtn = document.getElementById("home-modal-next");
+          const counterEl = document.getElementById("home-modal-counter");
 
-        mountVideo(src, title);
-        updateNav();
-      };
+          const titleEl = document.getElementById("home-modal-title");
+          const categoryEl = document.getElementById("home-modal-category");
+          const yearEl = document.getElementById("home-modal-year");
+          const roleEl = document.getElementById("home-modal-role");
+          const summaryEl = document.getElementById("home-modal-summary");
+          const tagsEl = document.getElementById("home-modal-tags");
+          const playerHost = document.getElementById("home-modal-player");
 
-      const openModalAt = (idx) => {
-        renderByIndex(idx);
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-        modal.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden";
-      };
+          if (!modal || !closeBtn || !replayBtn || !prevBtn || !nextBtn || !counterEl ||
+              !titleEl || !categoryEl || !yearEl || !roleEl || !summaryEl || !tagsEl || !playerHost) {
+            return null;
+          }
 
-      const closeModal = () => {
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-        modal.setAttribute("aria-hidden", "true");
-        playerHost.innerHTML = "";
-        tagsEl.innerHTML = "";
-        summaryEl.textContent = "";
-        document.body.style.overflow = "";
-      };
+          els = { modal, closeBtn, replayBtn, prevBtn, nextBtn, counterEl, titleEl, categoryEl, yearEl, roleEl, summaryEl, tagsEl, playerHost };
+          return els;
+        };
 
-      // ✅ 이벤트 위임으로 “모달 안 뜸” 문제 방지
-      document.addEventListener("click", (e) => {
-        const t = e.target;
-        if (!(t instanceof Element)) return;
+        const renderTags = (tags) => {
+          const e = getEls();
+          if (!e) return;
 
-        const btn = t.closest("button[data-open-homework='true']");
-        if (btn) {
-          e.preventDefault();
+          e.tagsEl.innerHTML = "";
+          const list = Array.isArray(tags) ? tags : [];
+          if (!list.length) {
+            const empty = document.createElement("span");
+            empty.className = "text-xs text-white/40";
+            empty.textContent = "태그 없음";
+            e.tagsEl.appendChild(empty);
+            return;
+          }
+          list.forEach((tag) => {
+            const chip = document.createElement("span");
+            chip.className = "px-3 py-1 text-xs font-mono rounded-full bg-white/10 text-white/80 border border-white/10";
+            chip.textContent = tag;
+            e.tagsEl.appendChild(chip);
+          });
+        };
+
+        const getButtons = () => Array.from(document.querySelectorAll("button[data-open-homework='true']"));
+        let currentIndex = 0;
+
+        const mountVideo = (src, title) => {
+          const e = getEls();
+          if (!e) return;
+
+          e.playerHost.innerHTML = "";
+          const id = getYoutubeId(src);
+          if (!id) return;
+
+          const embed = \`https://www.youtube.com/embed/\${id}?autoplay=1&mute=0&controls=1&rel=0&playsinline=1&vq=hd1080\`;
+
+          const iframe = document.createElement("iframe");
+          iframe.className = "w-full h-full";
+          iframe.src = embed;
+          iframe.title = title || "YouTube video";
+          iframe.loading = "lazy";
+          iframe.setAttribute("frameborder", "0");
+          iframe.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+          iframe.setAttribute("allowfullscreen", "true");
+          e.playerHost.appendChild(iframe);
+        };
+
+        const updateNav = () => {
+          const e = getEls();
+          if (!e) return;
+
+          const buttons = getButtons();
+          const total = buttons.length || 0;
+          e.counterEl.textContent = \`\${currentIndex + 1} / \${total}\`;
+          e.prevBtn.disabled = currentIndex <= 0;
+          e.nextBtn.disabled = currentIndex >= total - 1;
+        };
+
+        const renderByIndex = (idx) => {
+          const e = getEls();
+          if (!e) return;
+
+          const buttons = getButtons();
+          const total = buttons.length || 0;
+          if (!total) return;
+
+          currentIndex = Math.max(0, Math.min(total - 1, idx));
+          const btn = buttons[currentIndex];
+
+          const src = decode(btn.dataset.src);
+          const title = decode(btn.dataset.title); // ✅ 이미 cleanTitle이 들어있음
+          const summary = decode(btn.dataset.summary);
+          const year = decode(btn.dataset.year);
+          const role = decode(btn.dataset.role);
+          const category = decode(btn.dataset.category);
+          const tags = safeJson(btn.dataset.tags);
+
+          e.titleEl.textContent = title || "";
+          e.categoryEl.textContent = categoryLabel(category);
+          e.yearEl.textContent = \`작업 연도 · \${year || "-"}\`;
+          e.roleEl.textContent = \`역할 · \${role || "-"}\`;
+          e.summaryEl.textContent = summary || "";
+          renderTags(tags);
+
+          mountVideo(src, title);
+          updateNav();
+        };
+
+        const openModalAt = (idx) => {
+          const e = getEls();
+          if (!e) return;
+
+          renderByIndex(idx);
+          e.modal.classList.remove("hidden");
+          e.modal.classList.add("flex");
+          e.modal.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+        };
+
+        const closeModal = () => {
+          const e = getEls();
+          if (!e) return;
+
+          e.modal.classList.add("hidden");
+          e.modal.classList.remove("flex");
+          e.modal.setAttribute("aria-hidden", "true");
+          e.playerHost.innerHTML = "";
+          e.tagsEl.innerHTML = "";
+          e.summaryEl.textContent = "";
+          document.body.style.overflow = "";
+        };
+
+        document.addEventListener("click", (ev) => {
+          const t = ev.target;
+          if (!(t instanceof Element)) return;
+
+          const btn = t.closest("button[data-open-homework='true']");
+          if (!btn) return;
+
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+
           const idx = Number(btn.getAttribute("data-work-index") || "0");
           openModalAt(Number.isFinite(idx) ? idx : 0);
-          return;
-        }
-      });
+        }, true);
 
-      prevBtn.addEventListener("click", () => renderByIndex(currentIndex - 1));
-      nextBtn.addEventListener("click", () => renderByIndex(currentIndex + 1));
-      replayBtn.addEventListener("click", () => renderByIndex(currentIndex));
+        const bindModalControlsOnce = () => {
+          const e = getEls();
+          if (!e) return;
+          if (window.__HOME_WORKS_MODAL_CONTROLS__) return;
+          window.__HOME_WORKS_MODAL_CONTROLS__ = true;
 
-      closeBtn.addEventListener("click", closeModal);
-      modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+          e.prevBtn.addEventListener("click", () => renderByIndex(currentIndex - 1));
+          e.nextBtn.addEventListener("click", () => renderByIndex(currentIndex + 1));
+          e.replayBtn.addEventListener("click", () => renderByIndex(currentIndex));
+          e.closeBtn.addEventListener("click", closeModal);
 
-      document.addEventListener("keydown", (e) => {
-        if (modal.classList.contains("hidden")) return;
-        if (e.key === "Escape") closeModal();
-        if (e.key === "ArrowLeft") renderByIndex(currentIndex - 1);
-        if (e.key === "ArrowRight") renderByIndex(currentIndex + 1);
-      });
+          e.modal.addEventListener("click", (evt) => {
+            if (evt.target === e.modal) closeModal();
+          });
 
-      updateNav();
-    });
+          document.addEventListener("keydown", (evt) => {
+            const e2 = getEls();
+            if (!e2) return;
+            if (e2.modal.classList.contains("hidden")) return;
+
+            if (evt.key === "Escape") closeModal();
+            if (evt.key === "ArrowLeft") renderByIndex(currentIndex - 1);
+            if (evt.key === "ArrowRight") renderByIndex(currentIndex + 1);
+          });
+        };
+
+        bindModalControlsOnce();
+      })();
+    `}
   </script>
 </section>
