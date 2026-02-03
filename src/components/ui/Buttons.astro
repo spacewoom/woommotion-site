@@ -24,17 +24,24 @@ const computedRel = target === '_blank'
   : rel;
 
 const variants = {
-  primary: 'bg-primary text-white hover:bg-primary/90',
-  secondary: 'bg-secondary text-white hover:bg-secondary/90',
+  // 기본 채움 버튼(필요 시 사용)
+  primary:
+    'bg-highlightBlue text-white hover:bg-highlightBlue/90 ' +
+    'dark:bg-primary dark:text-neutral-dark dark:hover:bg-primary/90',
+
+  secondary:
+    'bg-secondary text-white hover:bg-secondary/90 ' +
+    'dark:bg-secondary dark:text-white dark:hover:bg-secondary/90',
 
   /**
-   * ✅ 요구사항 반영
-   * - Normal(라이트): 기존 유지 (투명 + 테두리 + primary 텍스트)
+   * ✅ 요구사항 핵심
+   * - Normal(라이트): 기존 유지 = 투명 + 테두리 + primary 텍스트
    * - Night(다크): 밝은 채움(primary) + 어두운 텍스트(neutral-dark)
+   *   (배경과 확실히 분리되게)
    */
   outline:
     'bg-transparent border border-primary text-primary hover:bg-primary/10 ' +
-    'dark:bg-primary dark:text-neutral-dark dark:hover:bg-primary/90',
+    'dark:bg-primary dark:text-neutral-dark dark:border-transparent dark:hover:bg-primary/90',
 };
 
 const sizes = {
@@ -49,10 +56,17 @@ const sizes = {
   target={target}
   rel={computedRel}
   class:list={[
+    // base (공통)
     'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-300 transform hover:scale-104 hover:shadow-button focus:outline-none focus:ring-2 focus:ring-primary/50 focus-visible:ring-2 focus-visible:ring-primary/50',
-    variants[variant],
+
+    // size
     sizes[size],
-    className
+
+    // ✅ className을 먼저 적용 (사용처에서 준 값이 있더라도)
+    className,
+
+    // ✅ variant를 마지막에 적용해서 "최종 승리"하도록
+    variants[variant],
   ]}
   data-aos="fade-up"
 >
