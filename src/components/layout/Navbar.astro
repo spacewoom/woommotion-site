@@ -149,7 +149,8 @@ const homeLink = (hash) => (isHome ? hash : `${prefix}/${hash}`);
     height: 2px;
     bottom: -4px;
     left: 0;
-    background-color: theme('colors.primary');
+    /* ✅ theme('colors.primary') → CSS 변수 기반 컬러로 변경 */
+    background-color: rgb(var(--color-primary-rgb));
     transition: width 0.3s ease;
   }
 
@@ -159,6 +160,7 @@ const homeLink = (hash) => (isHome ? hash : `${prefix}/${hash}`);
   }
 
   .nav-link.active {
-    color: theme('colors.primary');
+    /* ✅ theme('colors.primary') → CSS 변수 기반 컬러로 변경 */
+    color: rgb(var(--color-primary-rgb));
   }
 </style>
