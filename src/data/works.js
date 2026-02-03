@@ -5,9 +5,8 @@
  * - work.info.year 기준 내림차순(최신 → 과거)
  * - year가 없거나 숫자로 변환 불가면 0으로 처리되어 뒤로 감
  *
- * ✅ 카드 개수 규칙:
- * - 기본값: 업로드된 works 개수만큼만 반환(placeholder 없음)
- * - 옵션: targetCount를 숫자로 넘기면 그때만 placeholder로 채움(원할 때만)
+ * ✅ 페이지네이션:
+ * - paginateWorks(list, page, perPage) 제공
  */
 
 // =========================
@@ -47,17 +46,8 @@ function parseYear(value) {
   return Number.isFinite(y) ? y : 0;
 }
 
-function isPlaceholder(work) {
-  return typeof work?.slug === "string" && work.slug.startsWith("placeholder-");
-}
-
 function sortWorksLatestFirst(list) {
   return [...list].sort((a, b) => {
-    const aPh = isPlaceholder(a);
-    const bPh = isPlaceholder(b);
-    if (aPh && !bPh) return 1;
-    if (!aPh && bPh) return -1;
-
     const ay = parseYear(a?.info?.year);
     const by = parseYear(b?.info?.year);
     return by - ay; // 최신이 먼저
@@ -78,40 +68,38 @@ export function getWorksByCategory(category) {
 }
 
 /**
- * (옵션) Placeholder 생성
- * - 이제 기본 출력에서는 사용하지 않음
- * - targetCount를 넘겼을 때만 채우는 용도
+ * 페이지네이션 유틸
+ * @param {Array} list - 정렬된 전체 리스트
+ * @param {number} page - 1부터 시작
+ * @param {number} perPage - 페이지당 개수
  */
-export function makePlaceholders({ count = 0, category = "all" } = {}) {
-  return Array.from({ length: count }, (_, i) => ({
-    title: `추가 작업 준비중 #${i + 1}`,
-    slug: `placeholder-${category}-${i + 1}`,
-    category,
-    image: "/images/projects/card.jpg",
-    tags: ["Coming soon"],
-    summary: "업로드 준비 중입니다.",
-    info: { year: "-", role: "-" },
-    media: { kind: "", src: "" },
-  }));
+export function paginateWorks(list, page = 1, perPage = 30) {
+  const safePerPage =
+    typeof perPage === "number" && Number.isFinite(perPage) && perPage > 0 ? perPage : 30;
+
+  const total = Array.isArray(list) ? list.length : 0;
+  const totalPages = Math.max(1, Math.ceil(total / safePerPage));
+
+  let currentPage = Number(page);
+  if (!Number.isFinite(currentPage) || currentPage < 1) currentPage = 1;
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const start = (currentPage - 1) * safePerPage;
+  const end = start + safePerPage;
+
+  return {
+    items: (list || []).slice(start, end),
+    total,
+    totalPages,
+    currentPage,
+    perPage: safePerPage,
+  };
 }
 
 /**
- * ✅ 기본: 업로드된 작업 수만큼만 반환(placeholder 없음)
- * ✅ 옵션: targetCount(숫자)를 넘기면 그때만 placeholder로 채움
+ * buildGrid: 기존 호출부 호환용
+ * - 이제 placeholder 없이 "정렬된 전체 리스트"만 반환하는 역할로 유지
  */
-export function buildGrid({ category = "all", targetCount = null } = {}) {
-  const baseSorted = getWorksByCategory(category);
-
-  // 기본값: 카드 수 제한/고정 없이 실제 작업만 반환
-  if (typeof targetCount !== "number" || !Number.isFinite(targetCount)) {
-    return baseSorted;
-  }
-
-  // targetCount가 실제 작업 수보다 작거나 같으면 그냥 반환
-  if (targetCount <= baseSorted.length) return baseSorted;
-
-  // targetCount가 더 크면 placeholder로 채움(옵션 기능)
-  const remain = targetCount - baseSorted.length;
-  const filled = [...baseSorted, ...makePlaceholders({ count: remain, category })];
-  return sortWorksLatestFirst(filled);
+export function buildGrid({ category = "all" } = {}) {
+  return getWorksByCategory(category);
 }
