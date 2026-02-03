@@ -11,7 +11,8 @@ const topButtons = [
   { text: "Digital Signage Content", href: `${prefix}/projects/digital-signage`, variant: "outline" },
 ];
 
-const projects = buildGrid({ category: "agency", targetCount: 30 });
+// ✅ agency 작업 개수만큼 자동 반환
+const projects = buildGrid({ category: "agency" });
 ---
 
 <Layout title="Agency Outsourcing" description="Agency Outsourcing works" lang={lang}>
