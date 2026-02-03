@@ -52,7 +52,7 @@ const pageList =
     </div>
 
     {topButtons?.length ? (
-      <div class="flex flex-col sm:flex-row gap-3 justify-center mb-12" data-aos="fade-up">
+      <div class="flex flex-row gap-2 sm:gap-3 justify-center mb-12" data-aos="fade-up">
         {topButtons.map((btn) => {
           const isPrimary = btn.variant === "primary";
           return (
@@ -60,8 +60,8 @@ const pageList =
               href={btn.href}
               class={
                 isPrimary
-                  ? "inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-6 bg-primary text-white hover:bg-primary/90"
-                  : "inline-flex items-center justify-center rounded-lg font-medium text-base py-2 px-6 border border-primary text-primary hover:bg-primary/10 bg-transparent"
+                  ? "inline-flex items-center justify-center rounded-lg font-medium w-1/2 sm:w-[220px] text-sm sm:text-base py-2 px-3 sm:px-6 bg-primary text-white hover:bg-primary/90 whitespace-nowrap"
+                  : "inline-flex items-center justify-center rounded-lg font-medium w-1/2 sm:w-[220px] text-sm sm:text-base py-2 px-3 sm:px-6 border border-primary text-primary hover:bg-primary/10 bg-transparent whitespace-nowrap"
               }
             >
               {btn.text}
