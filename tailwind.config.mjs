@@ -1,72 +1,193 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
-  darkMode: 'class',
-  theme: {
-    extend: {
-      colors: {
-        // ✅ 모드별 primary 자동 변경 (global.css의 --color-primary-rgb를 따라감)
-        primary: 'rgb(var(--color-primary-rgb) / <alpha-value>)',
+---
+import {
+  VideoIcon,
+  PaletteIcon,
+  RocketIcon,
+  KanbanSquareIcon,
+  ClapperboardIcon,
+  PenToolIcon,
+  ImageIcon,
+  CameraIcon,
+  BracesIcon,
+  Globe2Icon,
+  Edit3Icon,
+} from '@lucide/astro';
 
-        // ✅ 가독성 개선: 너무 탁하게 느껴지지 않으면서 정보 전달력이 좋은 딥 차콜 그린
-        // 기존: '#233630'
-        secondary: '#182421',
+import { t } from '../../utils/i18n';
 
-        // ✅ highlightBlue는 더 진한 톤(포커스 링/강조선이 라이트 배경에서도 확실히 보이게)
-        // 그라데이션 끝 색(#7CA69A)은 gradient 전용으로만 사용
-        highlightBlue: '#2C423C',
+interface Props {
+  lang: string | undefined;
+}
 
-        neutral: {
-          bg: '#FAFAF0',
-          dark: '#333331',
-        },
-      },
+const { lang } = Astro.props;
 
-      fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        heading: ['Sora', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
-      },
-
-      fontSize: {
-        h1: 'clamp(3rem, 5vw, 4.5rem)',
-        h2: 'clamp(2.25rem, 4vw, 3rem)',
-        body: 'clamp(1rem, 1.125vw, 1.125rem)',
-      },
-
-      maxWidth: {
-        container: '1280px',
-      },
-
-      gridTemplateColumns: {
-        12: 'repeat(12, minmax(0, 1fr))',
-      },
-
-      gap: {
-        gutter: '24px',
-      },
-
-      // ✅ 버튼 섀도는 기존 의도대로 유지(#2C423C 계열)
-      boxShadow: {
-        button: '0 4px 12px 0 rgba(44,66,60,0.25)',
-      },
-
-      transitionProperty: {
-        transform: 'transform',
-      },
-
-      backgroundImage: {
-        // ✅ primary(모드별) → #7CA69A(그라데이션 전용)로 연결
-        akzentGradient:
-          'linear-gradient(180deg, rgb(var(--color-primary-rgb)) 0%, #7CA69A 100%)',
-      },
-    },
-
-    screens: {
-      sm: '600px',
-      md: '960px',
-      lg: '1280px',
-    },
-  },
-  plugins: [],
+type Tool = {
+  name: string;
+  icon: any; // lucide astro component
+  iconSrc?: string; // /public 경로 아이콘을 쓸 때만 지정
 };
+
+type Cluster = {
+  id: string;
+  title: string;
+  description: string;
+  icon: any;
+  tools: Tool[];
+};
+
+const skillClusters: Cluster[] = [
+  {
+    id: 'motion-editing',
+    title: '모션/편집 (Motion & Editing)',
+    description:
+      '브랜드 톤에 맞춘 모션그래픽·타이포 애니메이션·루프 영상 제작에 최적화된 툴 체인입니다.',
+    icon: VideoIcon,
+    tools: [
+      { name: 'After Effects', icon: ClapperboardIcon },
+      {
+        name: 'Media Encoder',
+        icon: VideoIcon,
+        iconSrc: '/tools/media-encoder.svg',
+      },
+      {
+        name: 'Procreate',
+        icon: PenToolIcon,
+        iconSrc: '/tools/procreate.svg',
+      },
+    ],
+  },
+  {
+    id: 'design-assets',
+    title: '디자인/에셋 제작 (Design & Assets)',
+    description:
+      '클라이언트의 니즈와 컨셉을 반영해 레이아웃·키비주얼·에셋을 목적에 맞게 설계합니다.',
+    icon: PaletteIcon,
+    tools: [
+      { name: 'Photoshop', icon: ImageIcon },
+      { name: 'Illustrator', icon: PenToolIcon },
+      {
+        name: 'Procreate',
+        icon: PenToolIcon,
+        iconSrc: '/tools/procreate.svg',
+      },
+    ],
+  },
+  {
+    id: 'ai-assisted',
+    title: 'AI 제작 보조 (AI Assisted)',
+    description:
+      '아이디어 확장과 레퍼런스 탐색, 숏폼 소재 제작, 반복 작업 효율화를 위해 AI 툴을 보조적으로 활용합니다.',
+    icon: RocketIcon,
+    tools: [
+      { name: 'Sora', icon: CameraIcon, iconSrc: '/tools/sora.svg' },
+      {
+        name: 'Nanobanana',
+        icon: ImageIcon,
+        iconSrc: '/tools/nanobanana.svg',
+      },
+      { name: 'Veo', icon: VideoIcon, iconSrc: '/tools/veo.svg' },
+      // Kling은 준비한 공용 비디오 아이콘(video.svg)로 처리
+      { name: 'Kling', icon: VideoIcon },
+      { name: 'ChatGPT', icon: BracesIcon },
+    ],
+  },
+  {
+    id: 'collab-delivery',
+    title: '협업 & 딜리버리 (Collaboration & Delivery)',
+    description:
+      '빠른 소통과 피드백 반영, 일정 준수, 명확한 기준으로 안정적으로 납품합니다.',
+    icon: KanbanSquareIcon,
+    tools: [
+      {
+        name: 'KakaoTalk',
+        icon: Edit3Icon,
+        iconSrc: '/tools/kakaotalk.svg',
+      },
+      {
+        name: 'Google Drive',
+        icon: Globe2Icon,
+        iconSrc: '/tools/google-drive.svg',
+      },
+    ],
+  },
+];
+---
+
+<section id="skills" class="py-16 md:py-24">
+  <div class="max-w-container mx-auto px-6">
+    <div class="mb-8 md:mb-10 text-center" data-aos="fade-up" data-aos-duration="800">
+      <h2 class="font-heading text-h2 text-secondary dark:text-white mb-4">
+        {t('skills.title', lang)}
+      </h2>
+      <p class="text-secondary/70 dark:text-white/70 max-w-2xl mx-auto">
+        {t('skills.subtitle', lang)}
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+      {skillClusters.map((cluster, index) => (
+        <div
+          id={cluster.id}
+          class="skill-cluster bg-white dark:bg-neutral-dark border border-gray-100 dark:border-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300"
+          data-aos="fade-up"
+          data-aos-duration="600"
+          data-aos-delay={index * 150}
+        >
+          <div class="cluster-header flex items-center mb-4">
+            <div class="icon-container mr-4 text-primary bg-primary/5 p-3 rounded-lg">
+              <cluster.icon size={26} stroke-width={1.75} />
+            </div>
+            <h3 class="font-heading text-xl text-secondary dark:text-white">
+              {cluster.title}
+            </h3>
+          </div>
+
+          <p class="text-secondary/70 dark:text-white/70 mb-4 cluster-description">
+            {cluster.description}
+          </p>
+
+          <div class="cluster-tools grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6">
+            {cluster.tools.map((tool) => (
+              <div class="tool-item flex flex-col items-center text-center">
+                <div class="tool-icon text-primary bg-primary/5 p-3 rounded-lg mb-2">
+                  {tool.iconSrc ? (
+                    <span
+                      class="tool-svg w-5 h-5"
+                      aria-label={`${tool.name} icon`}
+                      style={`--icon-url: url('${tool.iconSrc}')`}
+                    ></span>
+                  ) : (
+                    <tool.icon size={20} stroke-width={1.75} />
+                  )}
+                </div>
+                <p class="text-sm font-medium text-secondary dark:text-white">{tool.name}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Skills section will be animated via the animations.js file
+</script>
+
+<style>
+  /* Monochrome SVG icons from /tools/ follow currentColor (e.g., text-primary) */
+  .tool-svg {
+    display: inline-block;
+    background-color: currentColor;
+
+    -webkit-mask-image: var(--icon-url);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+
+    mask-image: var(--icon-url);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+</style>
