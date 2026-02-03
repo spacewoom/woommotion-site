@@ -361,6 +361,63 @@ function encJson(v: any) {
   </div>
 
   <style is:inline>
+    @media (max-width: 640px) {
+  /* 헤더: 상단 타이틀+정보 / 우측 Close / 아래 Nav */
+  .home-modal-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* ✅ 작업정보(칩) 1행 가로 정렬 */
+  .home-modal-chips {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;          /* 줄바꿈 없이 1행 유지 */
+    gap: 8px;
+    align-items: center;
+    overflow: hidden;           /* 넘치면 숨김 */
+  }
+
+  /* 칩이 너무 길면 내부 텍스트를 말줄임 */
+  .home-modal-chip {
+    max-width: 33%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ✅ 공간이 부족하면(아주 작은 화면) 작업정보 통째로 숨김 */
+  @media (max-width: 380px) {
+    .home-modal-chips { display: none; }
+  }
+
+  /* 액션 영역: Close는 상단 우측, Nav는 아래줄 */
+  .home-modal-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .home-modal-closewrap {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .home-modal-nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* 터치 영역 살짝 키우기(선택) */
+  #home-modal-prev,
+  #home-modal-next,
+  #home-modal-close {
+    padding: 10px 12px;
+  }
+}
     .work-summary{
       font-size:0.8em;
       display:-webkit-box;
